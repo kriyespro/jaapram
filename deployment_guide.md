@@ -20,7 +20,7 @@ mkdir -p /var/www/jaapram
 cd /var/www/jaapram
 
 # Clone the repository
-git clone https://github.com/your-username/sd-dj-ramjaap2-pro.git .
+git clone https://github.com/kriyespro/jaapram.git .
 ```
 
 ## 2. Set Up Virtual Environment
@@ -46,12 +46,12 @@ pip install -r ram_naam_jaap/requirements.txt
 sudo -u postgres psql
 
 # Create database and user
-CREATE DATABASE jaapram;
-CREATE USER jaapram_user WITH PASSWORD 'strong_password_here';
-ALTER ROLE jaapram_user SET client_encoding TO 'utf8';
-ALTER ROLE jaapram_user SET default_transaction_isolation TO 'read committed';
-ALTER ROLE jaapram_user SET timezone TO 'UTC';
-GRANT ALL PRIVILEGES ON DATABASE jaapram TO jaapram_user;
+CREATE DATABASE ramjaap_db;
+CREATE USER ramjaap_user WITH PASSWORD 'Durga98765Durga@@@@@';
+ALTER ROLE ramjaap_user SET client_encoding TO 'utf8';
+ALTER ROLE ramjaap_user SET default_transaction_isolation TO 'read committed';
+ALTER ROLE ramjaap_user SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE ramjaap_db TO ramjaap_user;
 \q
 ```
 
@@ -68,18 +68,18 @@ Add the following environment variables:
 
 ```
 DJANGO_ENV=production
-SECRET_KEY=your_secure_secret_key_here
-DATABASE_URL=postgres://jaapram_user:strong_password_here@localhost:5432/jaapram
-ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
+SECRET_KEY=django-insecure-h1w8&!xv2u5z+z7r-*!%p&br_4%dv4$t(b(@0$pwshr=ahfvnf
+DATABASE_URL=postgres://ramjaap_user:Durga98765Durga@@@@@/@localhost:5432/ramjaap_db
+ALLOWED_HOSTS=jaapram.com,www.jaapram.com
 REDIS_URL=redis://localhost:6379/1
 ADMIN_URL=durga/
 DASHBOARD_URL=admin/
 EMAIL_HOST=smtp.example.com
 EMAIL_PORT=587
-EMAIL_HOST_USER=your_email@example.com
-EMAIL_HOST_PASSWORD=your_email_password
+EMAIL_HOST_USER=noreply@jaapram.com
+EMAIL_HOST_PASSWORD=email-password-change-me
 EMAIL_USE_TLS=True
-DEFAULT_FROM_EMAIL=noreply@yourdomain.com
+DEFAULT_FROM_EMAIL=noreply@jaapram.com
 ```
 
 ## 5. Deploy Static Files
@@ -90,7 +90,7 @@ source venv/bin/activate
 cd ram_naam_jaap
 
 # Collect static files
-python manage.py collectstatic --no-input
+    python manage.py collectstatic --no-input
 ```
 
 ## 6. Run Migrations and Create Superuser
@@ -159,7 +159,7 @@ Add the following configuration:
 ```nginx
 server {
     listen 80;
-    server_name yourdomain.com www.yourdomain.com;
+    server_name jaapram.com www.jaapram.com;
 
     # Redirect HTTP to HTTPS
     return 301 https://$host$request_uri;
@@ -167,11 +167,11 @@ server {
 
 server {
     listen 443 ssl;
-    server_name yourdomain.com www.yourdomain.com;
+    server_name jaapram.com www.jaapram.com;
 
     # SSL configuration
-    ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/jaapram.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/jaapram.com/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_prefer_server_ciphers on;
     ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256';
@@ -241,7 +241,7 @@ sudo systemctl restart nginx
 
 ```bash
 sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+sudo certbot --nginx -d jaapram.com -d www.jaapram.com
 ```
 
 ## 10. Redis and Celery Setup (Optional but Recommended)
@@ -330,14 +330,14 @@ BACKUP_DIR="/var/backups/jaapram"
 mkdir -p $BACKUP_DIR
 
 # Database backup
-pg_dump -U jaapram_user jaapram | gzip > "$BACKUP_DIR/jaapram_db_$DATE.sql.gz"
+pg_dump -U ramjaap_user ramjaap_db | gzip > "$BACKUP_DIR/ramjaap_db_$DATE.sql.gz"
 
 # Media files backup
-tar -czf "$BACKUP_DIR/jaapram_media_$DATE.tar.gz" /var/www/jaapram/ram_naam_jaap/media
+tar -czf "$BACKUP_DIR/ramjaap_media_$DATE.tar.gz" /var/www/jaapram/ram_naam_jaap/media
 
 # Keep only the last 7 backups
-find $BACKUP_DIR -name "jaapram_db_*.sql.gz" -type f -mtime +7 -delete
-find $BACKUP_DIR -name "jaapram_media_*.tar.gz" -type f -mtime +7 -delete
+find $BACKUP_DIR -name "ramjaap_db_*.sql.gz" -type f -mtime +7 -delete
+find $BACKUP_DIR -name "ramjaap_media_*.tar.gz" -type f -mtime +7 -delete
 ```
 
 Make the script executable:
@@ -418,7 +418,7 @@ sudo journalctl -u jaapram-celerybeat -f
 
 3. Manually test database connection:
    ```bash
-   psql postgres://jaapram_user:password@localhost:5432/jaapram
+   psql postgres://ramjaap_user:Durga98765Durga@@@@@/@localhost:5432/ramjaap_db
    ```
 
 ### Static Files Not Found
