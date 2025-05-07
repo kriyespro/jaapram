@@ -1,0 +1,181 @@
+# Project Management Plan for Ram Naam Jaap
+
+## Project Overview
+Ram Naam Jaap is a comprehensive spiritual platform built using Django 5 with a multi-application architecture that allows different components to run as independent services while maintaining a unified user experience. The platform uses Jinja2 as the primary template engine for frontend templates, with Django's built-in templates reserved for the admin interface.
+
+## Technical Architecture
+
+### Core Components
+
+1. **Base Application** (Port 8000)
+   - Main user-facing application
+   - Authentication and user management
+   - Homepage and core functionalities
+   - Jaap (meditation) tracking and analytics
+
+2. **Admin Dashboard** (Port 8001)
+   - Custom admin interface for staff
+   - User management tools
+   - Content management
+   - System monitoring and reporting
+
+3. **API Service** (Port 8002)
+   - RESTful API for mobile apps and third-party integrations
+   - Authentication via tokens
+   - Documentation with drf-spectacular
+
+4. **Blog Platform** (Port 8003)
+   - Content publishing system
+   - Article management
+   - Comments and interactions
+
+5. **Community Platform** (Port 8004)
+   - User forums and discussions
+   - Real-time chat via WebSockets
+   - Group management
+
+### Technology Stack
+
+- **Backend**: Django 5.0
+- **Primary Template Engine**: Jinja2 (for all user-facing templates)
+- **Secondary Template Engine**: Django Templates (for admin interface only)
+- **Frontend**: Tailwind CSS, Alpine.js
+- **Database**: PostgreSQL
+- **Caching**: Redis
+- **Task Queue**: Celery
+- **Web Server**: Nginx
+- **Application Server**: Gunicorn
+- **Process Management**: Supervisor
+- **Container Management**: Docker (optional)
+
+## Directory Structure
+
+```
+ram_naam_jaap/
+├── accounts/              # User authentication and profiles
+├── community/             # Community and forums app
+├── config/                # Project configuration
+│   ├── settings/          # Settings for different environments
+│   │   ├── admin/         # Admin app specific settings
+│   │   ├── api/           # API specific settings
+│   │   ├── blog/          # Blog specific settings
+│   │   ├── community/     # Community specific settings
+│   │   ├── base.py        # Base settings
+│   │   ├── local.py       # Local development settings
+│   │   └── production.py  # Production settings
+│   ├── jinja2.py          # Jinja2 environment configuration
+│   ├── urls.py            # Root URL configuration
+│   ├── asgi.py            # ASGI configuration
+│   └── wsgi.py            # WSGI configuration
+├── core/                  # Core functionality
+│   ├── middleware/        # Custom middleware
+│   ├── management/        # Custom management commands
+│   ├── templatetags/      # Custom template tags
+│   └── utils/             # Utility functions
+├── dashboard/             # Admin dashboard app
+├── jaap/                  # Main jaap tracking app
+├── blog/                  # Blog application
+├── media/                 # User-uploaded files
+├── static/                # Static files
+├── staticfiles/           # Collected static files
+├── templates/             # Templates directory
+│   ├── account/           # Authentication templates
+│   ├── admin/             # Admin interface templates
+│   ├── blog/              # Blog templates
+│   ├── community/         # Community templates
+│   ├── dashboard/         # Dashboard templates
+│   ├── jaap/              # Jaap app templates
+│   └── layouts/           # Base layout templates
+└── theme/                 # Tailwind theme app
+```
+
+## Deployment Architecture
+
+### Development Environment
+- Each app can be run independently using the `durga.py` script
+- Shared database for ease of development
+- In-memory cache for simplicity
+
+### Production Environment
+- Nginx as the main reverse proxy
+- Path-based routing for main domain (ramjaap.in)
+- Subdomain-based isolation for specific applications
+- Separate database connections for optimal performance
+- Redis for caching and Celery task queue
+- Supervisor for process management
+
+## Database Design
+
+### Shared Tables
+- User accounts and profiles
+- Core application data
+- Configuration settings
+
+### App-Specific Tables
+- Blog posts, categories, tags
+- Community forums, threads, posts
+- Admin-specific analytics and logs
+
+## Caching Strategy
+- Page-level caching for static content
+- Template fragment caching for dynamic parts
+- Redis-backed session store
+- Cache versioning to prevent stale data
+- Cache-busting for static assets
+
+## Frontend Framework
+- Jinja2 templates for all user-facing pages
+- Django's template engine for admin interface
+- Tailwind CSS for styling (via CDN)
+- Alpine.js for interactive UI components (via CDN)
+- No HTMX or React as per requirements
+
+## Security Measures
+- CSRF protection for all forms
+- XSS prevention through template auto-escaping
+- SQL injection prevention via Django ORM
+- Rate limiting for API endpoints
+- JWT-based authentication for API
+- Admin access restrictions via middleware
+- HTTPS enforcement in production
+
+## Testing Strategy
+- Unit tests for model methods and utility functions
+- Integration tests for views and forms
+- End-to-end tests for critical user journeys
+- Load testing for high-traffic endpoints
+- Security testing with tools like Bandit
+
+## Backup and Disaster Recovery
+- Automated daily database backups
+- Static and media file backups
+- Periodic testing of restoration procedures
+- High-availability setup for critical components
+
+## Management Tools
+- Durga script (`durga.py`) for development utilities
+- Custom Django management commands for maintenance
+- Logging and monitoring setup for production
+- Error tracking and reporting
+
+## Development Workflow
+1. Create feature branches from development
+2. Run tests locally before push
+3. CI/CD pipeline for automated testing
+4. Code review before merging
+5. Deployment to staging for final testing
+6. Production deployment with rollback capability
+
+## Project Timeline
+- Phase 1: Core application and user authentication
+- Phase 2: Admin dashboard and reporting tools
+- Phase 3: Community features and user engagement
+- Phase 4: Blog platform and content management
+- Phase 5: API service for mobile applications
+- Phase 6: Performance optimization and scaling
+
+## Ongoing Maintenance
+- Regular dependency updates
+- Security patches and audits
+- Performance monitoring and optimization
+- User feedback collection and implementation 

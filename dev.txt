@@ -1,0 +1,328 @@
+# Ram Naam Jaap Application - Technical Implementation Document
+
+## Technical Architecture Overview
+
+This document outlines the technical approach for building the Ram Naam Jaap application. The architecture follows Django's MVT pattern with modern frontend enhancements.
+
+### System Architecture
+
+```
+User Request → Nginx → Gunicorn → Django Application ↔ Redis Cache
+                                          ↕
+                                    PostgreSQL Database
+```
+
+### Component Interaction
+
+1. **Frontend Layer**:
+   - Jinja2 templates with Tailwind CSS for styling
+   - Alpine.js for reactive UI components
+   - HTMX for partial page updates without full reloads
+
+2. **Application Layer**:
+   - Django 5 views (Class-based where appropriate)
+   - Django forms for data validation
+   - Custom middleware for request processing
+
+3. **Data Layer**:
+   - Django ORM for database interactions
+   - Redis for caching and real-time counters
+   - PostgreSQL for persistent storage (both local development and production)
+
+## Development Roadmap & Todo List
+
+### Phase 1: Project Setup (Days 1-3)
+
+- [x] Initialize Git repository
+- [ ] Create Django project structure
+- [ ] Set up virtual environment
+- [ ] Install and configure dependencies
+- [ ] Configure settings (base, local, production)
+- [ ] Set up Docker configuration
+- [ ] Create `.env` file for environment variables
+- [ ] Set up static and media file configuration
+- [ ] Configure custom admin URL (/durga)
+- [ ] Create custom dashboard URL (/admin)
+- [ ] Configure PostgreSQL database connection for local development
+- [ ] Set up Redis connection
+- [ ] Configure Tailwind CSS
+- [ ] Set up Alpine.js
+- [ ] Configure HTMX
+- [ ] Set up Jinja2 templates
+- [ ] Create base templates and layouts
+- [x] Create .cursorigone file
+
+### Phase 2: Core & Authentication (Days 4-7)
+
+- [ ] Create core app
+- [ ] Implement base models
+- [ ] Create accounts app
+- [ ] Extend Django User model with custom fields
+- [ ] Implement user registration
+- [ ] Implement login/logout functionality
+- [ ] Create profile management system
+- [ ] Implement password reset functionality
+- [ ] Create user profile page
+- [ ] Add city/location field to profile
+- [ ] Set up email verification
+- [ ] Add profile picture upload
+- [ ] Create test users
+- [ ] Write tests for authentication
+
+### Phase 3: Jaap Functionality (Days 8-12)
+
+- [ ] Create jaap app
+- [ ] Design and implement JaapSession model
+- [ ] Design and implement JaapCount model
+- [ ] Create Jaap entry interface
+- [ ] Implement real-time counter with Alpine.js
+- [ ] Set up Redis for counter performance
+- [ ] Create session management
+- [ ] Implement persistence for interrupted sessions
+- [ ] Create Jaap history view
+- [ ] Implement HTMX for real-time updates
+- [ ] Add visual feedback for successful entries
+- [ ] Optimize for mobile devices
+- [ ] Write tests for jaap functionality
+
+### Phase 4: Dashboard & Statistics (Days 13-17)
+
+- [ ] Create dashboard app
+- [ ] Implement personal statistics views
+- [ ] Create Target model
+- [ ] Implement target setting functionality
+- [ ] Create Achievement model
+- [ ] Implement achievement system
+- [ ] Design and build dashboard UI
+- [ ] Create data visualization components
+- [ ] Implement streak tracking
+- [ ] Add milestone notifications
+- [ ] Create personal history charts
+- [ ] Optimize queries with select_related/prefetch_related
+- [ ] Implement Redis caching for statistics
+- [ ] Write tests for dashboard functionality
+
+### Phase 5: Community Features (Days 18-22)
+
+- [ ] Create community app
+- [ ] Implement global leaderboard
+- [ ] Create city-wise leaderboards
+- [ ] Implement total count display
+- [ ] Add user count statistics
+- [ ] Create community pages
+- [ ] Implement HTMX for real-time leaderboard updates
+- [ ] Add social sharing functionality
+- [ ] Optimize leaderboard queries
+- [ ] Cache leaderboard data in Redis
+- [ ] Write tests for community features
+
+### Phase 6: Testing & Optimization (Days 23-25)
+
+- [ ] Conduct comprehensive testing
+- [ ] Profile and optimize database queries
+- [ ] Implement additional caching where needed
+- [ ] Fix any bugs or issues
+- [ ] Refactor code for maintainability
+- [ ] Optimize frontend assets
+- [ ] Implement proper error handling
+- [ ] Add logging
+- [ ] Review security measures
+- [ ] Complete documentation
+
+### Phase 7: Deployment (Days 26-28)
+
+- [ ] Prepare production settings
+- [ ] Set up CI/CD pipeline
+- [ ] Configure PostgreSQL for production
+- [ ] Set up Redis for production
+- [ ] Configure static file serving
+- [ ] Set up media file storage
+- [ ] Configure Nginx and Gunicorn
+- [ ] Implement SSL
+- [ ] Set up monitoring
+- [ ] Perform deployment testing
+- [ ] Create backup procedures
+
+## Technical Implementation Details
+
+### Custom Admin Configuration
+
+```python
+# In project URLs.py
+urlpatterns = [
+    path('durga/', admin.site.urls),  # Rename Django admin
+    path('admin/', include('core.dashboard_urls')),  # Custom dashboard
+]
+
+# In settings.py
+ADMIN_SITE_HEADER = "Ram Naam Jaap Administration"
+ADMIN_SITE_TITLE = "Ram Naam Jaap Admin Portal"
+ADMIN_INDEX_TITLE = "Welcome to Ram Naam Jaap Admin"
+```
+
+### Extended User Model
+
+```python
+# In accounts/models.py
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    city = models.CharField(max_length=100, blank=True)
+    profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
+    
+    def __str__(self):
+        return f"{self.user.username}'s profile"
+```
+
+### Real-time Counter Implementation
+
+```python
+# In jaap/views.py
+class JaapCounterView(LoginRequiredMixin, View):
+    def post(self, request):
+        # Increment counter in Redis for performance
+        redis_client = get_redis_connection("default")
+        session_key = f"jaap:session:{request.user.id}:{timezone.now().date()}"
+        redis_client.incr(session_key)
+        
+        # Every 10 counts, update the database for persistence
+        count = int(redis_client.get(session_key))
+        if count % 10 == 0:
+            self._update_database(request.user, count)
+            
+        return JsonResponse({"count": count})
+    
+    def _update_database(self, user, count):
+        today = timezone.now().date()
+        jaap_count, created = JaapCount.objects.get_or_create(
+            user=user,
+            date=today,
+            defaults={"count": 0}
+        )
+        
+        if not created:
+            jaap_count.count = count
+            jaap_count.save()
+```
+
+### Leaderboard Query Optimization
+
+```python
+# In community/views.py
+class GlobalLeaderboardView(View):
+    def get(self, request):
+        # Cache key based on date to refresh daily
+        cache_key = f"global_leaderboard:{timezone.now().date()}"
+        leaderboard = cache.get(cache_key)
+        
+        if not leaderboard:
+            # Optimized query with annotations and select_related
+            leaderboard = User.objects.annotate(
+                total_count=Sum('jaap_counts__count')
+            ).select_related('profile').order_by('-total_count')[:100]
+            
+            # Cache for 1 hour
+            cache.set(cache_key, leaderboard, 60*60)
+            
+        return render(request, 'community/leaderboard.html', {'leaderboard': leaderboard})
+```
+
+### Alpine.js Counter Component
+
+```html
+<!-- In jaap/templates/jaap/counter.html -->
+<div x-data="{ count: 0, jaapText: '', isFocused: false }">
+    <div class="text-center my-8">
+        <h1 class="text-5xl font-bold" x-text="count">0</h1>
+        <p class="text-lg text-gray-600">Ram Naam Jaap Count</p>
+    </div>
+    
+    <form @submit.prevent="submitJaap()">
+        <div class="relative">
+            <input
+                type="text"
+                x-model="jaapText"
+                @focus="isFocused = true"
+                @blur="isFocused = false"
+                @keydown.enter.prevent="submitJaap()"
+                class="w-full p-4 text-xl border rounded-lg"
+                :class="{'ring-2 ring-blue-500': isFocused}"
+                placeholder="Type 'Ram' here..."
+            >
+        </div>
+    </form>
+    
+    <script>
+        function submitJaap() {
+            if (this.jaapText.trim().toLowerCase() === 'ram') {
+                // HTMX request to increment counter
+                htmx.ajax('POST', '/jaap/increment/', {
+                    target: '#counter-value',
+                    swap: 'innerHTML'
+                });
+                
+                // Increment local counter
+                this.count++;
+                
+                // Clear input
+                this.jaapText = '';
+                
+                // Provide visual feedback
+                const feedback = document.getElementById('feedback');
+                feedback.classList.remove('opacity-0');
+                setTimeout(() => {
+                    feedback.classList.add('opacity-0');
+                }, 500);
+            }
+        }
+    </script>
+</div>
+```
+
+## Performance Considerations
+
+1. **Database Optimization**:
+   - Use select_related and prefetch_related for queries with foreign keys
+   - Create appropriate indexes for frequently queried fields on PostgreSQL
+   - Use Django's F() expressions to avoid race conditions
+   - Configure PostgreSQL for optimal performance in both development and production
+   - Set up proper connection pooling for PostgreSQL
+
+2. **Caching Strategy**:
+   - Cache leaderboards with reasonable expiration
+   - Use Redis for session data and counters
+   - Implement cache versioning for easy invalidation
+
+3. **Real-time Counter Performance**:
+   - Store counter updates in Redis
+   - Batch database updates
+   - Use WebSockets or HTMX for real-time UI updates
+
+4. **Front-end Performance**:
+   - Minify and bundle static assets
+   - Use lazy loading for images
+   - Implement proper frontend caching
+
+## Security Considerations
+
+1. **Authentication Security**:
+   - Enforce strong password policy
+   - Implement rate limiting for login attempts
+   - Use HTTPS everywhere
+
+2. **Data Validation**:
+   - Validate all user inputs
+   - Use Django's form validation
+   - Sanitize data before display
+
+3. **CSRF Protection**:
+   - Enable Django's CSRF middleware
+   - Use proper CSRF tokens in forms
+
+4. **XSS Prevention**:
+   - Use Django's template escaping
+   - Validate and sanitize user-generated content
+
+5. **Database Security**:
+   - Use parameterized queries (Django ORM handles this)
+   - Limit database user permissions
+   - Regularly backup database 

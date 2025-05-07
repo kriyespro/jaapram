@@ -1,0 +1,34 @@
+idea : - build a ram naam jaap app , user can login & can type ram naam , ram naam count ,can check others bhakts too , set naam jaap target too , show a big real time naam counter when user tyep in text box.
+
+sigh in redirect will be text form box with option to type ram naam. keep app simple.
+main feture login - type ram naam in text form box - a home page landing page to show ladderboard and total number of ram naam jaap couter , total number of user , in ladderboard show city too . a very good looking home page.
+
+tech: django 5 ,tailwind css ,alpine js , htmx , pgsql for local and production - i dont want to use sqlite, jinja2 tempates fully replace django defult tempates , use redis server too .
+
+
+on besed on idea , now create a ba.txt file think like a buiness anaysist and plan featuers of the app .
+
+then based on ba.txt think like a project manager  act & plan the project with folder stuture and all details create pm.txt file 
+
+
+then beased on pm.txt now think like sr. software engineer and create a dev.txt and create a road map todo list then start coding and make successfull app , also after each feture finish test the app (run test )
+
+build step buy step carefull ,i need production ready app without any error. 
+
+after geanrating all txt file wait for confimation to start build / coding .
+
+
+use agile development method plan in ag.txt
+also fix any conflicts . betwwen all txt files
+
+create dummy.py for ganarate 108 dummy devotee & ramdom jaap count , each name of devotee shhould be indian context name , city should be indian ,also can it possble to one dummy created on 24 hour scripy auto auto run and add 108 to 1008 ram naam jaap in these dummy devttro jaap count
+
+
+update : 070525 
+on hero section show live map 
+City Detection via IP	Use ip-api.com/json (free, no API key)
+🔹 Live Map with City Pins (Leaflet.js)	Real-time jaap count shown per city
+🔹 Backend Count Aggregation	Store city + count + timestamp
+🔹 API to Serve Map Data	JSON of city-wise jaap totals
+🔹 Polling for Updates (Every 30s)	No WebSockets; keep frontend light
+🔹 Jaap Today Total on Top Bar	Simple display of today’s global jaap

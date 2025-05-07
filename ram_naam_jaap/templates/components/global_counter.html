@@ -1,0 +1,26 @@
+<div 
+    id="global-jaap-counter" 
+    class="bg-orange-100 text-primary font-semibold text-sm py-1 px-3 rounded-full flex items-center"
+    x-data="{ count: 0 }"
+    x-init="
+        fetch('{{ url('jaap:map_data') }}')
+            .then(response => response.json())
+            .then(data => { count = data.today_total })
+            .catch(error => console.error('Error fetching global count:', error));
+            
+        // Poll every 30 seconds
+        setInterval(() => {
+            fetch('{{ url('jaap:map_data') }}')
+                .then(response => response.json())
+                .then(data => { count = data.today_total })
+                .catch(error => console.error('Error fetching global count:', error));
+        }, 30000);
+    "
+>
+    <i class="fas fa-globe-asia mr-1"></i>
+    <span>Today:</span>
+    <span 
+        class="ml-1 font-bold" 
+        x-text="count.toLocaleString()"
+    >0</span>
+</div> 

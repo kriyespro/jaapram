@@ -1,0 +1,106 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Ram Naam Jaap - Global Leaderboard{% endblock %}
+
+{% block extra_head %}
+    <meta name="description" content="View the top Ram Naam Jaap practitioners globally.">
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Page Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Global Leaderboard</h1>
+        <p class="text-gray-600 mt-2">Top Ram Naam Jaap practitioners worldwide</p>
+    </div>
+    
+    <!-- Leaderboard Tabs -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+        <div class="flex border-b border-gray-200">
+            <a href="{{ url('community:global_leaderboard') }}" class="flex-1 py-4 px-6 text-center bg-primary text-white font-semibold">Global</a>
+            <a href="{{ url('community:city_leaderboard') }}" class="flex-1 py-4 px-6 text-center bg-gray-100 text-gray-700 hover:bg-gray-200 transition">Cities</a>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Devotee</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">City</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Jaaps</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for user in leaderboard %}
+                    <tr class="hover:bg-orange-50 transition-colors duration-200 leaderboard-row">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-semibold flex items-center">
+                                {% if loop.index <= 3 %}
+                                    <div class="relative mr-2">
+                                        <span class="inline-flex items-center justify-center h-6 w-6 rounded-full 
+                                            {% if loop.index == 1 %}bg-yellow-400{% elif loop.index == 2 %}bg-gray-300{% elif loop.index == 3 %}bg-amber-600{% endif %} text-white shadow">
+                                            {{ loop.index }}
+                                        </span>
+                                    </div>
+                                {% else %}
+                                    <span class="text-gray-600">{{ loop.index }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <div class="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
+                                        <span class="text-xl text-orange-500">{{ user.username[0]|upper }}</span>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">{{ user.username }}</div>
+                                    <div class="text-xs text-gray-500">{{ user.get_full_name() or "" }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-500">
+                                {% if user.profile.city %}
+                                    <span class="inline-flex items-center">
+                                        <i class="fas fa-map-marker-alt text-primary mr-1"></i>
+                                        {{ user.profile.city }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-gray-400">Unknown</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-bold text-primary">{{ user.total_jaap|default("0") }}</div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">
+                            No entries yet. Be the first to start your practice!
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Information Box -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4">About the Leaderboard</h2>
+        <div class="prose text-gray-600 max-w-none">
+            <p>This global leaderboard shows the top Ram Naam Jaap practitioners worldwide. The leaderboard is updated hourly.</p>
+            <p class="mt-3">Each user's total count is accumulated from all their practice sessions. Continue your practice to climb the leaderboard!</p>
+        </div>
+        
+        <div class="mt-6 flex justify-center space-x-4">
+            <a href="{{ url('community:statistics') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-6 rounded-lg shadow-md transition">View Statistics</a>
+            <a href="{{ url('jaap:jaap_entry') }}" class="bg-primary hover:bg-orange-500 text-white py-3 px-6 rounded-lg shadow-md transition">Start Practice</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

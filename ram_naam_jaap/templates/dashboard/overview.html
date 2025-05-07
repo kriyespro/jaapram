@@ -1,0 +1,357 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Ram Naam Jaap | Dashboard{% endblock %}
+
+{% block extra_head %}
+    <meta name="description" content="Track your Ram Naam Jaap progress and achievements">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8" x-data="{ activeTab: 'stats' }">
+    <!-- Dashboard Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">Dashboard</h1>
+            <p class="text-gray-600">Track your spiritual journey with Ram Naam</p>
+        </div>
+        <div class="mt-4 md:mt-0">
+            <a href="{{ url('jaap:jaap_entry') }}" class="bg-primary hover:bg-orange-500 text-white px-4 py-2 rounded-lg font-medium transition">Start Today's Jaap</a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow p-6 border border-gray-100">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-700">Today</h2>
+                <div class="bg-blue-100 text-blue-800 p-2 rounded-full">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <span class="text-3xl font-bold text-gray-800">{{ today_count|default:"0" }}</span>
+                <p class="text-sm text-gray-600 mt-1">Ram Naam recitations</p>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-100">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-500">Target: {{ daily_target|default:"1008" }}</span>
+                    <span class="text-sm {% if daily_percentage >= 100 %}text-green-500{% else %}text-gray-500{% endif %}">{{ daily_percentage|default:"0" }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div class="bg-blue-500 h-2 rounded-full" style="width: {{ daily_percentage|default:'0' }}%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 border border-gray-100">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-700">This Week</h2>
+                <div class="bg-green-100 text-green-800 p-2 rounded-full">
+                    <i class="fas fa-calendar-week"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <span class="text-3xl font-bold text-gray-800">{{ week_count|default:"0" }}</span>
+                <p class="text-sm text-gray-600 mt-1">Ram Naam recitations</p>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-100">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-500">Target: {{ weekly_target|default:"7056" }}</span>
+                    <span class="text-sm {% if weekly_percentage >= 100 %}text-green-500{% else %}text-gray-500{% endif %}">{{ weekly_percentage|default:"0" }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div class="bg-green-500 h-2 rounded-full" style="width: {{ weekly_percentage|default:'0' }}%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 border border-gray-100">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-700">This Month</h2>
+                <div class="bg-purple-100 text-purple-800 p-2 rounded-full">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <span class="text-3xl font-bold text-gray-800">{{ month_count|default:"0" }}</span>
+                <p class="text-sm text-gray-600 mt-1">Ram Naam recitations</p>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-100">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-500">Target: {{ monthly_target|default:"30240" }}</span>
+                    <span class="text-sm {% if monthly_percentage >= 100 %}text-green-500{% else %}text-gray-500{% endif %}">{{ monthly_percentage|default:"0" }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div class="bg-purple-500 h-2 rounded-full" style="width: {{ monthly_percentage|default:'0' }}%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 border border-gray-100">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-700">All Time</h2>
+                <div class="bg-orange-100 text-orange-800 p-2 rounded-full">
+                    <i class="fas fa-infinity"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <span class="text-3xl font-bold text-gray-800">{{ total_count|default:"0" }}</span>
+                <p class="text-sm text-gray-600 mt-1">Ram Naam recitations</p>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-100">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-500">Joined: {{ user.date_joined|date:"M d, Y" }}</span>
+                    <span class="text-sm text-gray-500">{{ days_active }} days</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div class="bg-orange-500 h-2 rounded-full" style="width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mb-6">
+        <div class="border-b border-gray-200">
+            <nav class="flex -mb-px">
+                <button @click="activeTab = 'stats'" :class="{'border-primary text-primary': activeTab === 'stats', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'stats'}" class="py-4 px-6 font-medium border-b-2 transition">
+                    <i class="fas fa-chart-line mr-2"></i> Statistics
+                </button>
+                <button @click="activeTab = 'achievements'" :class="{'border-primary text-primary': activeTab === 'achievements', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'achievements'}" class="py-4 px-6 font-medium border-b-2 transition">
+                    <i class="fas fa-trophy mr-2"></i> Achievements
+                </button>
+                <button @click="activeTab = 'history'" :class="{'border-primary text-primary': activeTab === 'history', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'history'}" class="py-4 px-6 font-medium border-b-2 transition">
+                    <i class="fas fa-history mr-2"></i> History
+                </button>
+                <button @click="activeTab = 'settings'" :class="{'border-primary text-primary': activeTab === 'settings', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'settings'}" class="py-4 px-6 font-medium border-b-2 transition">
+                    <i class="fas fa-cog mr-2"></i> Settings
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div x-show="activeTab === 'stats'" class="bg-white rounded-lg shadow p-6 border border-gray-100">
+        <h2 class="text-2xl font-bold mb-6">Your Progress</h2>
+        
+        <!-- Progress Chart -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold mb-4">Last 7 Days</h3>
+            <div class="h-64">
+                <canvas id="weeklyChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Streak Information -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                <h3 class="font-semibold text-gray-700 mb-2">Current Streak</h3>
+                <div class="flex items-end">
+                    <span class="text-3xl font-bold text-primary">{{ current_streak|default:"0" }}</span>
+                    <span class="text-gray-600 ml-2 mb-1">days</span>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">Keep it going!</p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                <h3 class="font-semibold text-gray-700 mb-2">Longest Streak</h3>
+                <div class="flex items-end">
+                    <span class="text-3xl font-bold text-primary">{{ longest_streak|default:"0" }}</span>
+                    <span class="text-gray-600 ml-2 mb-1">days</span>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">{{ longest_streak_date|default:"Not yet recorded" }}</p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                <h3 class="font-semibold text-gray-700 mb-2">Daily Average</h3>
+                <div class="flex items-end">
+                    <span class="text-3xl font-bold text-primary">{{ daily_average|default:"0" }}</span>
+                    <span class="text-gray-600 ml-2 mb-1">recitations</span>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">Over the last 30 days</p>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="activeTab === 'achievements'" class="bg-white rounded-lg shadow p-6 border border-gray-100">
+        <h2 class="text-2xl font-bold mb-6">Your Achievements</h2>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <!-- Achievement Card (Unlocked) -->
+            <div class="border rounded-lg overflow-hidden bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+                <div class="p-4 flex flex-col items-center">
+                    <div class="bg-primary text-white rounded-full p-3 mb-3">
+                        <i class="fas fa-fire fa-2x"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-1">First Mala</h3>
+                    <p class="text-sm text-gray-600 text-center">Complete your first 108 Ram Naam recitations</p>
+                    <div class="mt-3 bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium">
+                        Achieved on {{ first_mala_date|default:"Jan 1, 2023" }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Achievement Card (In Progress) -->
+            <div class="border rounded-lg overflow-hidden bg-gray-50 border-gray-200">
+                <div class="p-4 flex flex-col items-center opacity-75">
+                    <div class="bg-gray-300 text-gray-600 rounded-full p-3 mb-3">
+                        <i class="fas fa-bolt fa-2x"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-1">7 Day Streak</h3>
+                    <p class="text-sm text-gray-600 text-center">Complete at least 108 recitations daily for 7 consecutive days</p>
+                    <div class="mt-3 w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-primary h-2 rounded-full" style="width: {{ streak_percentage|default:'42' }}%;"></div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">{{ current_streak|default:"3" }}/7 days</div>
+                </div>
+            </div>
+            
+            <!-- More Achievement Cards -->
+            <div class="border rounded-lg overflow-hidden bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+                <div class="p-4 flex flex-col items-center">
+                    <div class="bg-primary text-white rounded-full p-3 mb-3">
+                        <i class="fas fa-star fa-2x"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-1">1,008 Club</h3>
+                    <p class="text-sm text-gray-600 text-center">Reach 1,008 total Ram Naam recitations</p>
+                    <div class="mt-3 bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium">
+                        Achieved on {{ club_1008_date|default:"Jan 15, 2023" }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- More achievements would go here -->
+        </div>
+    </div>
+
+    <div x-show="activeTab === 'history'" class="bg-white rounded-lg shadow p-6 border border-gray-100">
+        <h2 class="text-2xl font-bold mb-6">Your History</h2>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Target</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for entry in history|default:dummy_history %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ entry.date }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ entry.count }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ entry.target }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if entry.status == 'completed' %}
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                Completed
+                            </span>
+                            {% elif entry.status == 'partial' %}
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                Partial
+                            </span>
+                            {% else %}
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                Missed
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No history available yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{{ url('dashboard:history') }}" class="text-primary hover:text-orange-500 font-medium">View Full History</a>
+        </div>
+    </div>
+
+    <div x-show="activeTab === 'settings'" class="bg-white rounded-lg shadow p-6 border border-gray-100">
+        <h2 class="text-2xl font-bold mb-6">Settings</h2>
+        
+        <form method="post" action="{{ url('dashboard:update_settings') }}">
+            {{ csrf_input }}
+            
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-lg font-medium mb-4">Daily Target</h3>
+                    <div class="flex items-center">
+                        <input type="number" name="daily_target" value="{{ settings.daily_target|default:'1008' }}" min="108" step="108" class="border border-gray-300 rounded-lg p-2 w-32" />
+                        <p class="ml-4 text-sm text-gray-500">Recommended: 108, 1008, or 2016 recitations</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-medium mb-4">Notification Preferences</h3>
+                    <div class="space-y-3">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="daily_reminder" {% if settings.daily_reminder %}checked{% endif %} class="h-4 w-4 text-primary border-gray-300 rounded" />
+                            <span class="ml-2 text-gray-700">Daily reminder to complete my Jaap</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="achievement_notifications" {% if settings.achievement_notifications %}checked{% endif %} class="h-4 w-4 text-primary border-gray-300 rounded" />
+                            <span class="ml-2 text-gray-700">Notification when I earn achievements</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="milestone_notifications" {% if settings.milestone_notifications %}checked{% endif %} class="h-4 w-4 text-primary border-gray-300 rounded" />
+                            <span class="ml-2 text-gray-700">Notification for milestones (1,000 recitations, etc.)</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-medium mb-4">Privacy Settings</h3>
+                    <div class="space-y-3">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="show_on_leaderboard" {% if settings.show_on_leaderboard %}checked{% endif %} class="h-4 w-4 text-primary border-gray-300 rounded" />
+                            <span class="ml-2 text-gray-700">Show my name on the community leaderboard</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="share_achievements" {% if settings.share_achievements %}checked{% endif %} class="h-4 w-4 text-primary border-gray-300 rounded" />
+                            <span class="ml-2 text-gray-700">Share my achievements with the community</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="pt-4">
+                    <button type="submit" class="bg-primary hover:bg-orange-500 text-white px-4 py-2 rounded-lg font-medium transition">Save Settings</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('weeklyChart').getContext('2d');
+    const weeklyChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_labels|default:"['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']"|safe }},
+            datasets: [{
+                label: 'Ram Naam Count',
+                data: {{ chart_data|default:"[420, 315, 508, 612, 726, 1008, 856]"|safe }},
+                backgroundColor: 'rgba(234, 88, 12, 0.7)',
+                borderColor: 'rgba(234, 88, 12, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %} 

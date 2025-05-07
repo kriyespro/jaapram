@@ -1,0 +1,44 @@
+[program:ramjaap]
+command=/var/www/ramjaap/venv/bin/gunicorn ram_naam_jaap.wsgi:application --bind 127.0.0.1:8000 --workers=4 --timeout=120
+directory=/var/www/ramjaap
+user=www-data
+group=www-data
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/ramjaap/gunicorn.log
+stderr_logfile=/var/log/ramjaap/gunicorn-error.log
+environment=DJANGO_SETTINGS_MODULE=ram_naam_jaap.settings
+
+# Example configuration for additional apps
+# Copy and modify this template for each new app
+# [program:app2]
+# command=/var/www/app2/venv/bin/gunicorn app2.wsgi:application --bind 127.0.0.1:8001 --workers=2 --timeout=120
+# directory=/var/www/app2
+# user=www-data
+# group=www-data
+# autostart=true
+# autorestart=true
+# stdout_logfile=/var/log/app2/gunicorn.log
+# stderr_logfile=/var/log/app2/gunicorn-error.log
+# environment=DJANGO_SETTINGS_MODULE=app2.settings
+
+[group:ramjaap-apps]
+programs=ramjaap
+priority=900
+
+# For automatic log rotation, add additional file in /etc/logrotate.d/
+# Sample logrotate configuration:
+# 
+# /var/log/ramjaap/*.log {
+#     daily
+#     missingok
+#     rotate 14
+#     compress
+#     delaycompress
+#     notifempty
+#     create 0640 www-data www-data
+#     sharedscripts
+#     postrotate
+#         systemctl reload supervisor
+#     endscript
+# } 

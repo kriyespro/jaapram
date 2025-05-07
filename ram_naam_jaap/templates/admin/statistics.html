@@ -1,0 +1,122 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Admin - Statistics{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-2xl font-bold mb-6">Statistics Dashboard</h1>
+        
+        <!-- Daily counts chart -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Daily Jaap Counts (Last 30 Days)</h2>
+            <div class="h-80">
+                <canvas id="dailyCountsChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Daily counts table -->
+        <div class="mt-8">
+            <h2 class="text-xl font-semibold mb-4">Daily Counts Table</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="py-3 px-4 text-left">Date</th>
+                            <th class="py-3 px-4 text-left">Total Count</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for count in daily_counts %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-3 px-4">
+                                {{ count.date|date('Y-m-d') }}
+                            </td>
+                            <td class="py-3 px-4">
+                                {{ count.day_total }}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="2" class="py-6 text-center text-gray-500">
+                                No data available for the past 30 days.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Prepare chart data
+        const dates = [
+            {% for count in daily_counts %}
+                "{{ count.date|date('Y-m-d') }}",
+            {% endfor %}
+        ];
+        
+        const counts = [
+            {% for count in daily_counts %}
+                {{ count.day_total }},
+            {% endfor %}
+        ];
+        
+        // Create daily counts chart
+        const ctx = document.getElementById('dailyCountsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Daily Jaap Count',
+                    data: counts,
+                    backgroundColor: 'rgba(255, 153, 51, 0.2)',
+                    borderColor: 'rgba(255, 153, 51, 1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true,
+                    pointBackgroundColor: 'rgba(255, 153, 51, 1)',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                if (value >= 1000) {
+                                    return (value / 1000) + 'k';
+                                }
+                                return value;
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let value = context.parsed.y;
+                                return context.dataset.label + ': ' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %} 

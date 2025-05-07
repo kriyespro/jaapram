@@ -1,0 +1,412 @@
+Watching for file changes with StatReloader
+Not Found: /community/global-leaderboard/
+[19/Apr/2025 12:17:52] "GET /community/global-leaderboard/ HTTP/1.1" 404 14115
+[19/Apr/2025 12:18:01] "GET / HTTP/1.1" 200 48491
+[19/Apr/2025 12:18:01] "GET /static/css/base.css?v=1745065081 HTTP/1.1" 200 2215
+[19/Apr/2025 12:18:01] "GET /static/css/home.css?v=1745065081 HTTP/1.1" 200 4073
+[19/Apr/2025 12:18:01] "GET /static/images/shree_ram.jpg?v=1745065081 HTTP/1.1" 200 114239
+[19/Apr/2025 12:18:03] "GET / HTTP/1.1" 200 47466
+[19/Apr/2025 12:18:09] "GET /admin/ HTTP/1.1" 302 0
+[19/Apr/2025 12:19:21] "GET / HTTP/1.1" 200 48490
+[19/Apr/2025 12:19:21] "GET /static/css/base.css?v=1745065161 HTTP/1.1" 200 2215
+[19/Apr/2025 12:19:21] "GET /static/css/home.css?v=1745065161 HTTP/1.1" 200 4073
+[19/Apr/2025 12:19:21] "GET /static/images/shree_ram.jpg?v=1745065161 HTTP/1.1" 200 105381
+[19/Apr/2025 12:21:26] "GET / HTTP/1.1" 200 48489
+[19/Apr/2025 12:21:26] "GET /static/css/home.css?v=1745065286 HTTP/1.1" 200 4073
+[19/Apr/2025 12:21:26] "GET /static/css/base.css?v=1745065286 HTTP/1.1" 200 2215
+[19/Apr/2025 12:21:26] "GET /static/images/shree_ram.jpg?v=1745065286 HTTP/1.1" 200 369080
+[19/Apr/2025 12:26:27] "GET /community/leaderboard/global/ HTTP/1.1" 200 223393
+[19/Apr/2025 12:26:28] "GET /__debug__/history_sidebar/?store_id=b33c2de6594f408680253e630ce03aec HTTP/1.1" 200 9474
+[19/Apr/2025 12:29:23] "GET / HTTP/1.1" 200 48488
+[19/Apr/2025 12:29:23] "GET /static/css/base.css?v=1745065763 HTTP/1.1" 200 2215
+[19/Apr/2025 12:29:23] "GET /static/css/home.css?v=1745065763 HTTP/1.1" 200 4073
+[19/Apr/2025 12:29:23] "GET /static/images/shree_ram.jpg?v=1745065763 HTTP/1.1" 200 369080
+[19/Apr/2025 12:29:25] "GET /jaap/ HTTP/1.1" 200 33756
+[19/Apr/2025 12:29:25] "GET /static/css/base.css?v=1745065765 HTTP/1.1" 200 2215
+[19/Apr/2025 12:29:26] "GET /dashboard/overview/ HTTP/1.1" 200 23512
+[19/Apr/2025 12:29:26] "GET /static/css/base.css?v=1745065766 HTTP/1.1" 200 2215
+[19/Apr/2025 12:29:27] "GET /community/ HTTP/1.1" 200 40343
+[19/Apr/2025 12:29:27] "GET /static/css/base.css?v=1745065767 HTTP/1.1" 200 2215
+[19/Apr/2025 12:29:27] "GET /about/ HTTP/1.1" 200 20984
+Internal Server Error: /terms/
+Traceback (most recent call last):
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/backends/jinja2.py", line 42, in get_template
+    return Template(self.env.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 1010, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 969, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 768, in compile
+    self.handle_exception(source=source_hint)
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 936, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/templates/pages/terms.html", line 15, in template
+    Last updated: {% now "F d, Y" %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.TemplateSyntaxError: Encountered unknown tag 'now'. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/core/views.py", line 75, in terms_view
+    return render(request, 'pages/terms.html')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/backends/jinja2.py", line 48, in get_template
+    raise new from exc
+django.template.exceptions.TemplateSyntaxError: ("Encountered unknown tag 'now'. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.",)
+[19/Apr/2025 12:29:30] "GET /terms/ HTTP/1.1" 500 169768
+Internal Server Error: /privacy/
+Traceback (most recent call last):
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/backends/jinja2.py", line 42, in get_template
+    return Template(self.env.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 1010, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 969, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 768, in compile
+    self.handle_exception(source=source_hint)
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 936, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/templates/pages/privacy.html", line 15, in template
+    Last updated: {% now "F d, Y" %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.TemplateSyntaxError: Encountered unknown tag 'now'. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/core/views.py", line 70, in privacy_view
+    return render(request, 'pages/privacy.html')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/backends/jinja2.py", line 48, in get_template
+    raise new from exc
+django.template.exceptions.TemplateSyntaxError: ("Encountered unknown tag 'now'. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.",)
+[19/Apr/2025 12:29:34] "GET /privacy/ HTTP/1.1" 500 170261
+[19/Apr/2025 12:29:38] "GET /about/ HTTP/1.1" 200 20984
+[19/Apr/2025 12:29:38] "GET /static/css/base.css?v=1745065778 HTTP/1.1" 200 2215
+[19/Apr/2025 12:29:40] "GET /community/ HTTP/1.1" 200 40344
+[19/Apr/2025 12:29:40] "GET /static/css/base.css?v=1745065780 HTTP/1.1" 200 2215
+[19/Apr/2025 12:29:41] "GET /dashboard/overview/ HTTP/1.1" 200 23512
+[19/Apr/2025 12:29:41] "GET /static/css/base.css?v=1745065781 HTTP/1.1" 200 2215
+[19/Apr/2025 12:29:41] "GET /jaap/ HTTP/1.1" 200 33756
+[19/Apr/2025 12:29:42] "GET / HTTP/1.1" 200 48488
+[19/Apr/2025 12:29:42] "GET /static/css/base.css?v=1745065782 HTTP/1.1" 200 2215
+[19/Apr/2025 12:29:42] "GET /static/css/home.css?v=1745065782 HTTP/1.1" 200 4073
+[19/Apr/2025 12:29:42] "GET /static/images/shree_ram.jpg?v=1745065782 HTTP/1.1" 200 369080
+Internal Server Error: /terms/
+Traceback (most recent call last):
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/backends/jinja2.py", line 42, in get_template
+    return Template(self.env.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 1010, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 969, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 768, in compile
+    self.handle_exception(source=source_hint)
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 936, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/templates/pages/terms.html", line 15, in template
+    Last updated: {% now "F d, Y" %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.TemplateSyntaxError: Encountered unknown tag 'now'. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/core/views.py", line 75, in terms_view
+    return render(request, 'pages/terms.html')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/backends/jinja2.py", line 48, in get_template
+    raise new from exc
+django.template.exceptions.TemplateSyntaxError: ("Encountered unknown tag 'now'. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.",)
+[19/Apr/2025 14:05:27] "GET /terms/ HTTP/1.1" 500 169763
+Internal Server Error: /terms/
+Traceback (most recent call last):
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/backends/jinja2.py", line 42, in get_template
+    return Template(self.env.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 1010, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 969, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 768, in compile
+    self.handle_exception(source=source_hint)
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 936, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/templates/pages/terms.html", line 15, in template
+    Last updated: {% now "F d, Y" %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.TemplateSyntaxError: Encountered unknown tag 'now'. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/core/views.py", line 75, in terms_view
+    return render(request, 'pages/terms.html')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/backends/jinja2.py", line 48, in get_template
+    raise new from exc
+django.template.exceptions.TemplateSyntaxError: ("Encountered unknown tag 'now'. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.",)
+[19/Apr/2025 14:05:46] "GET /terms/ HTTP/1.1" 500 169762
+Internal Server Error: /privacy/
+Traceback (most recent call last):
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/backends/jinja2.py", line 42, in get_template
+    return Template(self.env.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 1010, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 969, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 768, in compile
+    self.handle_exception(source=source_hint)
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 936, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/templates/pages/privacy.html", line 15, in template
+    Last updated: {% now "F d, Y" %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.TemplateSyntaxError: Encountered unknown tag 'now'. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/core/views.py", line 70, in privacy_view
+    return render(request, 'pages/privacy.html')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/backends/jinja2.py", line 48, in get_template
+    raise new from exc
+django.template.exceptions.TemplateSyntaxError: ("Encountered unknown tag 'now'. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.",)
+[19/Apr/2025 14:05:50] "GET /privacy/ HTTP/1.1" 500 170257
+[19/Apr/2025 14:06:01] "GET /community/ HTTP/1.1" 200 40344
+[19/Apr/2025 14:06:01] "GET /static/css/base.css?v=1745071561 HTTP/1.1" 200 2215
+[19/Apr/2025 14:06:06] "GET / HTTP/1.1" 200 48488
+[19/Apr/2025 14:06:06] "GET /static/css/base.css?v=1745071566 HTTP/1.1" 200 2215
+[19/Apr/2025 14:06:06] "GET /static/css/home.css?v=1745071566 HTTP/1.1" 200 4073
+[19/Apr/2025 14:06:06] "GET /static/images/shree_ram.jpg?v=1745071566 HTTP/1.1" 200 369080
+Internal Server Error: /terms/
+Traceback (most recent call last):
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/backends/jinja2.py", line 42, in get_template
+    return Template(self.env.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 1010, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 969, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 768, in compile
+    self.handle_exception(source=source_hint)
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 936, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/templates/pages/terms.html", line 15, in template
+    Last updated: {% now "F d, Y" %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.TemplateSyntaxError: Encountered unknown tag 'now'. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/core/views.py", line 75, in terms_view
+    return render(request, 'pages/terms.html')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/backends/jinja2.py", line 48, in get_template
+    raise new from exc
+django.template.exceptions.TemplateSyntaxError: ("Encountered unknown tag 'now'. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.",)
+[19/Apr/2025 14:09:53] "GET /terms/ HTTP/1.1" 500 166887
+Internal Server Error: /privacy/
+Traceback (most recent call last):
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/backends/jinja2.py", line 42, in get_template
+    return Template(self.env.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 1010, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 969, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 768, in compile
+    self.handle_exception(source=source_hint)
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/jinja2/environment.py", line 936, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/templates/pages/privacy.html", line 15, in template
+    Last updated: {% now "F d, Y" %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.TemplateSyntaxError: Encountered unknown tag 'now'. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/core/views.py", line 70, in privacy_view
+    return render(request, 'pages/privacy.html')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/template/backends/jinja2.py", line 48, in get_template
+    raise new from exc
+django.template.exceptions.TemplateSyntaxError: ("Encountered unknown tag 'now'. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.",)
+[19/Apr/2025 14:09:57] "GET /privacy/ HTTP/1.1" 500 167380
+[19/Apr/2025 14:11:07] "GET /community/leaderboard/global/ HTTP/1.1" 200 223391
+[19/Apr/2025 14:11:08] "GET /__debug__/history_sidebar/?store_id=75fcfded68bf42e2ab7f89e4bb8fe770 HTTP/1.1" 200 9472
+[19/Apr/2025 14:11:09] "GET /terms/ HTTP/1.1" 200 20657
+[19/Apr/2025 14:11:15] "GET /privacy/ HTTP/1.1" 200 19629
+[19/Apr/2025 14:11:20] "GET / HTTP/1.1" 200 47464
+/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/apps/__init__.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+April 19, 2025 - 12:17:49
+Django version 5.0.1, using settings 'config.settings'
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CONTROL-C.
+
+Traceback (most recent call last):
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/manage.py", line 15, in main
+    from django.core.management import execute_from_command_line
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap/ram_naam_jaap/venv/lib/python3.12/site-packages/django/__init__.py", line 1, in <module>
+    from django.utils.version import get_version
+ModuleNotFoundError: No module named 'django.utils'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/manage.py", line 26, in <module>
+    main()
+  File "/Users/kumarsunilverma/Desktop/sd-dj-test-1/manage.py", line 17, in main
+    raise ImportError(
+ImportError: Couldn't import Django. Are you sure it's installed and available on your PYTHONPATH environment variable? Did you forget to activate a virtual environment?

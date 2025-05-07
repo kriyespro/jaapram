@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}JaapRam{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <!-- Alpine.js -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js" defer></script>
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.2" integrity="sha384-L6OqL9pRWyyFU3+/bjdSri+iIphTN/bvYyM37tICVyOJkWZLpP2vGn6VUEXgzg6h" crossorigin="anonymous"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="{{ static('css/base.css') }}">
+    
+    {% block extra_css %}{% endblock %}
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="flex flex-col min-h-screen">
+    <!-- Header/Navbar -->
+    <header class="bg-white shadow-md">
+        <nav class="container mx-auto px-4 py-2 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="/" class="text-2xl font-bold text-primary">
+                    <i class="fas fa-om mr-2"></i>JaapRam
+                </a>
+            </div>
+            
+            <div class="hidden md:flex space-x-6">
+                <a href="{{ url('core:home') }}" class="text-gray-700 hover:text-primary">Home</a>
+                {% if user.is_authenticated %}
+                    <a href="{{ url('jaap:jaap_entry') }}" class="text-gray-700 hover:text-primary">Jaap</a>
+                    <a href="{{ url('dashboard:overview') }}" class="text-gray-700 hover:text-primary">Dashboard</a>
+                    <a href="{{ url('community:home') }}" class="text-gray-700 hover:text-primary">Community</a>
+                {% endif %}
+                <a href="{{ url('core:about') }}" class="text-gray-700 hover:text-primary">About</a>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <!-- Global Jaap Counter -->
+                {% include 'components/global_counter.html' %}
+                
+                {% if user.is_authenticated %}
+                    <div x-data="{ open: false }" class="relative">
+                        <button @click="open = !open" class="flex items-center text-gray-700 hover:text-primary focus:outline-none">
+                            <span class="mr-2">{{ user.username }}</span>
+                            <i class="fas fa-user-circle text-xl"></i>
+                        </button>
+                        
+                        <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                            <a href="{{ url('accounts:profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                            {% if user.is_staff %}
+                                <a href="{{ url('admin_dashboard:admin_dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Admin Dashboard</a>
+                                <a href="{{ url('admin:index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Django Admin</a>
+                            {% endif %}
+                            <a href="{{ url('account_logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{{ url('account_login') }}" class="bg-primary hover:bg-orange-500 text-white py-2 px-4 rounded mr-2">Login</a>
+                    <a href="{{ url('account_signup') }}" class="bg-secondary hover:bg-green-600 text-white py-2 px-4 rounded">Sign Up</a>
+                {% endif %}
+            </div>
+            
+            <!-- Mobile menu button -->
+            <div class="md:hidden" x-data="{ open: false }">
+                <button @click="open = !open" class="text-gray-700 hover:text-primary focus:outline-none">
+                    <i x-show="!open" class="fas fa-bars text-xl"></i>
+                    <i x-show="open" class="fas fa-times text-xl"></i>
+                </button>
+                
+                <!-- Mobile menu -->
+                <div x-show="open" class="absolute top-16 right-0 left-0 bg-white shadow-md z-50">
+                    <div class="flex flex-col px-4 py-2 space-y-2">
+                        <a href="{{ url('core:home') }}" class="text-gray-700 hover:text-primary py-2">Home</a>
+                        {% if user.is_authenticated %}
+                            <a href="{{ url('jaap:jaap_entry') }}" class="text-gray-700 hover:text-primary py-2">Jaap</a>
+                            <a href="{{ url('dashboard:overview') }}" class="text-gray-700 hover:text-primary py-2">Dashboard</a>
+                            <a href="{{ url('community:home') }}" class="text-gray-700 hover:text-primary py-2">Community</a>
+                            <a href="{{ url('accounts:profile') }}" class="text-gray-700 hover:text-primary py-2">Profile</a>
+                            <a href="{{ url('account_logout') }}" class="text-gray-700 hover:text-primary py-2">Logout</a>
+                        {% else %}
+                            <a href="{{ url('account_login') }}" class="text-gray-700 hover:text-primary py-2">Login</a>
+                            <a href="{{ url('account_signup') }}" class="text-gray-700 hover:text-primary py-2">Sign Up</a>
+                        {% endif %}
+                        <a href="{{ url('core:about') }}" class="text-gray-700 hover:text-primary py-2">About</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mx-auto px-4 py-2">
+            {% for message in messages %}
+                <div class="{% if message.tags == 'error' %}bg-red-100 border-red-500 text-red-700{% elif message.tags == 'success' %}bg-green-100 border-green-500 text-green-700{% else %}bg-blue-100 border-blue-500 text-blue-700{% endif %} border-l-4 p-4 mb-2">
+                    <p>{{ message }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-6">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between">
+                <div class="mb-4 md:mb-0">
+                    <h3 class="text-xl font-bold mb-2">JaapRam</h3>
+                    <p class="text-gray-400">A digital platform for devotees to track their Ram Naam Jaap practice.</p>
+                </div>
+                
+                <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-12">
+                    <div>
+                        <h4 class="text-lg font-semibold mb-2">Quick Links</h4>
+                        <ul class="space-y-1">
+                            <li><a href="{{ url('core:home') }}" class="text-gray-400 hover:text-white">Home</a></li>
+                            {% if user.is_authenticated %}
+                                <li><a href="{{ url('jaap:jaap_entry') }}" class="text-gray-400 hover:text-white">Jaap</a></li>
+                                <li><a href="{{ url('dashboard:overview') }}" class="text-gray-400 hover:text-white">Dashboard</a></li>
+                                <li><a href="{{ url('community:home') }}" class="text-gray-400 hover:text-white">Community</a></li>
+                            {% endif %}
+                            <li><a href="{{ url('core:about') }}" class="text-gray-400 hover:text-white">About</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-lg font-semibold mb-2">Legal</h4>
+                        <ul class="space-y-1">
+                            <li><a href="{{ url('core:privacy') }}" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
+                            <li><a href="{{ url('core:terms') }}" class="text-gray-400 hover:text-white">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-6 pt-6 text-center text-gray-400">
+                <p>&copy; {{ now().year }} JaapRam. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

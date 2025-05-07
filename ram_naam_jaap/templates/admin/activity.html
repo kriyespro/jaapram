@@ -1,0 +1,571 @@
+{% extends "layouts/admin_layout.html" %}
+{% block title %}Activity Logs{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4 text-saffron">Activity Logs</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{% url 'admin_dashboard:admin_dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item active">Activity Logs</li>
+    </ol>
+    
+    <!-- Activity Filter and Search -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-filter me-1"></i>
+            Search and Filter
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <div class="form-floating mb-3">
+                        <input class="form-control" id="searchQuery" name="q" type="text" placeholder="Search logs" />
+                        <label for="searchQuery">Search</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="actionType" name="action_type">
+                            <option value="">All Actions</option>
+                            <option value="login">Login</option>
+                            <option value="logout">Logout</option>
+                            <option value="create">Create</option>
+                            <option value="update">Update</option>
+                            <option value="delete">Delete</option>
+                            <option value="view">View</option>
+                            <option value="error">Error</option>
+                        </select>
+                        <label for="actionType">Action Type</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="userType" name="user_type">
+                            <option value="">All Users</option>
+                            <option value="admin">Admins</option>
+                            <option value="moderator">Moderators</option>
+                            <option value="member">Members</option>
+                            <option value="guest">Guests</option>
+                            <option value="system">System</option>
+                        </select>
+                        <label for="userType">User Type</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="startDate" name="start_date" type="date" />
+                                <label for="startDate">From Date</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="endDate" name="end_date" type="date" />
+                                <label for="endDate">To Date</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="d-flex align-items-center h-100 mt-2">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-search me-1"></i> Apply
+                        </button>
+                        <button type="reset" class="btn btn-outline-secondary">
+                            <i class="fas fa-undo me-1"></i> Reset
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- System Stats Summary -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">Total Logs</h5>
+                            <h3 class="mb-0">{{ total_logs }}</h3>
+                        </div>
+                        <div class="fs-1">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <span>All time activity records</span>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-warning text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">Today's Activity</h5>
+                            <h3 class="mb-0">{{ today_logs }}</h3>
+                        </div>
+                        <div class="fs-1">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <span>{{ today_date }}</span>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">Active Users</h5>
+                            <h3 class="mb-0">{{ active_users }}</h3>
+                        </div>
+                        <div class="fs-1">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <span>Last 24 hours</span>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-danger text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">System Errors</h5>
+                            <h3 class="mb-0">{{ error_count }}</h3>
+                        </div>
+                        <div class="fs-1">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <span>Last 7 days</span>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Activity Logs Table -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas fa-table me-1"></i>
+                    Activity Logs
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-outline-primary me-2" id="refreshLogsBtn">
+                        <i class="fas fa-sync-alt me-1"></i> Refresh
+                    </button>
+                    <div class="dropdown d-inline-block">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-download me-1"></i> Export
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                            <li><a class="dropdown-item" href="{% url 'admin_dashboard:export_logs' %}?format=csv">Export as CSV</a></li>
+                            <li><a class="dropdown-item" href="{% url 'admin_dashboard:export_logs' %}?format=xlsx">Export as Excel</a></li>
+                            <li><a class="dropdown-item" href="{% url 'admin_dashboard:export_logs' %}?format=json">Export as JSON</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <table id="activityTable" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Timestamp</th>
+                        <th>User</th>
+                        <th>IP Address</th>
+                        <th>Action</th>
+                        <th>Target</th>
+                        <th>Details</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in activity_logs %}
+                    <tr class="{% if log.action_type == 'error' %}table-danger{% elif log.action_type == 'login' or log.action_type == 'logout' %}table-info{% elif log.action_type == 'delete' %}table-warning{% endif %}">
+                        <td>{{ log.id }}</td>
+                        <td>
+                            <div>{{ log.timestamp|date:"M d, Y" }}</div>
+                            <small class="text-muted">{{ log.timestamp|time:"H:i:s" }}</small>
+                        </td>
+                        <td>
+                            <div>
+                                {% if log.user_id %}
+                                <a href="{% url 'admin_dashboard:user_detail' log.user_id %}">{{ log.username }}</a>
+                                {% else %}
+                                <span class="text-muted">System</span>
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">{{ log.user_type|title }}</small>
+                        </td>
+                        <td>{{ log.ip_address }}</td>
+                        <td>
+                            <span class="badge {% if log.action_type == 'login' %}bg-success{% elif log.action_type == 'logout' %}bg-secondary{% elif log.action_type == 'create' %}bg-primary{% elif log.action_type == 'update' %}bg-info{% elif log.action_type == 'delete' %}bg-warning{% elif log.action_type == 'error' %}bg-danger{% else %}bg-dark{% endif %}">
+                                {{ log.action_type|title }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if log.target_type and log.target_id %}
+                            <a href="#" data-bs-toggle="tooltip" title="View {{ log.target_type|title }}">
+                                {{ log.target_type|title }} #{{ log.target_id }}
+                            </a>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="log-details">{{ log.description|truncatechars:50 }}</span>
+                            {% if log.description|length > 50 %}
+                            <button class="btn btn-sm btn-link view-details-btn" data-bs-toggle="modal" data-bs-target="#logDetailsModal{{ log.id }}">
+                                View Details
+                            </button>
+
+                            <!-- Log Details Modal -->
+                            <div class="modal fade" id="logDetailsModal{{ log.id }}" tabindex="-1" aria-labelledby="logDetailsModalLabel{{ log.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="logDetailsModalLabel{{ log.id }}">Activity Log Details</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <h6>Action</h6>
+                                                <p>{{ log.action_type|title }}</p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <h6>Description</h6>
+                                                <p>{{ log.description }}</p>
+                                            </div>
+                                            {% if log.additional_data %}
+                                            <div class="mb-3">
+                                                <h6>Additional Data</h6>
+                                                <pre class="bg-light p-3 rounded"><code>{{ log.additional_data|pprint }}</code></pre>
+                                            </div>
+                                            {% endif %}
+                                            <div class="d-flex justify-content-between">
+                                                <div>
+                                                    <h6>User</h6>
+                                                    <p>{{ log.username }} ({{ log.user_type|title }})</p>
+                                                </div>
+                                                <div>
+                                                    <h6>IP Address</h6>
+                                                    <p>{{ log.ip_address }}</p>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h6>Timestamp</h6>
+                                                <p>{{ log.timestamp|date:"F d, Y H:i:s" }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge {% if log.status == 'success' %}bg-success{% elif log.status == 'error' %}bg-danger{% elif log.status == 'warning' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                {{ log.status|title }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4">
+                            <div class="text-muted">
+                                <i class="fas fa-clipboard-list fa-3x mb-3"></i>
+                                <p>No activity logs found. System activities will be recorded here.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <!-- Pagination -->
+            {% if activity_logs.has_other_pages %}
+            <nav aria-label="Activity log pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if activity_logs.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ activity_logs.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in activity_logs.paginator.page_range %}
+                        {% if activity_logs.number == num %}
+                        <li class="page-item active"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                        {% elif num > activity_logs.number|add:'-3' and num < activity_logs.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if activity_logs.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ activity_logs.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ activity_logs.paginator.num_pages }}" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Activity Chart -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-chart-area me-1"></i>
+            Activity Trends
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-8">
+                    <canvas id="activityChart" width="100%" height="50"></canvas>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <i class="fas fa-chart-pie me-1"></i>
+                            Action Types Distribution
+                        </div>
+                        <div class="card-body">
+                            <canvas id="actionTypesChart" width="100%" height="150"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-chart-pie me-1"></i>
+                            User Types Distribution
+                        </div>
+                        <div class="card-body">
+                            <canvas id="userTypesChart" width="100%" height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize DataTable
+        const activityTable = new DataTable('#activityTable', {
+            order: [[1, 'desc']], // Sort by timestamp (descending)
+            responsive: true,
+            pageLength: 25,
+            lengthMenu: [10, 25, 50, 100]
+        });
+        
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Refresh button functionality
+        document.getElementById('refreshLogsBtn').addEventListener('click', function() {
+            window.location.reload();
+        });
+        
+        // Activity Trends Chart
+        const activityCtx = document.getElementById('activityChart');
+        if (activityCtx) {
+            new Chart(activityCtx, {
+                type: 'line',
+                data: {
+                    labels: {{ activity_dates|safe }}, // Last 7 days
+                    datasets: [
+                        {
+                            label: 'Total Activity',
+                            backgroundColor: 'rgba(255, 105, 0, 0.1)',
+                            borderColor: 'rgba(255, 105, 0, 1)',
+                            pointRadius: 3,
+                            pointBackgroundColor: 'rgba(255, 105, 0, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverRadius: 5,
+                            fill: true,
+                            data: {{ activity_counts|safe }}
+                        },
+                        {
+                            label: 'Login Activity',
+                            borderColor: 'rgba(40, 167, 69, 0.8)',
+                            pointRadius: 2,
+                            pointBackgroundColor: 'rgba(40, 167, 69, 0.8)',
+                            fill: false,
+                            data: {{ login_counts|safe }}
+                        },
+                        {
+                            label: 'Errors',
+                            borderColor: 'rgba(220, 53, 69, 0.8)',
+                            pointRadius: 2,
+                            pointBackgroundColor: 'rgba(220, 53, 69, 0.8)',
+                            fill: false,
+                            data: {{ error_counts|safe }}
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Activities'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Action Types Distribution Chart
+        const actionTypesCtx = document.getElementById('actionTypesChart');
+        if (actionTypesCtx) {
+            new Chart(actionTypesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Login', 'Logout', 'Create', 'Update', 'Delete', 'View', 'Error'],
+                    datasets: [{
+                        data: {{ action_type_counts|safe }},
+                        backgroundColor: [
+                            'rgba(40, 167, 69, 0.8)',
+                            'rgba(108, 117, 125, 0.8)',
+                            'rgba(0, 123, 255, 0.8)',
+                            'rgba(23, 162, 184, 0.8)',
+                            'rgba(255, 193, 7, 0.8)',
+                            'rgba(111, 66, 193, 0.8)',
+                            'rgba(220, 53, 69, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 10
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // User Types Distribution Chart
+        const userTypesCtx = document.getElementById('userTypesChart');
+        if (userTypesCtx) {
+            new Chart(userTypesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Admin', 'Moderator', 'Member', 'Guest', 'System'],
+                    datasets: [{
+                        data: {{ user_type_counts|safe }},
+                        backgroundColor: [
+                            'rgba(0, 123, 255, 0.8)',
+                            'rgba(23, 162, 184, 0.8)',
+                            'rgba(255, 105, 0, 0.8)',
+                            'rgba(108, 117, 125, 0.8)',
+                            'rgba(111, 66, 193, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 10
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,245 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Ram Naam Jaap - Input{% endblock %}
+
+{% block extra_head %}
+    <meta name="description" content="Type Ram Naam for spiritual practice and count">
+    <style>
+        .input-container {
+            background-color: #FFF9F2;
+            min-height: 200px;
+            border: 2px solid #FF9933;
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .count-display {
+            font-size: 5rem;
+            font-weight: bold;
+            color: #FF9933;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .timer-options, .target-options {
+            margin-bottom: 2rem;
+        }
+
+        .option-button {
+            background-color: white;
+            border: 2px solid #FF9933;
+            color: #333;
+            padding: 0.5rem 1rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-button:hover {
+            background-color: #FFF0E0;
+        }
+
+        .option-button.active {
+            background-color: #FF9933;
+            color: white;
+        }
+
+        .save-button {
+            background-color: #FF9933;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .save-button:hover {
+            background-color: #E68A00;
+        }
+
+        .instructions-container {
+            margin-top: 2rem;
+            border-top: 1px solid #E5E5E5;
+            padding-top: 1.5rem;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse-animation {
+            animation: pulse 0.5s ease-in-out;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6 max-w-4xl" x-data="jaapCounter">
+    <h1 class="text-4xl font-bold text-center text-primary mb-8">राम नाम जाप</h1>
+    
+    <!-- Counter Display -->
+    <div class="count-display" x-text="count" :class="{'pulse-animation': justCounted}"></div>
+    <p class="text-center text-gray-600 mb-8">Ram Count</p>
+    
+    <!-- Timer Selection -->
+    <div class="timer-options">
+        <h2 class="text-xl font-bold mb-4">Select Timer</h2>
+        <div class="flex flex-wrap">
+            <button @click="setTimer(0)" :class="{'active': timer === 0}" class="option-button">No Timer</button>
+            <button @click="setTimer(5)" :class="{'active': timer === 5}" class="option-button">5 Minutes</button>
+            <button @click="setTimer(10)" :class="{'active': timer === 10}" class="option-button">10 Minutes</button>
+            <button @click="setTimer(15)" :class="{'active': timer === 15}" class="option-button">15 Minutes</button>
+            <button @click="setTimer(30)" :class="{'active': timer === 30}" class="option-button">30 Minutes</button>
+            <button @click="setTimer(60)" :class="{'active': timer === 60}" class="option-button">60 Minutes</button>
+        </div>
+        <div x-show="timerRunning" class="mt-2 text-center text-gray-700">
+            Time remaining: <span x-text="formatTime(timerRemaining)"></span>
+        </div>
+    </div>
+    
+    <!-- Target Selection -->
+    <div class="target-options">
+        <h2 class="text-xl font-bold mb-4">Select Target</h2>
+        <div class="flex flex-wrap">
+            <button @click="setTarget(0)" :class="{'active': target === 0}" class="option-button">No Target</button>
+            <button @click="setTarget(108)" :class="{'active': target === 108}" class="option-button">108 Times</button>
+            <button @click="setTarget(1008)" :class="{'active': target === 1008}" class="option-button">1,008 Times</button>
+            <button @click="setTarget(10000)" :class="{'active': target === 10000}" class="option-button">10,000 Times</button>
+            <button @click="setTarget(100000)" :class="{'active': target === 100000}" class="option-button">100,000 Times</button>
+        </div>
+        <div x-show="target > 0" class="mt-2 text-center text-gray-700">
+            Progress: <span x-text="count"></span> / <span x-text="target"></span> 
+            (<span x-text="Math.round((count / target) * 100)"></span>%)
+            <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                <div class="bg-primary h-2 rounded-full transition-all duration-300" :style="`width: ${Math.min(100, Math.round((count / target) * 100))}%`"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Input Area -->
+    <h2 class="text-xl font-bold mb-4">Type "Ram" as many times as you wish. The counter will automatically track each occurrence.</h2>
+    <div class="input-container" contenteditable="true" @input="checkInput" x-ref="inputArea"></div>
+    
+    <!-- Save Button -->
+    <form method="post" action="{{ url('jaap:save_entry') }}" x-ref="saveForm">
+        {{ csrf_input }}
+        <input type="hidden" name="count" :value="count" x-ref="countInput">
+        <input type="hidden" name="date" value="{{ today_date_iso }}">
+        <button type="submit" class="save-button">Save Ram Jaap</button>
+    </form>
+    
+    <!-- Instructions -->
+    <div class="instructions-container">
+        <h2 class="text-2xl font-bold mb-4">Instructions</h2>
+        <ul class="list-disc pl-6 space-y-2 text-gray-700">
+            <li>Type the word "ram" repeatedly in the input box above.</li>
+            <li>The counter will automatically increment each time you type "ram".</li>
+            <li>You can optionally set a timer to track your session duration.</li>
+            <li>Set a target count to track your progress towards a specific goal.</li>
+            <li>When you're finished, click "Save Ram Jaap" to record your practice.</li>
+            <li>Your progress will be saved to your account and will appear in your dashboard.</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('jaapCounter', () => ({
+        count: 0,
+        timer: 0,
+        target: 0,
+        timerRunning: false,
+        timerRemaining: 0,
+        timerInterval: null,
+        justCounted: false,
+        
+        init() {
+            // Initialize with previous values from localStorage if available
+            const storedCount = localStorage.getItem('ramJaapCount');
+            if (storedCount) {
+                this.count = parseInt(storedCount, 10);
+            }
+        },
+        
+        checkInput() {
+            const text = this.$refs.inputArea.innerText.toLowerCase();
+            const ramCount = (text.match(/\bram\b/g) || []).length;
+            
+            if (ramCount > this.count) {
+                // New "ram" words detected
+                const newRams = ramCount - this.count;
+                this.count = ramCount;
+                
+                // Trigger animation
+                this.justCounted = true;
+                setTimeout(() => {
+                    this.justCounted = false;
+                }, 500);
+                
+                // Save count to localStorage
+                localStorage.setItem('ramJaapCount', this.count);
+                
+                // Check if target reached
+                if (this.target > 0 && this.count >= this.target) {
+                    alert('Congratulations! You have reached your target of ' + this.target + ' Ram Naams!');
+                }
+            }
+        },
+        
+        setTimer(minutes) {
+            // Clear existing timer if any
+            if (this.timerInterval) {
+                clearInterval(this.timerInterval);
+                this.timerRunning = false;
+            }
+            
+            this.timer = minutes;
+            
+            if (minutes > 0) {
+                // Start new timer
+                this.timerRemaining = minutes * 60; // convert to seconds
+                this.timerRunning = true;
+                
+                this.timerInterval = setInterval(() => {
+                    this.timerRemaining--;
+                    
+                    if (this.timerRemaining <= 0) {
+                        clearInterval(this.timerInterval);
+                        this.timerRunning = false;
+                        alert('Timer completed! You recited Ram Naam ' + this.count + ' times.');
+                        
+                        // Optionally auto-submit the form
+                        // this.$refs.saveForm.submit();
+                    }
+                }, 1000);
+            }
+        },
+        
+        setTarget(number) {
+            this.target = number;
+        },
+        
+        formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+        }
+    }));
+});
+</script>
+{% endblock %} 

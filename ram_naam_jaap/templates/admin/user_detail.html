@@ -1,0 +1,282 @@
+{% extends 'base/base.html' %}
+
+{% block title %}User Details: {{ user_profile.username }} - Admin{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .stat-card {
+        transition: all 0.3s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-6">
+        <a href="{{ url('admin_dashboard:admin_users') }}" class="inline-flex items-center text-primary hover:text-primary-dark">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Users List
+        </a>
+    </div>
+
+    <!-- User Profile Info -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div class="mb-4 md:mb-0">
+                <h1 class="text-2xl font-bold">{{ user_profile.username }}</h1>
+                <p class="text-gray-600">{{ user_profile.email }}</p>
+            </div>
+            <div class="flex space-x-2">
+                {% if user_profile.is_active %}
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">Active</span>
+                {% else %}
+                    <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">Inactive</span>
+                {% endif %}
+                
+                {% if user_profile.is_staff %}
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Staff</span>
+                {% endif %}
+                
+                {% if user_profile.is_superuser %}
+                    <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">Superuser</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+            <div>
+                <h2 class="text-lg font-semibold mb-3">Account Information</h2>
+                <div class="space-y-2">
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">Full Name</span>
+                        <span>{{ user_profile.get_full_name() if user_profile.get_full_name() else 'Not provided' }}</span>
+                    </div>
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">Joined</span>
+                        <span>{{ user_profile.date_joined|date('M d, Y') }}</span>
+                    </div>
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">Last Login</span>
+                        <span>{{ user_profile.last_login|date('M d, Y H:i') if user_profile.last_login else 'Never' }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <h2 class="text-lg font-semibold mb-3">User Profile</h2>
+                <div class="space-y-2">
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">City</span>
+                        <span>{{ user_profile.profile.city if user_profile.profile and user_profile.profile.city else 'Not provided' }}</span>
+                    </div>
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">Total Jaap</span>
+                        <span>{{ total_jaap|default(0)|number_format }}</span>
+                    </div>
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">Active Days</span>
+                        <span>{{ jaap_days|default(0) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- User Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-white rounded-lg shadow-md p-6 stat-card">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-800">Total Jaap</h2>
+                <div class="text-primary">
+                    <i class="fas fa-om text-2xl"></i>
+                </div>
+            </div>
+            <div class="text-3xl font-bold text-gray-900 mt-4">{{ total_jaap|default(0)|number_format }}</div>
+            <p class="text-gray-600 text-sm mt-2">Lifetime jaap count</p>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 stat-card">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-800">Average Daily</h2>
+                <div class="text-primary">
+                    <i class="fas fa-chart-line text-2xl"></i>
+                </div>
+            </div>
+            <div class="text-3xl font-bold text-gray-900 mt-4">{{ avg_daily|default(0)|round|int|number_format }}</div>
+            <p class="text-gray-600 text-sm mt-2">Average jaap per active day</p>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 stat-card">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-800">Active Days</h2>
+                <div class="text-primary">
+                    <i class="fas fa-calendar-check text-2xl"></i>
+                </div>
+            </div>
+            <div class="text-3xl font-bold text-gray-900 mt-4">{{ jaap_days|default(0) }}</div>
+            <p class="text-gray-600 text-sm mt-2">Days with jaap activity</p>
+        </div>
+    </div>
+    
+    <!-- Jaap History -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">Jaap History</h2>
+        <div class="mb-6 h-80">
+            <canvas id="jaapHistoryChart"></canvas>
+        </div>
+        
+        <h3 class="text-lg font-semibold mb-3 mt-8">Recent Jaap Entries</h3>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="py-3 px-4 text-left">Date</th>
+                        <th class="py-3 px-4 text-left">Count</th>
+                        <th class="py-3 px-4 text-left">Cumulative</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for jaap in jaap_counts %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="py-3 px-4">
+                            {{ jaap.date|date('Y-m-d') }}
+                        </td>
+                        <td class="py-3 px-4">
+                            {{ jaap.count|number_format }}
+                        </td>
+                        <td class="py-3 px-4">
+                            {{ jaap.cumulative_count|number_format }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="py-6 text-center text-gray-500">
+                            No jaap entries found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Recent Sessions -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4">Recent Sessions</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="py-3 px-4 text-left">Start Time</th>
+                        <th class="py-3 px-4 text-left">End Time</th>
+                        <th class="py-3 px-4 text-left">Duration</th>
+                        <th class="py-3 px-4 text-left">Count</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for session in recent_sessions %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="py-3 px-4">
+                            {{ session.start_time|date('Y-m-d H:i') }}
+                        </td>
+                        <td class="py-3 px-4">
+                            {% if session.end_time %}
+                                {{ session.end_time|date('Y-m-d H:i') }}
+                            {% else %}
+                                <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Active</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4">
+                            {% if session.end_time %}
+                                {% set duration = (session.end_time - session.start_time).total_seconds() // 60 %}
+                                {{ duration }} min
+                            {% else %}
+                                --
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4">
+                            {{ session.count|default(0)|number_format }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="py-6 text-center text-gray-500">
+                            No recent sessions found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Prepare chart data
+        const dates = [
+            {% for jaap in jaap_counts %}
+                "{{ jaap.date|date('M d') }}",
+            {% endfor %}
+        ];
+        
+        const counts = [
+            {% for jaap in jaap_counts %}
+                {{ jaap.count }},
+            {% endfor %}
+        ];
+        
+        // Create jaap history chart
+        const ctx = document.getElementById('jaapHistoryChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Daily Jaap Count',
+                    data: counts,
+                    backgroundColor: 'rgba(255, 153, 51, 0.7)',
+                    borderColor: 'rgba(255, 153, 51, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                if (value >= 1000) {
+                                    return (value / 1000) + 'k';
+                                }
+                                return value;
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let value = context.parsed.y;
+                                return context.dataset.label + ': ' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %} 

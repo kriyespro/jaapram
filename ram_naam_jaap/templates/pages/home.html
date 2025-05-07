@@ -1,0 +1,960 @@
+{% extends 'base/base.html' %}
+
+{% block title %}JaapRam - Home{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ static('css/home.css') }}">
+{% endblock %}
+
+{% block extra_head %}
+    <meta name="description" content="Track your Ram Naam Jaap practice and join the community of devotees in this sacred practice.">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <!-- Leaflet Fullscreen plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@2.4.0/Control.FullScreen.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@2.4.0/Control.FullScreen.css">
+    <!-- Leaflet MarkerCluster plugin -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <style>
+        .animated-counter {
+            transition: all 0.5s ease-in-out;
+        }
+        .counter-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.5rem;
+        }
+        .counter-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,153,51,0.1), rgba(255,153,51,0.3));
+            z-index: 0;
+        }
+        .counter-content {
+            position: relative;
+            z-index: 1;
+        }
+        .benefit-card {
+            transition: transform 0.3s ease;
+        }
+        .benefit-card:hover {
+            transform: translateY(-5px);
+        }
+        .om-symbol {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .city-card {
+            transition: all 0.3s ease;
+        }
+        .city-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+        /* Updated marker styling for more compact look */
+        .jaap-marker {
+            background-color: rgba(231, 81, 31, 0.9);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-size: 10px;
+        }
+        
+        /* Custom cluster icon styling */
+        .custom-cluster {
+            background-color: transparent;
+        }
+        
+        .cluster-icon {
+            background-color: rgba(231, 81, 31, 0.9);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            font-weight: bold;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            font-size: 12px;
+        }
+        
+        /* More compact user location marker */
+        .user-location-marker {
+            background-color: rgba(35, 123, 245, 0.9);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 2px solid white;
+            box-shadow: 0 2px 10px rgba(35, 123, 245, 0.6);
+            animation: pulse-blue 2s infinite;
+            z-index: 1000 !important;
+            font-size: 11px;
+        }
+        
+        /* Simplified popup styling */
+        .city-popup {
+            padding: 5px;
+            max-width: 150px;
+        }
+        
+        .city-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #e75d1f;
+            margin-bottom: 2px;
+        }
+        
+        .jaap-stats {
+            font-size: 12px;
+        }
+        
+        /* More compact map controls */
+        .map-filter-btn {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 10px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        /* More compact map overlay */
+        .map-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 4px;
+            padding: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            max-width: 150px;
+            font-size: 10px;
+        }
+        
+        .map-stats {
+            margin-bottom: 4px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .map-stats:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .map-stats strong {
+            color: #e75d1f;
+        }
+        
+        .leaflet-popup-content {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .leaflet-popup-content .city-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #e75d1f;
+            margin-bottom: 4px;
+        }
+        
+        .leaflet-popup-content .jaap-stats {
+            margin-top: 6px;
+        }
+        
+        .map-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 0 20px;
+        }
+        
+        .map-filters {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .map-filter-btn:hover, .map-filter-btn.active {
+            background-color: #e75d1f;
+            color: white;
+            border-color: #e75d1f;
+        }
+        
+        @keyframes pulse-blue {
+            0% { box-shadow: 0 0 0 0 rgba(35, 123, 245, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(35, 123, 245, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(35, 123, 245, 0); }
+        }
+        
+        /* Add a label above the user marker */
+        .user-marker-label {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(35, 123, 245, 0.9);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        /* Full-width map styling */
+        .map-fullwidth-container {
+            width: 100%;
+            position: relative;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        #global-jaap-map {
+            width: 100%;
+            z-index: 10;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-col space-y-8" x-data="{ showBenefits: false }">
+    <!-- Hero Section -->
+    <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg shadow-xl overflow-hidden hero-bg animated-gradient">
+        <div class="md:flex p-8 hero-content">
+            <div class="md:w-1/2 flex flex-col justify-center text-white">
+                <h1 class="text-4xl md:text-5xl font-bold mb-3 hero-title">JaapRam</h1>
+                <p class="text-md mb-4">Track your spiritual journey with the divine name of Lord Ram</p>
+                
+                <!-- Stats moved to hero section - Made more compact -->
+                <div class="flex justify-between bg-white/10 p-3 rounded-lg mb-3">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold"
+                             x-data="{ count: 0, target: {{ total_count|default(0) }} }"
+                             x-init="() => {
+                                 const duration = 2000;
+                                 const start = performance.now();
+                                 const step = (timestamp) => {
+                                     const progress = Math.min((timestamp - start) / duration, 1);
+                                     count = Math.floor(progress * target);
+                                     if (progress < 1) requestAnimationFrame(step);
+                                 };
+                                 requestAnimationFrame(step);
+                             }" x-text="count.toLocaleString()"></div>
+                        <div class="text-xs">Total Jaap Count</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold"
+                             x-data="{ count: 0, target: {{ total_users|default(0) }} }"
+                             x-init="() => {
+                                 const duration = 1500;
+                                 const start = performance.now();
+                                 const step = (timestamp) => {
+                                     const progress = Math.min((timestamp - start) / duration, 1);
+                                     count = Math.floor(progress * target);
+                                     if (progress < 1) requestAnimationFrame(step);
+                                 };
+                                 requestAnimationFrame(step);
+                             }" x-text="count > 0 ? count.toLocaleString() : {{ total_users|default(1) }}"></div>
+                        <div class="text-xs">Community</div>
+                    </div>
+                </div>
+                
+                <!-- Top 5 Cities in a row -->
+                <div class="bg-white/10 p-3 rounded-lg mb-4">
+                    <div class="flex justify-between mb-1">
+                        <div class="text-xs font-semibold">Top Cities</div>
+                        <div class="text-xs">Devotees</div>
+                    </div>
+                    <div class="space-y-1">
+                        {% if top_cities and top_cities|length > 0 %}
+                            {% for city in top_cities[:5] %}
+                                <div class="flex justify-between items-center text-sm">
+                                    <div class="font-medium truncate mr-2">{{ city.city }}</div>
+                                    <div class="font-bold">{{ city.user_count }}</div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="flex justify-between items-center text-sm">
+                                <div class="font-medium">New Delhi</div>
+                                <div class="font-bold">108</div>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <div class="font-medium">Mumbai</div>
+                                <div class="font-bold">98</div>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <div class="font-medium">Bengaluru</div>
+                                <div class="font-bold">87</div>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <div class="font-medium">Varanasi</div>
+                                <div class="font-bold">76</div>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <div class="font-medium">Jaipur</div>
+                                <div class="font-bold">65</div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if user.is_authenticated %}
+                    <div>
+                        <a href="{{ url('jaap:jaap_entry') }}" class="inline-block bg-primary text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-orange-600 text-center transition-all transform hover:scale-105" style="display: inline-block !important;">START JAAP NOW</a>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="md:w-1/2 mt-6 md:mt-0 flex justify-center items-center">
+                <div class="image-container relative">
+                    <div class="divine-aura"></div>
+                    <img src="{{ static('images/shree_ram.jpg') }}" alt="Shree Ram" class="lord-ram-image rounded-lg shadow-2xl">
+                    <div class="image-overlay"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Live Map Section - Full Width -->
+    <div class="map-fullwidth-container mb-6" id="global-jaap-map-container">
+        <div class="container mx-auto px-4 py-2">
+            <h2 class="text-xl font-bold text-primary mb-2 text-center">
+                <i class="fas fa-globe-asia mr-1"></i>Live Ram Naam Jaap Map
+            </h2>
+            
+            <div class="map-controls flex justify-between items-center mb-2">
+                <div class="map-filters flex gap-2">
+                    <button class="map-filter-btn active text-xs py-1 px-2" id="filter-all">All</button>
+                    <button class="map-filter-btn text-xs py-1 px-2" id="filter-top">Top 10</button>
+                    <button class="map-filter-btn text-xs py-1 px-2" id="filter-recent">Recent</button>
+                </div>
+                <div id="map-debug" class="text-xs text-gray-500"></div>
+            </div>
+        </div>
+        
+        <!-- Reduce map height -->
+        <div id="global-jaap-map" style="height: 300px;"></div>
+        
+        <!-- Make overlay more compact -->
+        <div class="map-overlay hidden" id="map-info-overlay">
+            <div class="map-stats text-xs">
+                <span>Cities: <strong id="total-cities">0</strong></span>
+            </div>
+            <div class="map-stats text-xs">
+                <span>Today: <strong id="total-count">0</strong></span>
+            </div>
+            <div class="map-stats text-xs">
+                <span>Most Active: <strong id="most-active-city">-</strong></span>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-1">
+            <p class="text-xs text-gray-500 text-center">
+                Real-time jaap counts by city. Updates every 30s.
+            </p>
+        </div>
+    </div>
+    
+    <!-- Leaderboard Section - Modified to be more compact -->
+    <div class="bg-white rounded-lg shadow-md p-4 shadow-elevated">
+        <div class="flex justify-between items-center mb-2">
+            <h2 class="text-xl font-bold text-gray-800 title-saffron">Top Devotees</h2>
+            <div class="text-primary">
+                <i class="fas fa-trophy mr-1"></i>
+                <span>Leaderboard</span>
+            </div>
+        </div>
+        <div id="leaderboard-content" class="overflow-x-auto"
+             hx-get="{{ url('community:global_leaderboard') }}"
+             hx-trigger="revealed, every 5m"
+             hx-swap="innerHTML">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                        <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                        <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                        <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Count</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for user in top_users %}
+                    <tr class="hover:bg-orange-50 transition-colors duration-200 leaderboard-row">
+                        <td class="px-3 py-2 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ loop.index }}</div>
+                        </td>
+                        <td class="px-3 py-2 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-7 w-7">
+                                    <div class="h-7 w-7 rounded-full bg-orange-100 flex items-center justify-center">
+                                        <span class="text-sm text-orange-500">{{ user.username[0]|upper }}</span>
+                                    </div>
+                                </div>
+                                <div class="ml-2">
+                                    <div class="text-sm font-medium text-gray-900">{{ user.username }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-3 py-2 whitespace-nowrap">
+                            <div class="text-xs text-gray-500">{{ user.profile.city|default("Unknown") }}</div>
+                        </td>
+                        <td class="px-3 py-2 whitespace-nowrap">
+                            <div class="text-sm font-bold text-primary">{{ user.total_jaap|default("0") }}</div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="px-3 py-2 whitespace-nowrap text-center text-gray-500">
+                            No entries yet. Be the first to start your practice!
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-2 text-center">
+            <a href="{{ url('community:global_leaderboard') }}" 
+               class="inline-block bg-primary text-white hover:bg-orange-600 font-medium transition-colors duration-200 py-1 px-3 rounded text-sm">
+                <span>View Full Leaderboard</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="inline-block h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Benefits Section -->
+    <div class="bg-white rounded-lg shadow-md p-6 shadow-elevated">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 title-saffron">Benefits of Ram Naam Jaap</h2>
+            <div class="text-primary text-4xl om-symbol">
+                <i class="fas fa-om"></i>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+            <div class="flex flex-col items-center p-4 benefit-card bg-gray-50 rounded-lg border border-gray-100 benefit-highlight">
+                <div class="text-primary text-4xl mb-3">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3 class="text-lg font-semibold mb-2">Inner Peace</h3>
+                <p class="text-gray-600 text-center">Experience tranquility and inner peace through the repetition of the divine name.</p>
+            </div>
+            <div class="flex flex-col items-center p-4 benefit-card bg-gray-50 rounded-lg border border-gray-100 benefit-highlight">
+                <div class="text-primary text-4xl mb-3">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="text-lg font-semibold mb-2">Community</h3>
+                <p class="text-gray-600 text-center">Join a global community of devotees practicing this ancient spiritual tradition.</p>
+            </div>
+            <div class="flex flex-col items-center p-4 benefit-card bg-gray-50 rounded-lg border border-gray-100 benefit-highlight">
+                <div class="text-primary text-4xl mb-3">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="text-lg font-semibold mb-2">Track Progress</h3>
+                <p class="text-gray-600 text-center">Visualize your spiritual journey with detailed statistics and progress tracking.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize HTMX and Alpine.js
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize the map directly without Alpine.js
+        initGlobalJaapMap();
+        
+        // Add scroll-triggered animations for benefits
+        const benefitCards = document.querySelectorAll('.benefit-card');
+        
+        // Create an intersection observer for animation on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('transform', 'translateY(0)', 'opacity-100');
+                    entry.target.classList.remove('opacity-0', 'translate-y-4');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            root: null,
+            threshold: 0.1,
+            rootMargin: '0px'
+        });
+        
+        // Apply initial styles and observe each card
+        benefitCards.forEach(card => {
+            card.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-4');
+            observer.observe(card);
+        });
+        
+        // Initialize Activity Chart
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        
+        // Get chart data
+        let chartLabels = {{ chart_labels|default('["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]')|safe }};
+        let chartData = {{ chart_data|default('[89000, 96000, 94500, 91000, 93000, 92000, 130000]')|safe }};
+        
+        // Parse JSON if needed
+        if (typeof chartLabels === 'string') {
+            chartLabels = JSON.parse(chartLabels);
+        }
+        if (typeof chartData === 'string') {
+            chartData = JSON.parse(chartData);
+        }
+        
+        // Create the chart with realistic data and proper formatting
+        const activityChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: 'Ram Naam Jaap Count',
+                    data: chartData.length > 0 ? chartData : [89000, 96000, 94500, 91000, 93000, 92000, 130000],
+                    backgroundColor: 'rgba(255, 153, 51, 0.2)',
+                    borderColor: 'rgba(255, 153, 51, 1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true,
+                    pointRadius: 4,
+                    pointBackgroundColor: 'rgba(255, 153, 51, 1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                if (value >= 1000) {
+                                    return (value / 1000) + 'k';
+                                }
+                                return value;
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            maxRotation: 0,
+                            callback: function(value, index) {
+                                if (typeof this.getLabelForValue === 'function') {
+                                    const label = this.getLabelForValue(index);
+                                    try {
+                                        const date = new Date(label);
+                                        if (!isNaN(date)) {
+                                            return date.toISOString().split('T')[0];
+                                        }
+                                    } catch (e) {}
+                                }
+                                return chartLabels[index];
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let value = context.parsed.y;
+                                return context.dataset.label + ': ' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+    
+    // Global Jaap Map Initialization
+    function initGlobalJaapMap() {
+        try {
+            console.log('Initializing map...');
+            const debugElem = document.getElementById('map-debug');
+            if (debugElem) {
+                debugElem.innerHTML = 'Initializing map...';
+            }
+            
+            // Check if Leaflet is loaded
+            if (typeof L === 'undefined') {
+                console.error('Leaflet not loaded!');
+                if (debugElem) {
+                    debugElem.innerHTML = 'Error: Leaflet library not loaded!';
+                }
+                return;
+            }
+            
+            // Initialize the map with more compact settings
+            const map = L.map('global-jaap-map', {
+                fullscreenControl: true,
+                fullscreenControlOptions: {
+                    position: 'topleft',
+                    title: 'Fullscreen',
+                    titleCancel: 'Exit'
+                },
+                zoomControl: true,
+                attributionControl: false
+            }).setView([20, 77], 2);  // Start with a more zoomed out view
+            
+            // Add tile layer with a simpler setting
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+            
+            // Add minimalist zoom control
+            L.control.zoom({
+                position: 'bottomright'
+            }).addTo(map);
+            
+            // Initialize marker cluster group with more compact settings
+            const markers = L.markerClusterGroup({
+                disableClusteringAtZoom: 7,
+                spiderfyOnMaxZoom: true,
+                showCoverageOnHover: false,
+                zoomToBoundsOnClick: true,
+                maxClusterRadius: 50,
+                iconCreateFunction: function(cluster) {
+                    // Get count of all markers in this cluster
+                    const childCount = cluster.getChildCount();
+                    
+                    // Create a more compact cluster icon
+                    return L.divIcon({
+                        html: `<div class="cluster-icon">${childCount}</div>`,
+                        className: 'custom-cluster',
+                        iconSize: L.point(36, 36)
+                    });
+                }
+            });
+            
+            // Store individual markers for updates
+            const markerObjects = {};
+            let cityData = [];
+            let userMarker = null;
+            let mapInitialized = false;
+            
+            // Show overlay
+            const overlay = document.getElementById('map-info-overlay');
+            if (overlay) overlay.classList.remove('hidden');
+            
+            // Update user marker behavior to prefer user profile city over geolocation
+            function getUserLocation() {
+                {% if user.is_authenticated and user.profile.city %}
+                // Use city from user profile when available
+                const userCity = "{{ user.profile.city }}";
+                console.log('Using profile city:', userCity);
+                
+                // Try to get coordinates for user's profile city
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(userCity)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.length > 0) {
+                            const userLat = parseFloat(data[0].lat);
+                            const userLng = parseFloat(data[0].lon);
+                            addUserMarker(userLat, userLng, userCity, '');
+                            if (!mapInitialized) {
+                                map.setView([userLat, userLng], 5);
+                                mapInitialized = true;
+                            }
+                        } else {
+                            // Fallback to IP-based location if city lookup fails
+                            fallbackToIpLocation();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error getting city coordinates:', error);
+                        fallbackToIpLocation();
+                    });
+                {% else %}
+                // Try IP-based geolocation first (no permissions needed)
+                fallbackToIpLocation();
+                {% endif %}
+            }
+            
+            // IP-based location as a fallback (doesn't require permissions)
+            function fallbackToIpLocation() {
+                fetch('https://ipapi.co/json/')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.latitude && data.longitude) {
+                            const cityName = data.city || 'Your Location';
+                            const countryName = data.country_name || '';
+                            addUserMarker(data.latitude, data.longitude, cityName, countryName);
+                            if (!mapInitialized) {
+                                map.setView([data.latitude, data.longitude], 5);
+                                mapInitialized = true;
+                            }
+                        } else {
+                            // If IP geolocation fails, default to India
+                            addUserMarker(20.5937, 78.9629, 'Your Location', 'India');
+                            if (!mapInitialized) {
+                                map.setView([20.5937, 78.9629], 4);
+                                mapInitialized = true;
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error getting IP location:', error);
+                        // Default to India if all methods fail
+                        addUserMarker(20.5937, 78.9629, 'Your Location', 'India');
+                        if (!mapInitialized) {
+                            map.setView([20.5937, 78.9629], 4);
+                            mapInitialized = true;
+                        }
+                    });
+            }
+            
+            // Add user marker to map
+            function addUserMarker(lat, lng, city, country) {
+                // Get user's jaap count if available
+                fetch('{{ url('jaap:jaap_entry') }}?format=json')
+                    .then(response => response.json())
+                    .catch(() => ({ today_count: 0 }))
+                    .then(data => {
+                        const count = data.today_count || 0;
+                        
+                        // Create custom icon with "You" label and count
+                        const userIcon = L.divIcon({
+                            html: `
+                                <div class="user-marker-label">You</div>
+                                <div class='user-location-marker' style="width:40px;height:40px;">
+                                    <span>${count >= 1000 ? (count/1000).toFixed(1) + 'k' : count}</span>
+                                </div>
+                            `,
+                            className: '',
+                            iconSize: [40, 40]
+                        });
+                        
+                        // Remove existing user marker if any
+                        if (userMarker) {
+                            map.removeLayer(userMarker);
+                        }
+                        
+                        // Create user marker
+                        userMarker = L.marker([lat, lng], {
+                            icon: userIcon,
+                            zIndexOffset: 1000
+                        }).addTo(map);
+                        
+                        // Add popup with user details
+                        userMarker.bindPopup(`
+                            <div class="city-popup">
+                                <div class="city-name">You (${city})</div>
+                                <div class="jaap-stats">
+                                    <strong>${count.toLocaleString()}</strong> jaaps today
+                                </div>
+                            </div>
+                        `);
+                    });
+            }
+            
+            // Call to get user location
+            getUserLocation();
+            
+            // Load data
+            function loadMapData() {
+                console.log('Loading map data...');
+                fetch('{{ url('jaap:map_data') }}')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok: ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Map data received:', data);
+                        cityData = data.city_data || [];
+                        updateMarkers(cityData);
+                        updateStats(data);
+                        
+                        if (debugElem) {
+                            debugElem.innerHTML = `Last updated: ${new Date().toLocaleTimeString()}`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading map data:', error);
+                        if (debugElem) {
+                            debugElem.innerHTML = 'Error loading data: ' + error.message;
+                        }
+                    });
+            }
+            
+            // Update map statistics
+            function updateStats(data) {
+                const totalCount = document.getElementById('total-count');
+                const totalCities = document.getElementById('total-cities');
+                const mostActiveCity = document.getElementById('most-active-city');
+                
+                if (totalCount) totalCount.textContent = data.today_total.toLocaleString();
+                if (totalCities) totalCities.textContent = cityData.length;
+                
+                // Find most active city
+                if (cityData.length > 0 && mostActiveCity) {
+                    const sorted = [...cityData].sort((a, b) => b.count - a.count);
+                    mostActiveCity.textContent = `${sorted[0].city} (${sorted[0].count.toLocaleString()})`;
+                }
+            }
+            
+            // Update markers
+            function updateMarkers(cities) {
+                // Clear existing markers
+                markers.clearLayers();
+                
+                // Process each city
+                cities.forEach(city => {
+                    const id = `${city.city}-${city.country}`;
+                    
+                    // Calculate marker size based on count (min 30px, max 60px for more compact view)
+                    const size = Math.min(Math.max(30, 30 + Math.log10(city.count) * 8), 60);
+                    
+                    // Create custom icon with count and city initial
+                    const cityInitial = city.city.charAt(0).toUpperCase();
+                    const customIcon = L.divIcon({
+                        html: `<div class='jaap-marker' style="width:${size}px;height:${size}px;">
+                                <span style="font-size: ${size > 40 ? '12px' : '10px'}">
+                                    ${cityInitial}: ${city.count >= 1000 ? (city.count/1000).toFixed(1) + 'k' : city.count}
+                                </span>
+                               </div>`,
+                        className: '',
+                        iconSize: [size, size]
+                    });
+                    
+                    // Create more compact popup content
+                    const popupContent = `
+                        <div class="city-popup">
+                            <div class="city-name">${city.city}</div>
+                            <div class="jaap-stats">
+                                <strong>${city.count.toLocaleString()}</strong> jaaps
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Create marker
+                    const marker = L.marker([city.lat, city.lng], {
+                        icon: customIcon,
+                        title: `${city.city}: ${city.count.toLocaleString()} jaaps`
+                    }).bindPopup(popupContent);
+                    
+                    // Store marker
+                    markerObjects[id] = marker;
+                    
+                    // Add to cluster group
+                    markers.addLayer(marker);
+                });
+                
+                // Add markers to map
+                map.addLayer(markers);
+            }
+            
+            // Filter functions
+            document.getElementById('filter-all').addEventListener('click', function() {
+                setActiveFilter(this);
+                markers.clearLayers();
+                updateMarkers(cityData);
+            });
+            
+            document.getElementById('filter-top').addEventListener('click', function() {
+                setActiveFilter(this);
+                const topCities = [...cityData].sort((a, b) => b.count - a.count).slice(0, 10);
+                markers.clearLayers();
+                updateMarkers(topCities);
+            });
+            
+            document.getElementById('filter-recent').addEventListener('click', function() {
+                setActiveFilter(this);
+                // Sort by timestamp if available, otherwise use count
+                const recentActive = [...cityData].sort((a, b) => {
+                    if (a.timestamp && b.timestamp) {
+                        return new Date(b.timestamp) - new Date(a.timestamp);
+                    }
+                    return b.count - a.count;
+                }).slice(0, 15);
+                markers.clearLayers();
+                updateMarkers(recentActive);
+            });
+            
+            function setActiveFilter(button) {
+                document.querySelectorAll('.map-filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                button.classList.add('active');
+            }
+            
+            // Map interactions
+            map.on('popupopen', function(e) {
+                const marker = e.popup._source;
+                if (marker && marker.options && marker.options.icon) {
+                    const iconElement = marker.getElement().querySelector('.jaap-marker');
+                    if (iconElement) {
+                        iconElement.style.transform = 'scale(1.2)';
+                        iconElement.style.boxShadow = '0 4px 12px rgba(0,0,0,0.5)';
+                    }
+                }
+            });
+            
+            map.on('popupclose', function(e) {
+                const marker = e.popup._source;
+                if (marker && marker.options && marker.options.icon) {
+                    const iconElement = marker.getElement().querySelector('.jaap-marker');
+                    if (iconElement) {
+                        iconElement.style.transform = '';
+                        iconElement.style.boxShadow = '';
+                    }
+                }
+            });
+            
+            // Initial data load
+            loadMapData();
+            
+            // Set up polling
+            setInterval(loadMapData, 30000); // Every 30 seconds
+            setInterval(() => { 
+                // Refresh user marker every 2 minutes to update count
+                if (userMarker) {
+                    getUserLocation();
+                }
+            }, 120000);
+            
+            if (debugElem) {
+                debugElem.innerHTML = 'Map initialized successfully';
+            }
+            
+        } catch (error) {
+            console.error('Error in map initialization:', error);
+            const debugElem = document.getElementById('map-debug');
+            if (debugElem) {
+                debugElem.innerHTML = 'Error: ' + error.message;
+            }
+        }
+    }
+</script>
+{% endblock %} 

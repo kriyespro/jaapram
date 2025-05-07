@@ -1,0 +1,64 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Admin - Leaderboard{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-2xl font-bold mb-6">Leaderboard Administration</h1>
+        
+        <div class="mb-6 flex justify-between items-center">
+            <h2 class="text-xl font-semibold">Top Users by Count</h2>
+            <div class="text-gray-600">Showing top {{ top_users_by_count|length }} users</div>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="py-3 px-4 text-left">Rank</th>
+                        <th class="py-3 px-4 text-left">Username</th>
+                        <th class="py-3 px-4 text-left">Full Name</th>
+                        <th class="py-3 px-4 text-left">City</th>
+                        <th class="py-3 px-4 text-left">Total Jaap Count</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for user in top_users_by_count %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="py-3 px-4 font-medium">
+                            {{ loop.index }}
+                        </td>
+                        <td class="py-3 px-4">
+                            {{ user.username }}
+                        </td>
+                        <td class="py-3 px-4">
+                            {{ user.get_full_name() }}
+                        </td>
+                        <td class="py-3 px-4">
+                            {{ user.profile.city if user.profile else '-' }}
+                        </td>
+                        <td class="py-3 px-4 font-semibold text-primary">
+                            {{ user.total_jaap }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="py-6 text-center text-gray-500">
+                            No users with jaap counts found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Export options -->
+        <div class="mt-6 flex justify-end">
+            <button class="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300 transition">
+                Export to CSV
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="{% block meta_description %}Ram Naam Jaap - Track your spiritual journey{% endblock %}">
+    <title>{% block title %}Ram Naam Jaap{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="{{ static('images/favicon.ico') }}" type="image/x-icon">
+    
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#FFF7ED',
+                            100: '#FFEDD5',
+                            200: '#FED7AA',
+                            300: '#FDBA74',
+                            400: '#FB923C',
+                            500: '#F97316',
+                            600: '#EA580C',
+                            700: '#C2410C',
+                            800: '#9A3412',
+                            900: '#7C2D12',
+                        },
+                        secondary: {
+                            50: '#F0FDF4',
+                            100: '#DCFCE7',
+                            200: '#BBF7D0',
+                            300: '#86EFAC',
+                            400: '#4ADE80',
+                            500: '#22C55E',
+                            600: '#16A34A',
+                            700: '#15803D',
+                            800: '#166534',
+                            900: '#14532D',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        serif: ['Mukta', 'Georgia', 'serif'],
+                        display: ['Poppins', 'system-ui', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+
+    <!-- Alpine.js via CDN -->
+    <script defer src="https://unpkg.com/alpinejs@3.10.5/dist/cdn.min.js"></script>
+    
+    <!-- Custom CSS for additional styling -->
+    <style>
+        /* Global Custom CSS Here */
+        [x-cloak] { display: none !important; }
+    </style>
+    
+    <!-- Additional head content -->
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="flex flex-col min-h-screen bg-gray-50 text-gray-800">
+    <!-- Header -->
+    <header class="bg-primary-600 text-white shadow-md">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <!-- Logo and site name -->
+                <div class="flex items-center space-x-2">
+                    <a href="{{ url('jaap:home') }}" class="flex items-center">
+                        <img src="{{ static('images/logo.png') }}" alt="Ram Naam Jaap Logo" class="h-10 w-auto">
+                        <span class="ml-2 text-xl font-bold">Ram Naam Jaap</span>
+                    </a>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden" x-data="{ open: false }">
+                    <button @click="open = !open" class="text-white focus:outline-none">
+                        <svg class="h-6 w-6" x-show="!open" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                        <svg class="h-6 w-6" x-show="open" x-cloak fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                    
+                    <!-- Mobile menu -->
+                    <div x-show="open" x-cloak class="absolute top-16 right-0 left-0 bg-primary-600 shadow-md p-4 z-50">
+                        <nav class="flex flex-col space-y-4">
+                            <a href="{{ url('jaap:home') }}" class="text-white hover:text-primary-200">Home</a>
+                            <a href="{{ url('jaap:jaap_entry') }}" class="text-white hover:text-primary-200">Jaap Counter</a>
+                            <a href="{{ url('jaap:jaap_history') }}" class="text-white hover:text-primary-200">History</a>
+                            <a href="{{ url('community:leaderboard') }}" class="text-white hover:text-primary-200">Leaderboard</a>
+                            <a href="{{ url('community:forums') }}" class="text-white hover:text-primary-200">Community</a>
+                            {% if hasattr(request, 'user') and request.user.is_authenticated %}
+                                <a href="{{ url('accounts:profile') }}" class="text-white hover:text-primary-200">My Profile</a>
+                                <a href="{{ url('account_logout') }}" class="text-white hover:text-primary-200">Logout</a>
+                            {% else %}
+                                <a href="{{ url('account_login') }}" class="text-white hover:text-primary-200">Login</a>
+                                <a href="{{ url('account_signup') }}" class="text-white hover:text-primary-200">Sign Up</a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                </div>
+                
+                <!-- Desktop menu -->
+                <nav class="hidden md:flex items-center space-x-6">
+                    <a href="{{ url('jaap:home') }}" class="text-white hover:text-primary-200">Home</a>
+                    <a href="{{ url('jaap:jaap_entry') }}" class="text-white hover:text-primary-200">Jaap Counter</a>
+                    <a href="{{ url('jaap:jaap_history') }}" class="text-white hover:text-primary-200">History</a>
+                    <a href="{{ url('community:leaderboard') }}" class="text-white hover:text-primary-200">Leaderboard</a>
+                    <a href="{{ url('community:forums') }}" class="text-white hover:text-primary-200">Community</a>
+                    
+                    {% if hasattr(request, 'user') and request.user.is_authenticated %}
+                        <!-- User dropdown -->
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="flex items-center text-white focus:outline-none">
+                                <span>{{ request.user.username }}</span>
+                                <svg class="ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                            
+                            <!-- Dropdown menu -->
+                            <div x-show="open" @click.away="open = false" x-cloak class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                                <a href="{{ url('accounts:profile') }}" class="block px-4 py-2 text-gray-800 hover:bg-primary-100">My Profile</a>
+                                <a href="{{ url('jaap:dashboard') }}" class="block px-4 py-2 text-gray-800 hover:bg-primary-100">Dashboard</a>
+                                {% if request.user.is_staff %}
+                                    <a href="{{ url('admin_dashboard:index') }}" class="block px-4 py-2 text-gray-800 hover:bg-primary-100">Admin Dashboard</a>
+                                {% endif %}
+                                <div class="border-t border-gray-200"></div>
+                                <a href="{{ url('account_logout') }}" class="block px-4 py-2 text-gray-800 hover:bg-primary-100">Logout</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{{ url('account_login') }}" class="text-white hover:text-primary-200">Login</a>
+                        <a href="{{ url('account_signup') }}" class="px-4 py-2 bg-white text-primary-600 rounded-md hover:bg-gray-100">Sign Up</a>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Messages/Notifications -->
+    {% if messages %}
+    <div class="container mx-auto px-4 py-2">
+        {% for message in messages %}
+            <div class="my-2 p-4 rounded-md {% if message.tags == 'error' %}bg-red-100 text-red-700{% elif message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-700{% else %}bg-blue-100 text-blue-700{% endif %}" 
+                x-data="{ show: true }" 
+                x-show="show" 
+                x-init="setTimeout(() => show = false, 5000)">
+                <div class="flex justify-between items-center">
+                    <div>{{ message }}</div>
+                    <button @click="show = false" class="text-gray-500 hover:text-gray-700">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Main content -->
+    <main class="flex-grow container mx-auto px-4 py-6">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Ram Naam Jaap</h3>
+                    <p class="text-gray-300">Track your spiritual journey and connect with a community of devotees.</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="{{ url('jaap:home') }}" class="text-gray-300 hover:text-white">Home</a></li>
+                        <li><a href="{{ url('jaap:jaap_entry') }}" class="text-gray-300 hover:text-white">Jaap Counter</a></li>
+                        <li><a href="{{ url('jaap:jaap_history') }}" class="text-gray-300 hover:text-white">History</a></li>
+                        <li><a href="{{ url('community:leaderboard') }}" class="text-gray-300 hover:text-white">Leaderboard</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Community</h3>
+                    <ul class="space-y-2">
+                        <li><a href="{{ url('community:forums') }}" class="text-gray-300 hover:text-white">Forums</a></li>
+                        <li><a href="{{ url('community:events') }}" class="text-gray-300 hover:text-white">Events</a></li>
+                        <li><a href="{{ url('community:groups') }}" class="text-gray-300 hover:text-white">Groups</a></li>
+                        <li><a href="{{ url('blog:index') }}" class="text-gray-300 hover:text-white">Blog</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Account</h3>
+                    <ul class="space-y-2">
+                        {% if hasattr(request, 'user') and request.user.is_authenticated %}
+                            <li><a href="{{ url('accounts:profile') }}" class="text-gray-300 hover:text-white">My Profile</a></li>
+                            <li><a href="{{ url('jaap:dashboard') }}" class="text-gray-300 hover:text-white">Dashboard</a></li>
+                            <li><a href="{{ url('account_logout') }}" class="text-gray-300 hover:text-white">Logout</a></li>
+                        {% else %}
+                            <li><a href="{{ url('account_login') }}" class="text-gray-300 hover:text-white">Login</a></li>
+                            <li><a href="{{ url('account_signup') }}" class="text-gray-300 hover:text-white">Sign Up</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400">
+                <p>&copy; {{ now().year }} Ram Naam Jaap. All rights reserved.</p>
+                <div class="mt-2 flex justify-center space-x-4">
+                    <a href="{{ url('pages:privacy') }}" class="hover:text-white">Privacy Policy</a>
+                    <a href="{{ url('pages:terms') }}" class="hover:text-white">Terms of Service</a>
+                    <a href="{{ url('pages:contact') }}" class="hover:text-white">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- CSRF token for AJAX requests -->
+    <script>
+        // Set CSRF token for AJAX requests
+        window.csrfToken = "{{ csrf_input(request) }}";
+    </script>
+    
+    <!-- Additional scripts -->
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html> 

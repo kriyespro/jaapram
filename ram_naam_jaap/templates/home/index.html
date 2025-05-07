@@ -1,0 +1,166 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Ram Naam Jaap | Home{% endblock %}
+
+{% block extra_head %}
+    <meta name="description" content="Start your spiritual journey with Ram Naam Jaap - Track and maintain your daily Jaap count">
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Hero Section -->
+    <section class="flex flex-col md:flex-row items-center justify-between gap-8 py-12">
+        <div class="md:w-1/2">
+            <h1 class="text-4xl md:text-5xl font-bold text-primary mb-4">राम नाम जाप</h1>
+            <p class="text-xl md:text-2xl text-gray-700 mb-6">Begin your spiritual journey with the divine name of Ram</p>
+            <p class="text-gray-600 mb-8">Track your daily, weekly, and monthly progress as you deepen your practice and connection with the divine.</p>
+            <div class="flex flex-wrap gap-4">
+                {% if user.is_authenticated %}
+                <a href="{% url 'jaap:entry' %}" class="bg-primary hover:bg-orange-500 text-white px-6 py-3 rounded-lg font-medium transition">Start Jaap Now</a>
+                <a href="{% url 'dashboard:overview' %}" class="bg-white border border-primary text-primary hover:bg-gray-50 px-6 py-3 rounded-lg font-medium transition">View Dashboard</a>
+                {% else %}
+                <a href="{% url 'accounts:login' %}" class="bg-primary hover:bg-orange-500 text-white px-6 py-3 rounded-lg font-medium transition">Login to Start</a>
+                <a href="{% url 'accounts:register' %}" class="bg-white border border-primary text-primary hover:bg-gray-50 px-6 py-3 rounded-lg font-medium transition">Register Now</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="md:w-1/2">
+            <div class="bg-orange-50 p-8 rounded-lg shadow-lg border border-orange-100">
+                <h2 class="text-2xl font-bold text-center mb-4">Today's Community Jaap Count</h2>
+                <div class="text-center">
+                    <span class="text-5xl md:text-6xl font-bold text-primary">{{ community_count|default:"0" }}</span>
+                    <p class="text-gray-600 mt-2">Ram Naam recitations today</p>
+                </div>
+                <div class="mt-6 pt-6 border-t border-orange-200">
+                    <h3 class="font-semibold mb-2">Active Users Today</h3>
+                    <div class="flex flex-wrap gap-2 justify-center">
+                        {% for user in active_users|slice:":8" %}
+                            <div class="bg-white p-2 rounded-full w-10 h-10 flex items-center justify-center text-sm font-medium shadow">
+                                {{ user.username|first|upper }}
+                            </div>
+                        {% empty %}
+                            <p class="text-gray-500 text-sm">Be the first to contribute today!</p>
+                        {% endfor %}
+                        {% if active_users.count > 8 %}
+                            <div class="bg-gray-200 p-2 rounded-full w-10 h-10 flex items-center justify-center text-sm font-medium shadow">
+                                +{{ active_users.count|add:"-8" }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="py-12">
+        <h2 class="text-3xl font-bold text-center mb-12">Benefits of Ram Naam Jaap</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition">
+                <div class="text-primary text-4xl mb-4">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Peace of Mind</h3>
+                <p class="text-gray-600">The rhythmic recitation of Ram Naam calms the mind and reduces stress and anxiety.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition">
+                <div class="text-primary text-4xl mb-4">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Mental Clarity</h3>
+                <p class="text-gray-600">Regular practice enhances focus and brings clarity to your thoughts and decisions.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition">
+                <div class="text-primary text-4xl mb-4">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Community Connection</h3>
+                <p class="text-gray-600">Join others on the same spiritual path and support each other in your journey.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="py-12 bg-gray-50 rounded-lg p-8 my-8">
+        <h2 class="text-3xl font-bold text-center mb-12">How It Works</h2>
+        <div class="grid md:grid-cols-4 gap-8">
+            <div class="text-center">
+                <div class="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold">1</div>
+                <h3 class="font-semibold mb-2">Register</h3>
+                <p class="text-gray-600">Create your account to begin tracking your practice</p>
+            </div>
+            <div class="text-center">
+                <div class="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold">2</div>
+                <h3 class="font-semibold mb-2">Set Targets</h3>
+                <p class="text-gray-600">Define your daily, weekly, and monthly jaap targets</p>
+            </div>
+            <div class="text-center">
+                <div class="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold">3</div>
+                <h3 class="font-semibold mb-2">Practice Daily</h3>
+                <p class="text-gray-600">Type "Ram" to log your jaap count</p>
+            </div>
+            <div class="text-center">
+                <div class="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold">4</div>
+                <h3 class="font-semibold mb-2">Track Progress</h3>
+                <p class="text-gray-600">View your statistics and achievements</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-12">
+        <h2 class="text-3xl font-bold text-center mb-12">What Our Users Say</h2>
+        <div class="grid md:grid-cols-2 gap-8">
+            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                <div class="flex items-center mb-4">
+                    <div class="bg-orange-100 text-primary rounded-full w-12 h-12 flex items-center justify-center mr-4 font-bold">
+                        RG
+                    </div>
+                    <div>
+                        <h3 class="font-semibold">Rajesh Gupta</h3>
+                        <div class="text-yellow-500">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-gray-600">"This app has transformed my spiritual practice. I've been able to maintain consistency in my jaap for over 3 months now!"</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                <div class="flex items-center mb-4">
+                    <div class="bg-orange-100 text-primary rounded-full w-12 h-12 flex items-center justify-center mr-4 font-bold">
+                        SM
+                    </div>
+                    <div>
+                        <h3 class="font-semibold">Sunita Malhotra</h3>
+                        <div class="text-yellow-500">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-gray-600">"The tracking feature helps me stay motivated. I love seeing my progress and earning achievements along the way."</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-12 bg-primary text-white rounded-lg p-8 my-8 text-center">
+        <h2 class="text-3xl font-bold mb-4">Begin Your Spiritual Journey Today</h2>
+        <p class="text-xl opacity-90 mb-8 max-w-2xl mx-auto">Join thousands of devotees who have enhanced their spiritual practice with Ram Naam Jaap</p>
+        <div class="flex flex-wrap gap-4 justify-center">
+            {% if user.is_authenticated %}
+            <a href="{% url 'jaap:entry' %}" class="bg-white text-primary hover:bg-gray-100 px-8 py-3 rounded-lg font-medium transition">Start Now</a>
+            {% else %}
+            <a href="{% url 'accounts:register' %}" class="bg-white text-primary hover:bg-gray-100 px-8 py-3 rounded-lg font-medium transition">Create Free Account</a>
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %} 

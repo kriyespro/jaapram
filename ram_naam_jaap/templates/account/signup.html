@@ -1,0 +1,187 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Sign Up - Ram Naam Jaap{% endblock %}
+
+{% block extra_head %}
+<meta name="description" content="Create your Ram Naam Jaap account to start tracking your spiritual practice">
+<style>
+    .auth-container {
+        max-width: 500px;
+        margin: 2rem auto;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        background-color: white;
+        overflow: hidden;
+    }
+    
+    .auth-header {
+        background-color: var(--primary-color); /* Saffron header */
+        padding: 1.5rem;
+        text-align: center;
+        color: white;
+    }
+    
+    .auth-body {
+        padding: 2rem;
+    }
+    
+    .auth-footer {
+        padding: 1rem 2rem;
+        background-color: #f9f9f9;
+        border-top: 1px solid #eee;
+        text-align: center;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-control {
+        display: block;
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 0.25rem;
+        font-size: 1rem;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(255, 153, 51, 0.25);
+    }
+    
+    .btn-auth {
+        display: block;
+        width: 100%;
+        padding: 0.75rem;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 0.25rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        text-align: center;
+    }
+    
+    .btn-auth:hover {
+        background-color: #e68a00; /* Darker saffron */
+    }
+    
+    .social-login {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #eee;
+    }
+    
+    .auth-link {
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+    
+    .auth-link:hover {
+        text-decoration: underline;
+    }
+    
+    .checkbox-container {
+        display: flex;
+        align-items: flex-start;
+    }
+    
+    .checkbox-container input[type="checkbox"] {
+        margin-right: 0.5rem;
+        margin-top: 0.25rem;
+    }
+    
+    .field-error {
+        color: #e53e3e;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-header">
+        <h1 class="text-3xl font-bold">Sign Up</h1>
+        <p class="mt-2">Join Ram Naam Jaap spiritual community</p>
+    </div>
+    
+    <div class="auth-body">
+        <form method="post" action="{{ url('account_signup') }}">
+            {{ csrf_input }}
+            
+            {% if form.errors %}
+                <div class="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
+                    <p>There were errors in your signup information. Please correct them below.</p>
+                </div>
+            {% endif %}
+            
+            <div class="form-group">
+                <label for="id_username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                <input type="text" name="username" id="id_username" class="form-control" required>
+                {% if form.username.errors %}
+                    <div class="field-error">{{ form.username.errors[0] }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" name="email" id="id_email" class="form-control" required>
+                {% if form.email.errors %}
+                    <div class="field-error">{{ form.email.errors[0] }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_city" class="block text-sm font-medium text-gray-700 mb-1">City (Optional)</label>
+                <input type="text" name="city" id="id_city" class="form-control">
+            </div>
+            
+            <div class="form-group">
+                <label for="id_password1" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input type="password" name="password1" id="id_password1" class="form-control" required>
+                {% if form.password1.errors %}
+                    <div class="field-error">{{ form.password1.errors[0] }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_password2" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                <input type="password" name="password2" id="id_password2" class="form-control" required>
+                {% if form.password2.errors %}
+                    <div class="field-error">{{ form.password2.errors[0] }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group checkbox-container">
+                <input type="checkbox" name="terms" id="id_terms" required>
+                <label for="id_terms" class="text-sm text-gray-700">
+                    I agree to the <a href="{{ url('core:terms') }}" class="auth-link" target="_blank">Terms of Service</a> and <a href="{{ url('core:privacy') }}" class="auth-link" target="_blank">Privacy Policy</a>
+                </label>
+            </div>
+            
+            <div class="form-group mb-0">
+                <button type="submit" class="btn-auth">Create Account</button>
+            </div>
+        </form>
+    </div>
+    
+    <div class="auth-footer">
+        <p class="text-gray-600">Already have an account? <a href="{{ url('account_login') }}" class="auth-link font-medium">Log In</a></p>
+    </div>
+</div>
+
+<div class="text-center mt-8 mb-10">
+    <div class="mb-4">
+        <i class="fas fa-om text-primary text-4xl"></i>
+    </div>
+    <p class="text-gray-600 max-w-md mx-auto">
+        "Begin your spiritual journey with Ram Naam Jaap. By reciting the divine name of Lord Ram, 
+        one attains peace of mind and spiritual growth."
+    </p>
+</div>
+{% endblock %} 

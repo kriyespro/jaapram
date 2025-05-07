@@ -1,0 +1,132 @@
+# RAM NAAM JAAP APPLICATION - TEST USERS
+
+This file contains the login credentials and profile details for test users in the Ram Naam Jaap application. These users can be used for testing and demonstration purposes.
+
+## Admin User
+- Username: admin
+- Email: admin@ramjaap.com
+- Password: admin@123
+- Role: Superuser (has full access to admin panel)
+
+## Regular Users
+
+### Test User 1
+- Username: bhakt_ram
+- Email: bhakt_ram@example.com  
+- Password: password123
+- First Name: Ramesh
+- Last Name: Sharma
+- City: Delhi
+- Jaap Count: 10,850
+- Joined: 30 days ago
+- Streak: 28 days
+
+### Test User 2
+- Username: sita_devotee
+- Email: sita_devotee@example.com
+- Password: password123
+- First Name: Sunita
+- Last Name: Patel
+- City: Mumbai
+- Jaap Count: 15,235
+- Joined: 45 days ago
+- Streak: 42 days
+
+### Test User 3
+- Username: hanuman_bhakt
+- Email: hanuman_bhakt@example.com
+- Password: password123
+- First Name: Hari
+- Last Name: Singh
+- City: Ayodhya
+- Jaap Count: 25,780
+- Joined: 60 days ago
+- Streak: 58 days
+
+### Test User 4
+- Username: lakshman_seva
+- Email: lakshman_seva@example.com
+- Password: password123
+- First Name: Lakshmi
+- Last Name: Gupta
+- City: Varanasi
+- Jaap Count: 8,456
+- Joined: 20 days ago
+- Streak: 18 days
+
+### Test User 5
+- Username: bharat_devotion
+- Email: bharat_devotion@example.com
+- Password: password123
+- First Name: Bharti
+- Last Name: Mishra
+- City: Pune
+- Jaap Count: 12,345
+- Joined: 35 days ago
+- Streak: 30 days
+
+### Test User 6
+- Username: shatrughan_faith
+- Email: shatrughan_faith@example.com
+- Password: password123
+- First Name: Shashi
+- Last Name: Kumar
+- City: Bangalore
+- Jaap Count: 7,890
+- Joined: 15 days ago
+- Streak: 12 days
+
+### Test User 7
+- Username: raghav_path
+- Email: raghav_path@example.com
+- Password: password123
+- First Name: Raghav
+- Last Name: Verma
+- City: Chennai
+- Jaap Count: 19,876
+- Joined: 50 days ago
+- Streak: 45 days
+
+### Test User 8
+- Username: dashrath_legacy
+- Email: dashrath_legacy@example.com
+- Password: password123
+- First Name: Deepak
+- Last Name: Tiwari
+- City: Lucknow
+- Jaap Count: 23,456
+- Joined: 55 days ago
+- Streak: 50 days
+
+### Test User 9
+- Username: kaushalya_divine
+- Email: kaushalya_divine@example.com
+- Password: password123
+- First Name: Kavita
+- Last Name: Joshi
+- City: Jaipur
+- Jaap Count: 14,567
+- Joined: 40 days ago
+- Streak: 36 days
+
+### Test User 10
+- Username: ram_devotee_new
+- Email: ram_devotee_new@example.com
+- Password: password123
+- First Name: Raj
+- Last Name: Malhotra
+- City: Hyderabad
+- Jaap Count: 1,234
+- Joined: 5 days ago
+- Streak: 5 days
+
+## How to Use These Test Users
+1. Log in using these credentials to test different user perspectives
+2. These users have varying levels of engagement to test leaderboard functionality
+3. The geographic diversity allows testing of city-wise leaderboards
+4. Streak variations help test the achievement and milestone systems
+
+## Note on Data Security
+- These are test accounts only and should not contain sensitive information
+- In a production environment, always use strong, unique passwords
+- For demonstration purposes, all test accounts use the same password 

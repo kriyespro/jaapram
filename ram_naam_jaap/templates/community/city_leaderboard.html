@@ -1,0 +1,120 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Ram Naam Jaap - City Leaderboards{% endblock %}
+
+{% block extra_head %}
+    <meta name="description" content="View Ram Naam Jaap leaderboards by city.">
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Page Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">City Leaderboards</h1>
+        <p class="text-gray-600 mt-2">Top Ram Naam Jaap practitioners in each city</p>
+    </div>
+    
+    <!-- Leaderboard Tabs -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+        <div class="flex border-b border-gray-200">
+            <a href="{{ url('community:global_leaderboard') }}" class="flex-1 py-4 px-6 text-center bg-gray-100 text-gray-700 hover:bg-gray-200 transition">Global</a>
+            <a href="{{ url('community:city_leaderboard') }}" class="flex-1 py-4 px-6 text-center bg-primary text-white font-semibold">Cities</a>
+        </div>
+        
+        <!-- City Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+            {% for city in cities %}
+            <a href="{{ url('community:city_detail_leaderboard', city) }}" class="bg-gray-50 hover:bg-gray-100 rounded-lg p-4 transition">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ city }}</h3>
+                {% if city in city_leaders %}
+                <div class="flex justify-between items-center">
+                    <div class="text-sm text-gray-600">
+                        <span class="font-medium">Top User:</span> {{ city_leaders[city].user.username }}
+                    </div>
+                    <div class="text-sm font-bold text-primary">
+                        {{ city_leaders[city].count }} jaaps
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-sm text-gray-500">No data available</div>
+                {% endif %}
+            </a>
+            {% else %}
+            <div class="col-span-full text-center p-8 text-gray-500">
+                No cities available. Users need to add their city in their profile.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- City Leaders Table -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+        <h2 class="text-xl font-semibold p-6 border-b border-gray-200">Top Users By City</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Devotee</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">City</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Jaaps</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for city, data in city_leaders.items() %}
+                    <tr class="hover:bg-orange-50 transition-colors duration-200 leaderboard-row">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-semibold">{{ loop.index }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <div class="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
+                                        <span class="text-xl text-orange-500">{{ data.user.username[0]|upper }}</span>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">{{ data.user.username }}</div>
+                                    <div class="text-xs text-gray-500">{{ data.user.get_full_name() or "" }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-700 font-medium">
+                                <span class="inline-flex items-center">
+                                    <i class="fas fa-map-marker-alt text-primary mr-1"></i>
+                                    {{ city }}
+                                </span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-bold text-primary">{{ data.count }}</div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">
+                            No entries yet. Be the first to start your practice!
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Information Box -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4">City-wise Practice</h2>
+        <div class="prose text-gray-600 max-w-none">
+            <p>These leaderboards show the top Ram Naam Jaap practitioners in each city. Click on a city to view its detailed leaderboard.</p>
+            <p class="mt-3">Cities are based on user profile information. If you want to appear on your city's leaderboard, make sure to add your city in your profile settings.</p>
+        </div>
+        
+        <div class="mt-6 flex justify-center space-x-4">
+            <a href="{{ url('accounts:profile') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-6 rounded-lg shadow-md transition">Update Profile</a>
+            <a href="{{ url('jaap:jaap_entry') }}" class="bg-primary hover:bg-orange-500 text-white py-3 px-6 rounded-lg shadow-md transition">Start Practice</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

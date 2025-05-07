@@ -1,0 +1,449 @@
+{% extends "layouts/admin_layout.html" %}
+{% block title %}Reports Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4 text-saffron">Reports Dashboard</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{% url 'admin_dashboard:admin_dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item active">Reports</li>
+    </ol>
+    
+    <!-- Analytics Summary Cards -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">{{ total_jaaps|default:"0" }}</h3>
+                            <div>Total Jaaps</div>
+                        </div>
+                        <div>
+                            <i class="fas fa-pray fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#jaap-trends">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-warning text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">{{ total_users|default:"0" }}</h3>
+                            <div>Active Users</div>
+                        </div>
+                        <div>
+                            <i class="fas fa-users fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#user-activity">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">{{ total_communities|default:"0" }}</h3>
+                            <div>Active Communities</div>
+                        </div>
+                        <div>
+                            <i class="fas fa-user-friends fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#community-metrics">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-danger text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">{{ total_events|default:"0" }}</h3>
+                            <div>Upcoming Events</div>
+                        </div>
+                        <div>
+                            <i class="fas fa-calendar-alt fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#event-analytics">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Report Generation Options -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-file-export me-1"></i>
+            Generate Reports
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">User Activity Report</h5>
+                            <p class="card-text">Generate detailed reports about user engagement, jaap counts, and platform usage.</p>
+                            <form method="post" action="{% url 'admin_dashboard:generate_report' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="report_type" value="user_activity">
+                                <div class="mb-3">
+                                    <label for="date_range_user" class="form-label">Date Range</label>
+                                    <select class="form-select" id="date_range_user" name="date_range">
+                                        <option value="7">Last 7 days</option>
+                                        <option value="30">Last 30 days</option>
+                                        <option value="90">Last 90 days</option>
+                                        <option value="365">Last year</option>
+                                        <option value="custom">Custom range</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="format_user" class="form-label">Format</label>
+                                    <select class="form-select" id="format_user" name="format">
+                                        <option value="pdf">PDF</option>
+                                        <option value="csv">CSV</option>
+                                        <option value="excel">Excel</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Generate</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Community Growth Report</h5>
+                            <p class="card-text">Analyze community growth, membership trends, and engagement metrics.</p>
+                            <form method="post" action="{% url 'admin_dashboard:generate_report' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="report_type" value="community_growth">
+                                <div class="mb-3">
+                                    <label for="date_range_community" class="form-label">Date Range</label>
+                                    <select class="form-select" id="date_range_community" name="date_range">
+                                        <option value="7">Last 7 days</option>
+                                        <option value="30">Last 30 days</option>
+                                        <option value="90">Last 90 days</option>
+                                        <option value="365">Last year</option>
+                                        <option value="custom">Custom range</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="format_community" class="form-label">Format</label>
+                                    <select class="form-select" id="format_community" name="format">
+                                        <option value="pdf">PDF</option>
+                                        <option value="csv">CSV</option>
+                                        <option value="excel">Excel</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Generate</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Jaap Statistics Report</h5>
+                            <p class="card-text">View comprehensive statistics on jaap counts, durations, and patterns.</p>
+                            <form method="post" action="{% url 'admin_dashboard:generate_report' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="report_type" value="jaap_statistics">
+                                <div class="mb-3">
+                                    <label for="date_range_jaap" class="form-label">Date Range</label>
+                                    <select class="form-select" id="date_range_jaap" name="date_range">
+                                        <option value="7">Last 7 days</option>
+                                        <option value="30">Last 30 days</option>
+                                        <option value="90">Last 90 days</option>
+                                        <option value="365">Last year</option>
+                                        <option value="custom">Custom range</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="format_jaap" class="form-label">Format</label>
+                                    <select class="form-select" id="format_jaap" name="format">
+                                        <option value="pdf">PDF</option>
+                                        <option value="csv">CSV</option>
+                                        <option value="excel">Excel</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Generate</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Jaap Trends Chart -->
+    <div class="card mb-4" id="jaap-trends">
+        <div class="card-header">
+            <i class="fas fa-chart-line me-1"></i>
+            Jaap Trends
+        </div>
+        <div class="card-body">
+            <canvas id="jaapTrendsChart" width="100%" height="30"></canvas>
+        </div>
+        <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+    </div>
+    
+    <div class="row">
+        <!-- User Activity Chart -->
+        <div class="col-lg-6">
+            <div class="card mb-4" id="user-activity">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar me-1"></i>
+                    User Activity
+                </div>
+                <div class="card-body">
+                    <canvas id="userActivityChart" width="100%" height="50"></canvas>
+                </div>
+                <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+            </div>
+        </div>
+        
+        <!-- Community Metrics -->
+        <div class="col-lg-6">
+            <div class="card mb-4" id="community-metrics">
+                <div class="card-header">
+                    <i class="fas fa-chart-pie me-1"></i>
+                    Community Metrics
+                </div>
+                <div class="card-body">
+                    <canvas id="communityMetricsChart" width="100%" height="50"></canvas>
+                </div>
+                <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Event Analytics -->
+    <div class="card mb-4" id="event-analytics">
+        <div class="card-header">
+            <i class="fas fa-calendar-check me-1"></i>
+            Event Analytics
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-8">
+                    <canvas id="eventAnalyticsChart" width="100%" height="40"></canvas>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            Upcoming Events
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush">
+                                {% for event in upcoming_events %}
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ event.title }}</h6>
+                                        <small>{{ event.date }}</small>
+                                    </div>
+                                    <small>{{ event.location }}</small>
+                                </a>
+                                {% empty %}
+                                <div class="list-group-item">No upcoming events</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+    </div>
+    
+    <!-- Download History -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-history me-1"></i>
+            Recent Report Downloads
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Report Name</th>
+                        <th>Generated By</th>
+                        <th>Date</th>
+                        <th>Format</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in recent_reports %}
+                    <tr>
+                        <td>{{ report.name }}</td>
+                        <td>{{ report.generated_by }}</td>
+                        <td>{{ report.date }}</td>
+                        <td>{{ report.format }}</td>
+                        <td>
+                            <a href="{{ report.url }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No reports downloaded recently</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Sample data for charts - Replace with actual data from backend
+    document.addEventListener('DOMContentLoaded', function() {
+        // Jaap Trends Chart
+        var jaapCtx = document.getElementById('jaapTrendsChart').getContext('2d');
+        var jaapTrendsChart = new Chart(jaapCtx, {
+            type: 'line',
+            data: {
+                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                datasets: [{
+                    label: 'Total Jaaps',
+                    data: [15000, 19000, 20000, 25000, 22000, 30000, 35000],
+                    backgroundColor: 'rgba(255, 111, 0, 0.1)',
+                    borderColor: 'rgba(255, 111, 0, 1)',
+                    borderWidth: 2,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        // User Activity Chart
+        var userCtx = document.getElementById('userActivityChart').getContext('2d');
+        var userActivityChart = new Chart(userCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Active Users',
+                    data: [120, 150, 180, 190, 210, 250, 300],
+                    backgroundColor: 'rgba(0, 123, 255, 0.5)',
+                    borderColor: 'rgba(0, 123, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        // Community Metrics Chart
+        var communityCtx = document.getElementById('communityMetricsChart').getContext('2d');
+        var communityMetricsChart = new Chart(communityCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Small (1-10)', 'Medium (11-50)', 'Large (51-100)', 'Very Large (100+)'],
+                datasets: [{
+                    data: [30, 40, 20, 10],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+        
+        // Event Analytics Chart
+        var eventCtx = document.getElementById('eventAnalyticsChart').getContext('2d');
+        var eventAnalyticsChart = new Chart(eventCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Online', 'In-Person', 'Hybrid'],
+                datasets: [{
+                    label: 'Attendance Rate (%)',
+                    data: [85, 75, 90],
+                    backgroundColor: [
+                        'rgba(255, 193, 7, 0.7)',
+                        'rgba(40, 167, 69, 0.7)',
+                        'rgba(23, 162, 184, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 193, 7, 1)',
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(23, 162, 184, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Attendance Rate (%)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Event Type'
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %} 

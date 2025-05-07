@@ -1,0 +1,104 @@
+/* Base saffron theme colors */
+:root {
+  --primary-color: #FF9933; /* Saffron color */
+  --primary-hover: #E68A00;
+  --secondary-color: #FF8C00; /* Darker saffron */
+  --accent-color: #FFA500;
+  --text-dark: #333333;
+  --text-light: #FFFFFF;
+  --bg-light: #FFF9F2; /* Light saffron tint for backgrounds */
+  --bg-gray: #F5F5F5;
+  --border-color: #E5E5E5;
+}
+
+/* Apply text color */
+.text-primary {
+  color: var(--primary-color) !important;
+}
+
+.text-secondary {
+  color: var(--secondary-color) !important;
+}
+
+/* Apply background colors */
+.bg-primary {
+  background-color: var(--primary-color) !important;
+}
+
+.bg-secondary {
+  background-color: var(--secondary-color) !important;
+}
+
+.bg-light {
+  background-color: var(--bg-light) !important;
+}
+
+/* Button styles */
+.btn-primary {
+  background-color: var(--primary-color);
+  color: var(--text-light);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Gradient backgrounds */
+.bg-gradient-primary {
+  background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+}
+
+/* Custom hero section */
+.hero-section {
+  background: linear-gradient(rgba(255, 153, 51, 0.9), rgba(255, 140, 0, 0.9)), url('/static/images/ram.jpg');
+  background-size: cover;
+  background-position: center;
+  color: white;
+  padding: 3rem 2rem;
+  border-radius: 0.5rem;
+  text-align: center;
+}
+
+/* Custom container */
+.container-custom {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Add saffron border accents */
+.border-primary {
+  border-color: var(--primary-color) !important;
+}
+
+/* Card with saffron accents */
+.card-saffron {
+  border-top: 3px solid var(--primary-color);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  padding: 1.5rem;
+}
+
+/* Page title with saffron underline */
+.title-saffron {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 1.5rem;
+}
+
+.title-saffron::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -0.5rem;
+  width: 50px;
+  height: 3px;
+  background-color: var(--primary-color);
+} 

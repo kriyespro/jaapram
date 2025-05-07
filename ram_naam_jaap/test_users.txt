@@ -1,0 +1,222 @@
+# RAM NAAM JAAP APPLICATION - TEST USERS
+
+This file contains the login credentials and profile details for test users in the Ram Naam Jaap application. These users can be used for testing and demonstration purposes.
+
+## Admin User
+- Username: admin
+- Email: admin@ramjaap.com
+- Password: admin@123
+- Role: Superuser (has full access to admin panel)
+
+## Regular Users
+
+### Test User 1
+- Username: bhakt_ram
+- Email: bhakt_ram@example.com  
+- Password: password123
+- First Name: Ramesh
+- Last Name: Sharma
+- City: Delhi
+- Jaap Count: 10,850
+- Joined: 30 days ago
+- Streak: 28 days
+
+### Test User 2
+- Username: sita_devotee
+- Email: sita_devotee@example.com
+- Password: password123
+- First Name: Sunita
+- Last Name: Patel
+- City: Mumbai
+- Jaap Count: 15,235
+- Joined: 45 days ago
+- Streak: 42 days
+
+### Test User 3
+- Username: hanuman_bhakt
+- Email: hanuman_bhakt@example.com
+- Password: password123
+- First Name: Hari
+- Last Name: Singh
+- City: Ayodhya
+- Jaap Count: 25,780
+- Joined: 60 days ago
+- Streak: 58 days
+
+### Test User 4
+- Username: lakshman_seva
+- Email: lakshman_seva@example.com
+- Password: password123
+- First Name: Lakshmi
+- Last Name: Gupta
+- City: Varanasi
+- Jaap Count: 8,456
+- Joined: 20 days ago
+- Streak: 18 days
+
+### Test User 5
+- Username: bharat_devotion
+- Email: bharat_devotion@example.com
+- Password: password123
+- First Name: Bharti
+- Last Name: Mishra
+- City: Pune
+- Jaap Count: 12,345
+- Joined: 35 days ago
+- Streak: 30 days
+
+### Test User 6
+- Username: shatrughan_faith
+- Email: shatrughan_faith@example.com
+- Password: password123
+- First Name: Shashi
+- Last Name: Kumar
+- City: Bangalore
+- Jaap Count: 7,890
+- Joined: 15 days ago
+- Streak: 12 days
+
+### Test User 7
+- Username: raghav_path
+- Email: raghav_path@example.com
+- Password: password123
+- First Name: Raghav
+- Last Name: Verma
+- City: Chennai
+- Jaap Count: 19,876
+- Joined: 50 days ago
+- Streak: 45 days
+
+### Test User 8
+- Username: dashrath_legacy
+- Email: dashrath_legacy@example.com
+- Password: password123
+- First Name: Deepak
+- Last Name: Tiwari
+- City: Lucknow
+- Jaap Count: 23,456
+- Joined: 55 days ago
+- Streak: 50 days
+
+### Test User 9
+- Username: kaushalya_divine
+- Email: kaushalya_divine@example.com
+- Password: password123
+- First Name: Kavita
+- Last Name: Joshi
+- City: Jaipur
+- Jaap Count: 14,567
+- Joined: 40 days ago
+- Streak: 36 days
+
+### Test User 10
+- Username: ram_devotee_new
+- Email: ram_devotee_new@example.com
+- Password: password123
+- First Name: Raj
+- Last Name: Malhotra
+- City: Hyderabad
+- Jaap Count: 1,234
+- Joined: 5 days ago
+- Streak: 5 days
+
+## How to Use These Test Users
+1. Log in using these credentials to test different user perspectives
+2. These users have varying levels of engagement to test leaderboard functionality
+3. The geographic diversity allows testing of city-wise leaderboards
+4. Streak variations help test the achievement and milestone systems
+
+## Note on Data Security
+- These are test accounts only and should not contain sensitive information
+- In a production environment, always use strong, unique passwords
+- For demonstration purposes, all test accounts use the same password
+
+## About Dummy Data
+
+The application includes a script to generate 108 dummy devotees with Indian names and cities. These devotees have random jaap counts ranging from 108 to 1008 per day.
+
+### How Dummy Users Are Generated
+
+1. Each user has:
+   - A first name and last name from various Indian cultural backgrounds (Hindu, Muslim, Sikh, South Indian)
+   - A city from major Indian cities, including holy places 
+   - A username based on their name with a random number
+   - An email in the format username@example.com (this is how the system identifies dummy users)
+   - Random jaap counts for the past 7 days
+   - A profile with random "devotee since" date
+
+2. The script can be run in two modes:
+   - `create` - Creates 108 new dummy devotees
+   - `update` - Adds random jaap counts (between 108-1008) to all existing dummy devotees for the current day
+
+### Sample Dummy Users
+
+Here are some examples of dummy users that might be generated:
+
+| Name            | Username          | City       | Daily Average Jaap Count |
+|-----------------|-------------------|------------|--------------------------|
+| Aarav Sharma    | aaravsharma123    | Delhi      | 108-1008                 |
+| Ananya Patel    | ananyapatel456    | Mumbai     | 108-1008                 |
+| Ibrahim Khan    | ibrahimkhan789    | Hyderabad  | 108-1008                 |
+| Simran Kaur     | simrankaur321     | Amritsar   | 108-1008                 |
+| Aishwarya Reddy | aishwaryareddy654 | Bangalore  | 108-1008                 |
+| Gurpreet Singh  | gurpreetsingh987  | Chandigarh | 108-1008                 |
+| Fatima Syed     | fatimasyed246     | Lucknow    | 108-1008                 |
+| Rohan Iyer      | rohaniyer135      | Chennai    | 108-1008                 |
+| Diya Gupta      | diyagupta579      | Varanasi   | 108-1008                 |
+| Vihaan Kulkarni | vihaankulkarni864 | Pune       | 108-1008                 |
+
+## How to Use the Scripts
+
+### Running the Standalone Script
+
+```bash
+# Create 108 dummy devotees
+python dummy.py create
+
+# Update jaap counts for all existing dummy devotees
+python dummy.py update
+```
+
+### Running as Django Management Command
+
+```bash
+# Create 108 dummy devotees
+python manage.py generate_dummy_data create
+
+# Create a custom number of devotees
+python manage.py generate_dummy_data create --count 50
+
+# Update jaap counts for all existing dummy devotees
+python manage.py generate_dummy_data update
+```
+
+### Automatic Daily Updates
+
+The script is set up to be run daily via a cron job to add random jaap counts to all dummy devotees.
+
+#### Cron Setup (Linux/Mac)
+
+```bash
+# Edit crontab
+crontab -e
+
+# Add this line to run the script at midnight every day
+0 0 * * * cd /path/to/ram_naam_jaap && ./update_jaap_counts.sh
+```
+
+#### Task Scheduler Setup (Windows)
+
+1. Create a batch file (update_jaap.bat) with:
+   ```
+   cd C:\path\to\ram_naam_jaap
+   python manage.py generate_dummy_data update
+   ```
+2. Set up Task Scheduler to run this batch file daily.
+
+## Notes
+
+- All dummy users have email addresses ending with @example.com
+- Passwords are randomly generated and not stored in plain text
+- The script will not create duplicate usernames
+- Jaap counts are added daily for all dummy users 

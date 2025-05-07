@@ -1,0 +1,168 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Dashboard - Ram Naam Jaap{% endblock %}
+
+{% block extra_head %}
+    <meta name="description" content="Track your spiritual journey with Ram Naam Jaap practice">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="bg-bg-light">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Dashboard Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 title-saffron">Your Dashboard</h1>
+            <p class="text-gray-600">Welcome back, {{ user.username }}!</p>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Today's Count -->
+            <div class="card-saffron">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-gray-700">Today</h3>
+                    <div class="text-primary">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                </div>
+                <p class="text-3xl font-bold text-primary">{{ today_count|default('0') }}</p>
+                <p class="text-sm text-gray-600">Ram Naam recitations</p>
+                <div class="mt-4">
+                    <div class="flex justify-between text-sm">
+                        <span>Target: {{ daily_target|default('108') }}</span>
+                        <span>{{ daily_percentage|default('0') }}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                        <div class="bg-primary h-2 rounded-full" style="width: {{ daily_percentage|default('0') }}%;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- This Week Count -->
+            <div class="card-saffron">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-gray-700">This Week</h3>
+                    <div class="text-primary">
+                        <i class="fas fa-calendar-week"></i>
+                    </div>
+                </div>
+                <p class="text-3xl font-bold text-primary">{{ week_count|default('0') }}</p>
+                <p class="text-sm text-gray-600">Ram Naam recitations</p>
+                <div class="mt-4">
+                    <div class="flex justify-between text-sm">
+                        <span>Target: {{ weekly_target|default('756') }}</span>
+                        <span>{{ weekly_percentage|default('0') }}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                        <div class="bg-primary h-2 rounded-full" style="width: {{ weekly_percentage|default('0') }}%;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Total Count -->
+            <div class="card-saffron">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-gray-700">Total Count</h3>
+                    <div class="text-primary">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                </div>
+                <p class="text-3xl font-bold text-primary">{{ total_count|default('0') }}</p>
+                <p class="text-sm text-gray-600">Ram Naam recitations</p>
+                <div class="mt-4">
+                    <p class="text-sm text-gray-600">Since {{ user.date_joined.strftime('%b %d, %Y')|default('joining') }}</p>
+                </div>
+            </div>
+            
+            <!-- Streak -->
+            <div class="card-saffron">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-gray-700">Current Streak</h3>
+                    <div class="text-primary">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                </div>
+                <p class="text-3xl font-bold text-primary">{{ streak_days|default('0') }}</p>
+                <p class="text-sm text-gray-600">Consecutive days</p>
+                <div class="mt-4">
+                    <p class="text-sm text-gray-600">Longest streak: {{ longest_streak|default('0') }} days</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Weekly Chart -->
+        <div class="card-saffron mb-8">
+            <h2 class="text-xl font-semibold mb-4">Weekly Progress</h2>
+            <div class="h-64">
+                <canvas id="weeklyChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="card-saffron">
+            <h2 class="text-xl font-semibold mb-4">Recent Activity</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Session Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for entry in recent_entries %}
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ entry.date.strftime('%b %d, %Y') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ entry.count }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ entry.duration|default('N/A') }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">No recent entries. Start your practice today!</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Data for chart
+    const ctx = document.getElementById('weeklyChart').getContext('2d');
+    const weeklyData = {
+        labels: {{ week_labels|default("['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']")|safe }},
+        counts: {{ week_counts|default("[0, 0, 0, 0, 0, 0, 0]")|safe }}
+    };
+    
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: weeklyData.labels,
+            datasets: [{
+                label: 'Daily Jaap Count',
+                data: weeklyData.counts,
+                backgroundColor: '#FF9933',
+                borderColor: '#E68A00',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %} 

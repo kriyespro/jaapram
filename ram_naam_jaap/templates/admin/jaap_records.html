@@ -1,0 +1,225 @@
+{% extends "layouts/admin_layout.html" %}
+{% block title %}Jaap Records Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4 text-saffron">Jaap Records Management</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{% url 'admin_dashboard:admin_dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item active">Jaap Records</li>
+    </ol>
+    
+    <!-- Filters and Search -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-filter me-1"></i>
+            Filter Jaap Records
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="date_from" class="form-label">Date From</label>
+                    <input type="date" class="form-control" id="date_from" name="date_from" value="{{ date_from }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="date_to" class="form-label">Date To</label>
+                    <input type="date" class="form-control" id="date_to" name="date_to" value="{{ date_to }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="user" class="form-label">User</label>
+                    <input type="text" class="form-control" id="user" name="user" placeholder="Username" value="{{ user_filter }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="type" class="form-label">Jaap Type</label>
+                    <select class="form-select" id="type" name="type">
+                        <option value="all" {% if type_filter == 'all' %}selected{% endif %}>All Types</option>
+                        <option value="mala" {% if type_filter == 'mala' %}selected{% endif %}>Mala</option>
+                        <option value="mahajaap" {% if type_filter == 'mahajaap' %}selected{% endif %}>Mahajaap</option>
+                        <option value="general" {% if type_filter == 'general' %}selected{% endif %}>General</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                    <a href="{% url 'admin_dashboard:jaap_records' %}" class="btn btn-secondary">Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Jaap Records Table -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Jaap Records
+        </div>
+        <div class="card-body">
+            <table id="jaapRecordsTable" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Date</th>
+                        <th>Count</th>
+                        <th>Duration</th>
+                        <th>Type</th>
+                        <th>Notes</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in jaap_records %}
+                    <tr>
+                        <td>{{ record.id }}</td>
+                        <td>{{ record.user }}</td>
+                        <td>{{ record.date }}</td>
+                        <td>{{ record.count }}</td>
+                        <td>{{ record.duration }}</td>
+                        <td>{{ record.type }}</td>
+                        <td>{{ record.notes }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#viewModal{{ record.id }}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ record.id }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- View Modal -->
+                            <div class="modal fade" id="viewModal{{ record.id }}" tabindex="-1" aria-labelledby="viewModalLabel{{ record.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="viewModalLabel{{ record.id }}">Jaap Record Details</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <table class="table">
+                                                <tr>
+                                                    <th>ID:</th>
+                                                    <td>{{ record.id }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>User:</th>
+                                                    <td>{{ record.user }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Date:</th>
+                                                    <td>{{ record.date }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Count:</th>
+                                                    <td>{{ record.count }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Duration:</th>
+                                                    <td>{{ record.duration }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Type:</th>
+                                                    <td>{{ record.type }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Notes:</th>
+                                                    <td>{{ record.notes }}</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Delete Modal -->
+                            <div class="modal fade" id="deleteModal{{ record.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ record.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteModalLabel{{ record.id }}">Confirm Deletion</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Are you sure you want to delete this jaap record? This action cannot be undone.
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <form action="#" method="post" style="display: inline;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="record_id" value="{{ record.id }}">
+                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center">No jaap records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Export Options -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-file-export me-1"></i>
+            Export Options
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <form action="#" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="export_type" value="csv">
+                        <button type="submit" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-file-csv me-2"></i> Export as CSV
+                        </button>
+                    </form>
+                </div>
+                <div class="col-md-4">
+                    <form action="#" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="export_type" value="excel">
+                        <button type="submit" class="btn btn-outline-success w-100">
+                            <i class="fas fa-file-excel me-2"></i> Export as Excel
+                        </button>
+                    </form>
+                </div>
+                <div class="col-md-4">
+                    <form action="#" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="export_type" value="pdf">
+                        <button type="submit" class="btn btn-outline-danger w-100">
+                            <i class="fas fa-file-pdf me-2"></i> Export as PDF
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('#jaapRecordsTable').DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            lengthChange: true,
+            info: true,
+            autoWidth: false,
+            responsive: true
+        });
+    });
+</script>
+{% endblock %} 

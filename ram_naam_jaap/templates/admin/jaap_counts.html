@@ -1,0 +1,67 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Admin - Jaap Counts{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-2xl font-bold mb-6">Jaap Counts Administration</h1>
+        
+        <div class="mb-6 flex justify-between items-center">
+            <h2 class="text-xl font-semibold">All Jaap Counts</h2>
+            <div class="text-gray-600">Total records: {{ jaap_counts|length }}</div>
+        </div>
+        
+        <!-- Filter and search controls could go here -->
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="py-3 px-4 text-left">User</th>
+                        <th class="py-3 px-4 text-left">Date</th>
+                        <th class="py-3 px-4 text-left">Count</th>
+                        <th class="py-3 px-4 text-left">Session</th>
+                        <th class="py-3 px-4 text-left">Cumulative</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for count in jaap_counts %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="py-3 px-4">
+                            {{ count.user.username }}
+                        </td>
+                        <td class="py-3 px-4">
+                            {{ count.date|date('Y-m-d') }}
+                        </td>
+                        <td class="py-3 px-4">
+                            {{ count.count }}
+                        </td>
+                        <td class="py-3 px-4">
+                            {% if count.session %}
+                            <a href="{{ url('jaap:jaap_session_detail', count.session.id) }}" class="text-blue-600 hover:underline">
+                                {{ count.session.id }}
+                            </a>
+                            {% else %}
+                            <span class="text-gray-500">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4">
+                            {{ count.cumulative_count }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="py-6 text-center text-gray-500">
+                            No jaap counts found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination controls could go here -->
+    </div>
+</div>
+{% endblock %} 

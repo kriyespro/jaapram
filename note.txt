@@ -1,0 +1,28 @@
+  cd /Users/kumarsunilverma/Desktop/sd-dj-test-1/ram_naam_jaap && python3 manage.py runserver          
+  
+  
+   python manage.py generate_dummy_data create
+
+python manage.py generate_dummy_data update
+
+   python manage.py generate_dummy_data create
+   python manage.py generate_dummy_data update
+
+
+   crontab -e
+   # Add: 0 0 * * * cd /path/to/ram_naam_jaap && ./update_jaap_counts.sh
+
+
+
+   update in dummy.py  can genarte only hindu name  male & female both 
+   on count add add only 108 to 1008  count per user in start as per realisitc
+   then in update only add 108 to 1008 count only 
+
+
+   add on home page add
+
+   Activity Over Time  -done
+   Top Cities  -done
+
+to add imge on Shree Ram Image .  done
+

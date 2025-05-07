@@ -1,0 +1,242 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Ram Naam Jaap - Leaderboard{% endblock %}
+
+{% block extra_head %}
+    <meta name="description" content="View the top Ram Naam Jaap practitioners on our leaderboards.">
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-6xl">
+    <h1 class="text-3xl font-bold text-center text-primary mb-6">राम नाम जाप Leaderboards</h1>
+    
+    <!-- Global Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-orange-50 rounded-lg shadow p-6 text-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-2">Total Ram Naam Jaaps</h2>
+            <p class="text-5xl font-bold text-primary">{{ total_count }}</p>
+        </div>
+        <div class="bg-orange-50 rounded-lg shadow p-6 text-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-2">Active Devotees</h2>
+            <p class="text-5xl font-bold text-primary">{{ active_users }}</p>
+        </div>
+        <div class="bg-orange-50 rounded-lg shadow p-6 text-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-2">Today's Jaaps</h2>
+            <p class="text-5xl font-bold text-primary">{{ today_count }}</p>
+        </div>
+    </div>
+    
+    <!-- Leaderboard Tabs -->
+    <div class="mb-8" x-data="{ tab: 'global' }">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="border-b border-gray-200">
+                <nav class="flex">
+                    <button @click="tab = 'global'" :class="{'border-primary text-primary': tab === 'global', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': tab !== 'global'}" class="py-4 px-6 border-b-2 font-medium text-sm sm:text-base flex-1 text-center">
+                        Global Leaderboard
+                    </button>
+                    <button @click="tab = 'city'" :class="{'border-primary text-primary': tab === 'city', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': tab !== 'city'}" class="py-4 px-6 border-b-2 font-medium text-sm sm:text-base flex-1 text-center">
+                        City Leaderboard
+                    </button>
+                    <button @click="tab = 'streak'" :class="{'border-primary text-primary': tab === 'streak', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': tab !== 'streak'}" class="py-4 px-6 border-b-2 font-medium text-sm sm:text-base flex-1 text-center">
+                        Longest Streaks
+                    </button>
+                </nav>
+            </div>
+            
+            <!-- Global Leaderboard -->
+            <div x-show="tab === 'global'" class="overflow-x-auto">
+                <div class="p-4 bg-gray-50 border-b border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-800">Global Leaderboard</h2>
+                </div>
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Devotee</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">City</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Jaaps</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for user in top_users %}
+                        <tr class="hover:bg-orange-50 transition-colors duration-200 {% if user == request.user %}bg-orange-50{% endif %}">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-semibold flex items-center">
+                                    {% if loop.index <= 3 %}
+                                        <div class="relative mr-2">
+                                            <span class="inline-flex items-center justify-center h-6 w-6 rounded-full 
+                                                {% if loop.index == 1 %}bg-yellow-400{% elif loop.index == 2 %}bg-gray-300{% elif loop.index == 3 %}bg-amber-600{% endif %} text-white shadow">
+                                                {{ loop.index }}
+                                            </span>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-gray-600">{{ loop.index }}</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 relative">
+                                        {% if user.profile.avatar %}
+                                        <img class="h-10 w-10 rounded-full object-cover" src="{{ user.profile.avatar.url }}" alt="">
+                                        {% else %}
+                                        <div class="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
+                                            <span class="text-xl text-orange-500">{{ user.username[0]|upper }}</span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">{{ user.username }}</div>
+                                        <div class="text-xs text-gray-500">{{ user.get_full_name() or "" }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {% if user.profile.city %}
+                                    <span class="inline-flex items-center">
+                                        <i class="fas fa-map-marker-alt text-primary mr-1"></i>
+                                        {{ user.profile.city }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-gray-400">Unknown</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-orange-500">{{ user.total }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No users found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- City Leaderboard -->
+            <div x-show="tab === 'city'" class="overflow-hidden">
+                <div class="p-4 bg-gray-50 border-b border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-800">City Leaderboard</h2>
+                </div>
+                
+                <!-- City Selector -->
+                <div class="p-6 border-b border-gray-200">
+                    <label for="city-select" class="block text-sm font-medium text-gray-700 mb-2">Select City</label>
+                    <select id="city-select" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+                            hx-get="{{ url('community:city_leaderboard') }}" 
+                            hx-target="#city-leaderboard-content"
+                            hx-trigger="change">
+                        <option value="">All Cities</option>
+                        {% for city in cities %}
+                        <option value="{{ city }}">{{ city }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div id="city-leaderboard-content" class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Devotee</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">City</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Jaaps</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for user in top_users_by_city %}
+                            <tr class="hover:bg-orange-50 transition-colors duration-200 {% if user == request.user %}bg-orange-50{% endif %}">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">{{ loop.index }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10">
+                                            {% if user.profile.avatar %}
+                                            <img class="h-10 w-10 rounded-full object-cover" src="{{ user.profile.avatar.url }}" alt="">
+                                            {% else %}
+                                            <div class="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
+                                                <span class="text-xl text-orange-500">{{ user.username[0]|upper }}</span>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">{{ user.username }}</div>
+                                            <div class="text-xs text-gray-500">{{ user.get_full_name() or "" }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.profile.city or "Unknown" }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-orange-500">{{ user.total }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No users found for selected city</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Streak Leaderboard -->
+            <div x-show="tab === 'streak'" class="overflow-hidden">
+                <div class="p-4 bg-gray-50 border-b border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-800">Longest Streak Leaderboard</h2>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Devotee</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">City</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Streak (Days)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for user in top_streaks %}
+                            <tr class="hover:bg-orange-50 transition-colors duration-200 {% if user == request.user %}bg-orange-50{% endif %}">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">{{ loop.index }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10">
+                                            {% if user.profile.avatar %}
+                                            <img class="h-10 w-10 rounded-full object-cover" src="{{ user.profile.avatar.url }}" alt="">
+                                            {% else %}
+                                            <div class="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
+                                                <span class="text-xl text-orange-500">{{ user.username[0]|upper }}</span>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">{{ user.username }}</div>
+                                            <div class="text-xs text-gray-500">{{ user.get_full_name() or "" }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.profile.city or "Unknown" }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">
+                                        {{ user.profile.streak_days }} days
+                                    </span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No streak data available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Call to Action -->
+    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+        <h2 class="text-xl font-semibold mb-4">Join the Community</h2>
+        <p class="text-gray-600 mb-6">Start your Ram Naam Jaap practice today and join thousands of devotees around the world.</p>
+        <a href="{{ url('jaap:jaap_entry') }}" class="bg-primary hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition">Start Practice Now</a>
+    </div>
+</div>
+{% endblock %} 

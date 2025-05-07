@@ -1,0 +1,181 @@
+/* Enhanced styles for the home page */
+
+/* Hero section with Om pattern background */
+.hero-bg {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  position: relative;
+  overflow: hidden;
+}
+
+/* Elevation shadows for cards */
+.shadow-elevated {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 
+              0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.shadow-elevated:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+              0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transform: translateY(-2px);
+}
+
+/* Animated gradient background */
+.animated-gradient {
+  background: linear-gradient(270deg, #ff8a00, #ff9933, #e68a00);
+  background-size: 600% 600%;
+  animation: gradientAnimation 8s ease infinite;
+}
+
+@keyframes gradientAnimation {
+  0% {background-position: 0% 50%}
+  50% {background-position: 100% 50%}
+  100% {background-position: 0% 50%}
+}
+
+/* Custom divider */
+.divider-saffron {
+  height: 3px;
+  background: linear-gradient(90deg, rgba(255,153,51,0), rgba(255,153,51,1) 50%, rgba(255,153,51,0) 100%);
+  margin: 2rem 0;
+}
+
+/* Enhanced image container for Lord Ram */
+.image-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+  transform: translateZ(0);
+  transition: transform 0.5s ease;
+}
+
+.image-container:hover {
+  transform: translateZ(0) scale(1.05);
+}
+
+.lord-ram-image {
+  max-height: 300px !important;
+  object-fit: contain;
+  border-radius: 0.5rem;
+  transition: all 0.5s ease;
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255,153,51,0.1) 0%, rgba(255,153,51,0.3) 100%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.image-container:hover .image-overlay {
+  opacity: 1;
+}
+
+/* Divine aura effect */
+.divine-aura {
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  right: -10%;
+  bottom: -10%;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, rgba(255, 153, 51, 0) 70%);
+  opacity: 0.7;
+  z-index: -1;
+  animation: pulse-aura 4s infinite ease-in-out;
+}
+
+@keyframes pulse-aura {
+  0% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.05); opacity: 0.9; }
+  100% { transform: scale(1); opacity: 0.7; }
+}
+
+/* Stats counter animation */
+.counter-value {
+  display: inline-block;
+  position: relative;
+}
+
+.counter-value::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background-color: var(--primary-color);
+  transform-origin: bottom right;
+  transition: transform 0.3s ease-out;
+}
+
+.counter-value:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* Leaderboard row highlight on hover */
+.leaderboard-row {
+  position: relative;
+  overflow: hidden;
+}
+
+.leaderboard-row::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background-color: rgba(255, 153, 51, 0.1);
+  transition: width 0.3s ease;
+  z-index: 0;
+}
+
+.leaderboard-row:hover::after {
+  width: 100%;
+}
+
+.leaderboard-row > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Benefits card highlight */
+.benefit-highlight {
+  transition: all 0.3s ease;
+}
+
+.benefit-highlight:hover {
+  background-color: var(--bg-light);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Hero section content */
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* Enhanced hero title */
+.hero-title {
+  font-size: 3rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .lord-ram-image {
+    max-height: 250px !important;
+  }
+} 

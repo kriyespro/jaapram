@@ -1,0 +1,52 @@
+# Cursor ignore configuration
+
+# This file helps reduce Cursor AI load during development
+# by specifying which files and directories should be ignored.
+
+# Ignore virtual environment
+venv/
+env/
+.env/
+
+# Ignore database files
+*.sqlite3
+*.db
+
+# Ignore compiled Python files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore static and media files
+/static/
+/media/
+
+# Ignore log files
+*.log
+
+# Ignore environment files
+.env
+.env.local
+.env.development
+.env.production
+
+# Ignore temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Ignore node modules
+node_modules/
+
+# Ignore distribution directories
+dist/
+build/
+
+# Ignore coverage reports
+.coverage
+htmlcov/
+
+# Ignore cache directories
+.cache/
+.pytest_cache/ 

@@ -1,0 +1,94 @@
+<div class="bg-white rounded-lg shadow-lg p-4 mx-auto mb-8" id="global-jaap-map-container">
+    <h2 class="text-xl font-bold text-primary mb-4 text-center">
+        <i class="fas fa-globe-asia mr-2"></i>Live Ram Naam Jaap Around the World
+    </h2>
+    
+    <!-- Map Container -->
+    <div 
+        id="global-jaap-map" 
+        class="w-full h-80 bg-gray-100 rounded-lg"
+        x-data="{ 
+            map: null,
+            markers: {},
+            initMap() {
+                // Initialize the map
+                this.map = L.map('global-jaap-map').setView([20, 77], 3);
+                
+                // Add tile layer
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'
+                }).addTo(this.map);
+                
+                // Load initial data
+                this.loadMapData();
+                
+                // Set up polling
+                setInterval(() => {
+                    this.loadMapData();
+                }, 30000); // Every 30 seconds
+            },
+            loadMapData() {
+                fetch('{{ url('jaap:map_data') }}')
+                    .then(response => response.json())
+                    .then(data => {
+                        this.updateMarkers(data.city_data);
+                    })
+                    .catch(error => console.error('Error loading map data:', error));
+            },
+            updateMarkers(cityData) {
+                // Process each city
+                cityData.forEach(city => {
+                    const id = `${city.city}-${city.country}`;
+                    
+                    // Create custom icon with count
+                    const customIcon = L.divIcon({
+                        html: `<div class='jaap-marker'><span>${city.count}</span></div>`,
+                        className: '',
+                        iconSize: [40, 40]
+                    });
+                    
+                    // If marker already exists, update it
+                    if (this.markers[id]) {
+                        this.markers[id].setLatLng([city.lat, city.lng]);
+                        this.markers[id].setIcon(customIcon);
+                        this.markers[id].setPopupContent(`<strong>${city.city}, ${city.country}</strong><br>${city.count} jaaps today`);
+                    } else {
+                        // Create new marker
+                        const marker = L.marker([city.lat, city.lng], {icon: customIcon})
+                            .addTo(this.map)
+                            .bindPopup(`<strong>${city.city}, ${city.country}</strong><br>${city.count} jaaps today`);
+                        
+                        this.markers[id] = marker;
+                    }
+                });
+            }
+        }"
+        x-init="$nextTick(() => initMap())"
+    ></div>
+    
+    <p class="text-sm text-gray-500 mt-3 text-center">
+        Showing real-time jaap counts from cities around the world. Data updates every 30 seconds.
+    </p>
+</div>
+
+<!-- Leaflet CSS and JS -->
+{% block extra_head %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <style>
+        .jaap-marker {
+            background-color: rgba(231, 81, 31, 0.9);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            font-weight: bold;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+    </style>
+{% endblock %} 
