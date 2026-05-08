@@ -247,101 +247,93 @@
 
 {% block content %}
 <div class="flex flex-col space-y-8" x-data="{ showBenefits: false }">
-    <!-- Hero Section -->
-    <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg shadow-xl overflow-hidden hero-bg animated-gradient">
-        <div class="md:flex p-8 hero-content">
-            <div class="md:w-1/2 flex flex-col justify-center text-white">
-                <h1 class="text-4xl md:text-5xl font-bold mb-3 hero-title">JaapRam</h1>
-                <p class="text-md mb-4">Track your spiritual journey with the divine name of Lord Ram</p>
-                
-                <!-- Stats moved to hero section - Made more compact -->
-                <div class="flex justify-between bg-white/10 p-3 rounded-lg mb-3">
-                    <div class="text-center">
-                        <div class="text-2xl font-bold"
-                             x-data="{ count: 0, target: {{ total_count|default(0) }} }"
-                             x-init="() => {
-                                 const duration = 2000;
-                                 const start = performance.now();
-                                 const step = (timestamp) => {
-                                     const progress = Math.min((timestamp - start) / duration, 1);
-                                     count = Math.floor(progress * target);
-                                     if (progress < 1) requestAnimationFrame(step);
-                                 };
-                                 requestAnimationFrame(step);
-                             }" x-text="count.toLocaleString()"></div>
-                        <div class="text-xs">Total Jaap Count</div>
+    <!-- Mobile-first Landing Hero -->
+    <section class="hero-shell rounded-2xl overflow-hidden shadow-xl hero-bg animated-gradient">
+        <div class="hero-grid p-5 sm:p-7 lg:p-10 hero-content">
+            <div class="text-white order-2 lg:order-1">
+                <p class="hero-kicker">Ram Naam Jaap Community</p>
+                <h1 class="hero-title mt-2">Make Daily Jaap a Consistent Habit</h1>
+                <p class="hero-subtitle mt-3">
+                    Build spiritual discipline with a simple daily counter, real-time community inspiration, and progress you can see.
+                </p>
+
+                <div class="hero-cta-row mt-5">
+                    {% if user.is_authenticated %}
+                        <a href="{{ url('jaap:jaap_entry') }}" class="hero-btn-primary">Start Jaap Now</a>
+                        <a href="{{ url('dashboard:overview') }}" class="hero-btn-secondary">Open Dashboard</a>
+                    {% else %}
+                        <a href="{{ url('account_signup') }}" class="hero-btn-primary">Create Free Account</a>
+                        <a href="{{ url('account_login') }}" class="hero-btn-secondary">Login</a>
+                    {% endif %}
+                </div>
+
+                <div class="hero-stats mt-5">
+                    <div class="hero-stat-card">
+                        <p class="hero-stat-value"
+                           x-data="{ count: 0, target: {{ total_count|default(0) }} }"
+                           x-init="() => {
+                                const duration = 1800;
+                                const start = performance.now();
+                                const step = (timestamp) => {
+                                    const progress = Math.min((timestamp - start) / duration, 1);
+                                    count = Math.floor(progress * target);
+                                    if (progress < 1) requestAnimationFrame(step);
+                                };
+                                requestAnimationFrame(step);
+                           }"
+                           x-text="count.toLocaleString()"></p>
+                        <p class="hero-stat-label">Total Jaap Count</p>
                     </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold"
-                             x-data="{ count: 0, target: {{ total_users|default(0) }} }"
-                             x-init="() => {
-                                 const duration = 1500;
-                                 const start = performance.now();
-                                 const step = (timestamp) => {
-                                     const progress = Math.min((timestamp - start) / duration, 1);
-                                     count = Math.floor(progress * target);
-                                     if (progress < 1) requestAnimationFrame(step);
-                                 };
-                                 requestAnimationFrame(step);
-                             }" x-text="count > 0 ? count.toLocaleString() : {{ total_users|default(1) }}"></div>
-                        <div class="text-xs">Community</div>
+                    <div class="hero-stat-card">
+                        <p class="hero-stat-value"
+                           x-data="{ count: 0, target: {{ total_users|default(0) }} }"
+                           x-init="() => {
+                                const duration = 1400;
+                                const start = performance.now();
+                                const step = (timestamp) => {
+                                    const progress = Math.min((timestamp - start) / duration, 1);
+                                    count = Math.floor(progress * target);
+                                    if (progress < 1) requestAnimationFrame(step);
+                                };
+                                requestAnimationFrame(step);
+                           }"
+                           x-text="count.toLocaleString()"></p>
+                        <p class="hero-stat-label">Active Devotees</p>
                     </div>
                 </div>
-                
-                <!-- Top 5 Cities in a row -->
-                <div class="bg-white/10 p-3 rounded-lg mb-4">
-                    <div class="flex justify-between mb-1">
-                        <div class="text-xs font-semibold">Top Cities</div>
-                        <div class="text-xs">Devotees</div>
+
+                <div class="hero-cities mt-5">
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="text-xs uppercase tracking-wide font-semibold">Top Cities</p>
+                        <p class="text-xs opacity-90">Devotees</p>
                     </div>
-                    <div class="space-y-1">
+                    <div class="space-y-1.5">
                         {% if top_cities and top_cities|length > 0 %}
-                            {% for city in top_cities[:5] %}
-                                <div class="flex justify-between items-center text-sm">
-                                    <div class="font-medium truncate mr-2">{{ city.city }}</div>
-                                    <div class="font-bold">{{ city.user_count }}</div>
+                            {% for city in top_cities[:4] %}
+                                <div class="city-row">
+                                    <span class="truncate">{{ city.city }}</span>
+                                    <strong>{{ city.user_count }}</strong>
                                 </div>
                             {% endfor %}
                         {% else %}
-                            <div class="flex justify-between items-center text-sm">
-                                <div class="font-medium">New Delhi</div>
-                                <div class="font-bold">108</div>
-                            </div>
-                            <div class="flex justify-between items-center text-sm">
-                                <div class="font-medium">Mumbai</div>
-                                <div class="font-bold">98</div>
-                            </div>
-                            <div class="flex justify-between items-center text-sm">
-                                <div class="font-medium">Bengaluru</div>
-                                <div class="font-bold">87</div>
-                            </div>
-                            <div class="flex justify-between items-center text-sm">
-                                <div class="font-medium">Varanasi</div>
-                                <div class="font-bold">76</div>
-                            </div>
-                            <div class="flex justify-between items-center text-sm">
-                                <div class="font-medium">Jaipur</div>
-                                <div class="font-bold">65</div>
-                            </div>
+                            <div class="city-row"><span>New Delhi</span><strong>108</strong></div>
+                            <div class="city-row"><span>Mumbai</span><strong>98</strong></div>
+                            <div class="city-row"><span>Bengaluru</span><strong>87</strong></div>
+                            <div class="city-row"><span>Varanasi</span><strong>76</strong></div>
                         {% endif %}
                     </div>
                 </div>
-                
-                {% if user.is_authenticated %}
-                    <div>
-                        <a href="{{ url('jaap:jaap_entry') }}" class="inline-block bg-primary text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-orange-600 text-center transition-all transform hover:scale-105" style="display: inline-block !important;">START JAAP NOW</a>
-                    </div>
-                {% endif %}
             </div>
-            <div class="md:w-1/2 mt-6 md:mt-0 flex justify-center items-center">
+
+            <div class="order-1 lg:order-2 flex items-center justify-center">
                 <div class="image-container relative">
                     <div class="divine-aura"></div>
-                    <img src="{{ static('images/shree_ram.jpg') }}" alt="Shree Ram" class="lord-ram-image rounded-lg shadow-2xl">
+                    <img src="{{ static('images/shree_ram.jpg') }}" alt="Shree Ram" class="lord-ram-image rounded-xl shadow-2xl">
                     <div class="image-overlay"></div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
     
     <!-- Live Map Section - Full Width -->
     <div class="map-fullwidth-container mb-6" id="global-jaap-map-container">
@@ -517,83 +509,55 @@
             observer.observe(card);
         });
         
-        // Initialize Activity Chart
-        const ctx = document.getElementById('activityChart').getContext('2d');
-        
-        // Get chart data
-        let chartLabels = {{ chart_labels|default('["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]')|safe }};
-        let chartData = {{ chart_data|default('[89000, 96000, 94500, 91000, 93000, 92000, 130000]')|safe }};
-        
-        // Parse JSON if needed
-        if (typeof chartLabels === 'string') {
-            chartLabels = JSON.parse(chartLabels);
-        }
-        if (typeof chartData === 'string') {
-            chartData = JSON.parse(chartData);
-        }
-        
-        // Create the chart with realistic data and proper formatting
-        const activityChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: chartLabels,
-                datasets: [{
-                    label: 'Ram Naam Jaap Count',
-                    data: chartData.length > 0 ? chartData : [89000, 96000, 94500, 91000, 93000, 92000, 130000],
-                    backgroundColor: 'rgba(255, 153, 51, 0.2)',
-                    borderColor: 'rgba(255, 153, 51, 1)',
-                    borderWidth: 2,
-                    tension: 0.3,
-                    fill: true,
-                    pointRadius: 4,
-                    pointBackgroundColor: 'rgba(255, 153, 51, 1)'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                if (value >= 1000) {
-                                    return (value / 1000) + 'k';
-                                }
-                                return value;
-                            }
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            maxRotation: 0,
-                            callback: function(value, index) {
-                                if (typeof this.getLabelForValue === 'function') {
-                                    const label = this.getLabelForValue(index);
-                                    try {
-                                        const date = new Date(label);
-                                        if (!isNaN(date)) {
-                                            return date.toISOString().split('T')[0];
-                                        }
-                                    } catch (e) {}
-                                }
-                                return chartLabels[index];
-                            }
-                        }
-                    }
+        // Initialize Activity Chart only if canvas exists
+        const chartCanvas = document.getElementById('activityChart');
+        if (chartCanvas) {
+            const ctx = chartCanvas.getContext('2d');
+            let chartLabels = {{ chart_labels|default('["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]')|safe }};
+            let chartData = {{ chart_data|default('[89000, 96000, 94500, 91000, 93000, 92000, 130000]')|safe }};
+
+            if (typeof chartLabels === 'string') {
+                chartLabels = JSON.parse(chartLabels);
+            }
+            if (typeof chartData === 'string') {
+                chartData = JSON.parse(chartData);
+            }
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'Ram Naam Jaap Count',
+                        data: chartData.length > 0 ? chartData : [89000, 96000, 94500, 91000, 93000, 92000, 130000],
+                        backgroundColor: 'rgba(255, 153, 51, 0.2)',
+                        borderColor: 'rgba(255, 153, 51, 1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                        pointRadius: 4,
+                        pointBackgroundColor: 'rgba(255, 153, 51, 1)'
+                    }]
                 },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let value = context.parsed.y;
-                                return context.dataset.label + ': ' + value.toLocaleString();
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    if (value >= 1000) {
+                                        return (value / 1000) + 'k';
+                                    }
+                                    return value;
+                                }
                             }
                         }
                     }
                 }
-            }
-        });
+            });
+        }
     });
     
     // Global Jaap Map Initialization
