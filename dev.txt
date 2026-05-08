@@ -1,3 +1,10 @@
+Deployment prep progress
+- [x] Checked git repository status and branch.
+- [x] Added Dockerfile and docker-compose stack with PostgreSQL + Redis.
+- [x] Added Celery app bootstrap and worker/beat services.
+- [x] Hardened production settings for cache/session/celery/security.
+- [x] Added deployment planning checklist in dev_plan.txt.
+- [ ] Finalize `.env.docker` real production values before release.
 # Ram Naam Jaap Application - Technical Implementation Document
 
 ## Technical Architecture Overview

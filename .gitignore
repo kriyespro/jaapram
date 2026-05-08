@@ -20,11 +20,15 @@ var/
 .installed.cfg
 *.egg
 .env
+.env.docker
 venv/
+ram_naam_jaap/venv/
+ram_naam_jaap/ram_naam_jaap/venv/
 ENV/
 .idea/
 .vscode/
 *.sqlite3
 media/
 staticfiles/
+ram_naam_jaap/logs/
 .DS_Store

@@ -1,0 +1,20 @@
+Phase 1 - Container baseline
+- Add Dockerfile for Django app image with production runtime defaults.
+- Add docker-compose stack for web, postgres, redis, celery worker, and celery beat.
+- Add .dockerignore and docker env example.
+
+Phase 2 - Production hardening
+- Enforce production settings via DJANGO_ENV=production.
+- Configure secure proxy headers and trusted origins.
+- Configure Redis cache/sessions and Celery broker using env variables.
+- Keep debug-only tooling out of production middleware/apps.
+
+Phase 3 - Runtime reliability
+- Add entrypoint to run migrations and collectstatic on startup.
+- Add healthchecks for postgres/redis and dependency ordering.
+- Set gunicorn workers/threads/timeouts from env.
+
+Phase 4 - Release checklist
+- Copy .env.docker.example to .env.docker and set strong secrets.
+- Run `docker compose up --build`.
+- Validate `/`, admin login, celery worker, and beat schedule execution.

@@ -176,6 +176,22 @@ For larger installations, each component can run on separate servers/containers:
 - Blog: `blog.example.com`
 - Community: `community.example.com`
 
+### Docker Deployment (Recommended)
+
+1. Create docker env file:
+   ```bash
+   cp .env.docker.example .env.docker
+   ```
+2. Set strong values in `.env.docker` (especially `SECRET_KEY`, `ALLOWED_HOSTS`, and DB credentials).
+3. Build and start:
+   ```bash
+   docker compose up --build -d
+   ```
+4. View logs:
+   ```bash
+   docker compose logs -f web celery_worker celery_beat
+   ```
+
 ## Contributing
 
 1. Fork the repository
