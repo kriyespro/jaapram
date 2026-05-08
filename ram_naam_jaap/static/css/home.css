@@ -200,6 +200,28 @@
   max-width: 40rem;
 }
 
+.hero-points {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.hero-point {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.6rem;
+  padding: 0.45rem 0.55rem;
+}
+
+.hero-point i {
+  color: #fff;
+  font-size: 0.86rem;
+  opacity: 0.95;
+}
+
 .hero-cta-row {
   display: flex;
   flex-direction: column;
@@ -215,6 +237,8 @@
   border-radius: 0.7rem;
   padding: 0.72rem 1rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  width: 100%;
+  text-align: center;
 }
 
 .hero-btn-primary {
@@ -274,6 +298,59 @@
   font-size: 0.88rem;
 }
 
+.city-row span {
+  min-width: 0;
+}
+
+.hero-trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.hero-trust-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+}
+
+/* Better map controls and overlay behavior on mobile */
+.map-controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0;
+}
+
+.map-filters {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.map-filter-btn {
+  min-height: 32px;
+  font-weight: 600;
+}
+
+.mobile-fit-btn {
+  width: 100%;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 40px;
+  text-align: center;
+}
+
 @media (min-width: 640px) {
   .hero-title {
     font-size: 2.3rem;
@@ -287,6 +364,11 @@
   .hero-btn-primary,
   .hero-btn-secondary {
     min-width: 170px;
+    width: auto;
+  }
+
+  .mobile-fit-btn {
+    width: auto;
   }
 }
 
@@ -304,10 +386,81 @@
   .hero-subtitle {
     font-size: 1.05rem;
   }
+
+  .hero-point {
+    font-size: 0.92rem;
+  }
 }
 
 @media (max-width: 768px) {
+  .hero-shell {
+    border-radius: 1rem;
+  }
+
   .lord-ram-image {
     max-height: 250px !important;
+  }
+
+  .hero-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-stat-value {
+    font-size: 1.05rem;
+  }
+
+  .hero-point {
+    font-size: 0.84rem;
+  }
+
+  #global-jaap-map {
+    height: 250px !important;
+  }
+
+  .map-overlay {
+    right: 6px;
+    top: 6px;
+    max-width: 130px;
+    padding: 5px;
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 420px) {
+  .hero-title {
+    font-size: 1.55rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.92rem;
+  }
+
+  .hero-kicker {
+    font-size: 0.66rem;
+    letter-spacing: 0.06em;
+  }
+
+  .hero-btn-primary,
+  .hero-btn-secondary {
+    font-size: 0.9rem;
+    padding: 0.68rem 0.8rem;
+  }
+
+  .hero-point {
+    font-size: 0.79rem;
+    line-height: 1.35;
+  }
+
+  .hero-trust-chip {
+    font-size: 0.64rem;
+    padding: 0.25rem 0.45rem;
+  }
+
+  .city-row {
+    font-size: 0.82rem;
+  }
+
+  #global-jaap-map {
+    height: 220px !important;
   }
 } 

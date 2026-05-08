@@ -257,13 +257,19 @@
                     Build spiritual discipline with a simple daily counter, real-time community inspiration, and progress you can see.
                 </p>
 
+                <div class="hero-points mt-4">
+                    <div class="hero-point"><i class="fas fa-check-circle"></i><span>One-tap daily Jaap tracking</span></div>
+                    <div class="hero-point"><i class="fas fa-check-circle"></i><span>Live city-wise devotional momentum</span></div>
+                    <div class="hero-point"><i class="fas fa-check-circle"></i><span>Personal dashboard for streak consistency</span></div>
+                </div>
+
                 <div class="hero-cta-row mt-5">
                     {% if user.is_authenticated %}
-                        <a href="{{ url('jaap:jaap_entry') }}" class="hero-btn-primary">Start Jaap Now</a>
-                        <a href="{{ url('dashboard:overview') }}" class="hero-btn-secondary">Open Dashboard</a>
+                        <a href="{{ url('jaap:jaap_entry') }}" class="hero-btn-primary mobile-fit-btn">Start Jaap Now</a>
+                        <a href="{{ url('dashboard:overview') }}" class="hero-btn-secondary mobile-fit-btn">Open Dashboard</a>
                     {% else %}
-                        <a href="{{ url('account_signup') }}" class="hero-btn-primary">Create Free Account</a>
-                        <a href="{{ url('account_login') }}" class="hero-btn-secondary">Login</a>
+                        <a href="{{ url('account_signup') }}" class="hero-btn-primary mobile-fit-btn">Create Free Account</a>
+                        <a href="{{ url('account_login') }}" class="hero-btn-secondary mobile-fit-btn">Login</a>
                     {% endif %}
                 </div>
 
@@ -323,6 +329,12 @@
                         {% endif %}
                     </div>
                 </div>
+
+                <div class="hero-trust mt-4">
+                    <span class="hero-trust-chip"><i class="fas fa-bolt"></i> Live Updates</span>
+                    <span class="hero-trust-chip"><i class="fas fa-mobile-alt"></i> Mobile Friendly</span>
+                    <span class="hero-trust-chip"><i class="fas fa-globe-asia"></i> Community Driven</span>
+                </div>
             </div>
 
             <div class="order-1 lg:order-2 flex items-center justify-center">
@@ -377,7 +389,7 @@
     
     <!-- Leaderboard Section - Modified to be more compact -->
     <div class="bg-white rounded-lg shadow-md p-4 shadow-elevated">
-        <div class="flex justify-between items-center mb-2">
+        <div class="flex flex-wrap gap-2 justify-between items-center mb-2">
             <h2 class="text-xl font-bold text-gray-800 title-saffron">Top Devotees</h2>
             <div class="text-primary">
                 <i class="fas fa-trophy mr-1"></i>
@@ -434,7 +446,7 @@
         </div>
         <div class="mt-2 text-center">
             <a href="{{ url('community:global_leaderboard') }}" 
-               class="inline-block bg-primary text-white hover:bg-orange-600 font-medium transition-colors duration-200 py-1 px-3 rounded text-sm">
+               class="mobile-fit-btn sm:w-auto inline-flex bg-primary text-white hover:bg-orange-600 font-medium transition-colors duration-200 py-2 px-4 rounded text-sm">
                 <span>View Full Leaderboard</span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="inline-block h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -445,7 +457,7 @@
     
     <!-- Benefits Section -->
     <div class="bg-white rounded-lg shadow-md p-6 shadow-elevated">
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex flex-wrap gap-2 justify-between items-center mb-6">
             <h2 class="text-2xl font-bold text-gray-800 title-saffron">Benefits of Ram Naam Jaap</h2>
             <div class="text-primary text-4xl om-symbol">
                 <i class="fas fa-om"></i>
