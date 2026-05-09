@@ -67,11 +67,11 @@
 <body class="flex flex-col min-h-screen bg-gray-50 text-gray-800">
     <!-- Header -->
     <header class="bg-primary-600 text-white shadow-md">
-        <div class="container mx-auto px-4 py-4">
+        <div class="container mx-auto px-4 py-4 relative">
             <div class="flex justify-between items-center">
                 <!-- Logo and site name -->
                 <div class="flex items-center space-x-2">
-                    <a href="{{ url('jaap:home') }}" class="flex items-center">
+                    <a href="{{ url('core:home') }}" class="flex items-center">
                         <img src="{{ static('images/logo.png') }}" alt="Ram Naam Jaap Logo" class="h-10 w-auto">
                         <span class="ml-2 text-xl font-bold">Ram Naam Jaap</span>
                     </a>
@@ -89,19 +89,21 @@
                     </button>
                     
                     <!-- Mobile menu -->
-                    <div x-show="open" x-cloak class="absolute top-16 right-0 left-0 bg-primary-600 shadow-md p-4 z-50">
-                        <nav class="flex flex-col space-y-4">
-                            <a href="{{ url('jaap:home') }}" class="text-white hover:text-primary-200">Home</a>
-                            <a href="{{ url('jaap:jaap_entry') }}" class="text-white hover:text-primary-200">Jaap Counter</a>
-                            <a href="{{ url('jaap:jaap_history') }}" class="text-white hover:text-primary-200">History</a>
-                            <a href="{{ url('community:leaderboard') }}" class="text-white hover:text-primary-200">Leaderboard</a>
-                            <a href="{{ url('community:forums') }}" class="text-white hover:text-primary-200">Community</a>
+                    <div x-show="open" @click.away="open = false" x-cloak class="absolute top-full left-0 right-0 bg-primary-700 shadow-md p-4 z-50 border-t border-primary-500">
+                        <nav class="flex flex-col space-y-3">
+                            <a href="{{ url('core:home') }}" class="text-white hover:text-primary-200 py-1">Home</a>
+                            <a href="{{ url('jaap:jaap_entry') }}" class="text-white hover:text-primary-200 py-1">Jaap Counter</a>
+                            <a href="{{ url('jaap:jaap_history') }}" class="text-white hover:text-primary-200 py-1">History</a>
+                            <a href="{{ url('community:leaderboard') }}" class="text-white hover:text-primary-200 py-1">Leaderboard</a>
+                            <a href="{{ url('community:home') }}" class="text-white hover:text-primary-200 py-1">Community</a>
                             {% if hasattr(request, 'user') and request.user.is_authenticated %}
-                                <a href="{{ url('accounts:profile') }}" class="text-white hover:text-primary-200">My Profile</a>
-                                <a href="{{ url('account_logout') }}" class="text-white hover:text-primary-200">Logout</a>
+                                <a href="{{ url('accounts:profile') }}" class="text-white hover:text-primary-200 py-1">My Profile</a>
+                                {% set logout_form_classes = "block w-full pt-1" %}
+                                {% set logout_button_classes = "w-full text-center py-3 rounded-md bg-white text-primary-600 font-medium hover:bg-gray-100 border-0 cursor-pointer font-sans" %}
+                                {% include 'partials/account_logout_form.html' %}
                             {% else %}
-                                <a href="{{ url('account_login') }}" class="text-white hover:text-primary-200">Login</a>
-                                <a href="{{ url('account_signup') }}" class="text-white hover:text-primary-200">Sign Up</a>
+                                <a href="{{ url('account_login') }}" class="block w-full text-center py-3 rounded-md bg-white text-primary-600 font-medium hover:bg-gray-100">Login</a>
+                                <a href="{{ url('account_signup') }}" class="block w-full text-center py-3 rounded-md bg-secondary-500 hover:bg-secondary-600 text-white font-medium shadow-sm">Sign Up</a>
                             {% endif %}
                         </nav>
                     </div>
@@ -109,11 +111,11 @@
                 
                 <!-- Desktop menu -->
                 <nav class="hidden md:flex items-center space-x-6">
-                    <a href="{{ url('jaap:home') }}" class="text-white hover:text-primary-200">Home</a>
+                    <a href="{{ url('core:home') }}" class="text-white hover:text-primary-200">Home</a>
                     <a href="{{ url('jaap:jaap_entry') }}" class="text-white hover:text-primary-200">Jaap Counter</a>
                     <a href="{{ url('jaap:jaap_history') }}" class="text-white hover:text-primary-200">History</a>
                     <a href="{{ url('community:leaderboard') }}" class="text-white hover:text-primary-200">Leaderboard</a>
-                    <a href="{{ url('community:forums') }}" class="text-white hover:text-primary-200">Community</a>
+                    <a href="{{ url('community:home') }}" class="text-white hover:text-primary-200">Community</a>
                     
                     {% if hasattr(request, 'user') and request.user.is_authenticated %}
                         <!-- User dropdown -->
@@ -128,12 +130,14 @@
                             <!-- Dropdown menu -->
                             <div x-show="open" @click.away="open = false" x-cloak class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
                                 <a href="{{ url('accounts:profile') }}" class="block px-4 py-2 text-gray-800 hover:bg-primary-100">My Profile</a>
-                                <a href="{{ url('jaap:dashboard') }}" class="block px-4 py-2 text-gray-800 hover:bg-primary-100">Dashboard</a>
+                                <a href="{{ url('dashboard:overview') }}" class="block px-4 py-2 text-gray-800 hover:bg-primary-100">Dashboard</a>
                                 {% if request.user.is_staff %}
                                     <a href="{{ url('admin_dashboard:index') }}" class="block px-4 py-2 text-gray-800 hover:bg-primary-100">Admin Dashboard</a>
                                 {% endif %}
                                 <div class="border-t border-gray-200"></div>
-                                <a href="{{ url('account_logout') }}" class="block px-4 py-2 text-gray-800 hover:bg-primary-100">Logout</a>
+                                {% set logout_form_classes = "" %}
+                                {% set logout_button_classes = "block w-full text-left px-4 py-2 text-gray-800 hover:bg-primary-100 bg-transparent border-0 cursor-pointer font-sans text-sm" %}
+                                {% include 'partials/account_logout_form.html' %}
                             </div>
                         </div>
                     {% else %}
@@ -183,7 +187,7 @@
                 <div>
                     <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
                     <ul class="space-y-2">
-                        <li><a href="{{ url('jaap:home') }}" class="text-gray-300 hover:text-white">Home</a></li>
+                            <li><a href="{{ url('core:home') }}" class="text-gray-300 hover:text-white">Home</a></li>
                         <li><a href="{{ url('jaap:jaap_entry') }}" class="text-gray-300 hover:text-white">Jaap Counter</a></li>
                         <li><a href="{{ url('jaap:jaap_history') }}" class="text-gray-300 hover:text-white">History</a></li>
                         <li><a href="{{ url('community:leaderboard') }}" class="text-gray-300 hover:text-white">Leaderboard</a></li>
@@ -193,10 +197,10 @@
                 <div>
                     <h3 class="text-lg font-semibold mb-4">Community</h3>
                     <ul class="space-y-2">
-                        <li><a href="{{ url('community:forums') }}" class="text-gray-300 hover:text-white">Forums</a></li>
-                        <li><a href="{{ url('community:events') }}" class="text-gray-300 hover:text-white">Events</a></li>
-                        <li><a href="{{ url('community:groups') }}" class="text-gray-300 hover:text-white">Groups</a></li>
-                        <li><a href="{{ url('blog:index') }}" class="text-gray-300 hover:text-white">Blog</a></li>
+                        <li><a href="{{ url('community:home') }}" class="text-gray-300 hover:text-white">Forums</a></li>
+                        <li><a href="{{ url('community:statistics') }}" class="text-gray-300 hover:text-white">Statistics</a></li>
+                        <li><a href="{{ url('community:leaderboard') }}" class="text-gray-300 hover:text-white">Leaderboard</a></li>
+                        <li><a href="{{ url('core:about') }}" class="text-gray-300 hover:text-white">About</a></li>
                     </ul>
                 </div>
                 
@@ -205,8 +209,12 @@
                     <ul class="space-y-2">
                         {% if hasattr(request, 'user') and request.user.is_authenticated %}
                             <li><a href="{{ url('accounts:profile') }}" class="text-gray-300 hover:text-white">My Profile</a></li>
-                            <li><a href="{{ url('jaap:dashboard') }}" class="text-gray-300 hover:text-white">Dashboard</a></li>
-                            <li><a href="{{ url('account_logout') }}" class="text-gray-300 hover:text-white">Logout</a></li>
+                            <li><a href="{{ url('dashboard:overview') }}" class="text-gray-300 hover:text-white">Dashboard</a></li>
+                            <li class="list-none">
+                                {% set logout_form_classes = "inline" %}
+                                {% set logout_button_classes = "text-gray-300 hover:text-white bg-transparent border-0 cursor-pointer p-0 font-sans text-base hover:underline" %}
+                                {% include 'partials/account_logout_form.html' %}
+                            </li>
                         {% else %}
                             <li><a href="{{ url('account_login') }}" class="text-gray-300 hover:text-white">Login</a></li>
                             <li><a href="{{ url('account_signup') }}" class="text-gray-300 hover:text-white">Sign Up</a></li>
@@ -218,9 +226,9 @@
             <div class="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400">
                 <p>&copy; {{ now().year }} Ram Naam Jaap. All rights reserved.</p>
                 <div class="mt-2 flex justify-center space-x-4">
-                    <a href="{{ url('pages:privacy') }}" class="hover:text-white">Privacy Policy</a>
-                    <a href="{{ url('pages:terms') }}" class="hover:text-white">Terms of Service</a>
-                    <a href="{{ url('pages:contact') }}" class="hover:text-white">Contact Us</a>
+                    <a href="{{ url('core:privacy') }}" class="hover:text-white">Privacy Policy</a>
+                    <a href="{{ url('core:terms') }}" class="hover:text-white">Terms of Service</a>
+                    <a href="{{ url('core:about') }}" class="hover:text-white">Contact</a>
                 </div>
             </div>
         </div>

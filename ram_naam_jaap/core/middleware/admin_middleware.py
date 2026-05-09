@@ -32,7 +32,7 @@ class AdminAccessMiddleware:
         if not request.user.is_staff:
             messages.error(request, "You don't have permission to access this area.")
             # Redirect to home page or user dashboard
-            return redirect('jaap:home')
+            return redirect('core:home')
             
         response = self.get_response(request)
         return response 
