@@ -252,24 +252,16 @@
         <div class="hero-grid p-5 sm:p-7 lg:p-10 hero-content">
             <div class="text-white order-2 lg:order-1">
                 <p class="hero-kicker">Ram Naam Jaap Community</p>
-                <h1 class="hero-title mt-2">Make Daily Jaap a Consistent Habit</h1>
+                <h1 class="hero-title mt-2">Royal Simplicity for Daily Ram Jaap</h1>
                 <p class="hero-subtitle mt-3">
-                    Build spiritual discipline with a simple daily counter, real-time community inspiration, and progress you can see.
+                    A calm and focused space to track your daily practice and stay connected with the devotional community.
                 </p>
-
-                <div class="hero-points mt-4">
-                    <div class="hero-point"><i class="fas fa-check-circle"></i><span>One-tap daily Jaap tracking</span></div>
-                    <div class="hero-point"><i class="fas fa-check-circle"></i><span>Live city-wise devotional momentum</span></div>
-                    <div class="hero-point"><i class="fas fa-check-circle"></i><span>Personal dashboard for streak consistency</span></div>
-                </div>
 
                 <div class="hero-cta-row mt-5">
                     {% if user.is_authenticated %}
                         <a href="{{ url('jaap:jaap_entry') }}" class="hero-btn-primary mobile-fit-btn hero-cta-primary">Start Jaap Now</a>
-                        <a href="{{ url('dashboard:overview') }}" class="hero-btn-secondary mobile-fit-btn hero-cta-secondary">Open Dashboard</a>
                     {% else %}
-                        <a href="{{ url('account_signup') }}?next={{ url('jaap:jaap_entry')|urlencode }}" class="hero-btn-primary mobile-fit-btn hero-cta-primary">Create free account</a>
-                        <a href="{{ url('account_login') }}?next={{ url('jaap:jaap_entry')|urlencode }}" class="hero-btn-secondary mobile-fit-btn hero-cta-secondary">Sign in</a>
+                        <a href="{{ url('account_signup') }}?next={{ url('jaap:jaap_entry')|urlencode }}" class="hero-btn-primary mobile-fit-btn hero-cta-primary">Start Free in 10 Seconds</a>
                     {% endif %}
                 </div>
 
@@ -308,32 +300,9 @@
                     </div>
                 </div>
 
-                <div class="hero-cities mt-5">
-                    <div class="flex justify-between items-center mb-2">
-                        <p class="text-xs uppercase tracking-wide font-semibold">Top Cities</p>
-                        <p class="text-xs opacity-90">Devotees</p>
-                    </div>
-                    <div class="space-y-1.5">
-                        {% if top_cities and top_cities|length > 0 %}
-                            {% for city in top_cities[:4] %}
-                                <div class="city-row">
-                                    <span class="truncate">{{ city.city }}</span>
-                                    <strong>{{ city.user_count }}</strong>
-                                </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="city-row"><span>New Delhi</span><strong>108</strong></div>
-                            <div class="city-row"><span>Mumbai</span><strong>98</strong></div>
-                            <div class="city-row"><span>Bengaluru</span><strong>87</strong></div>
-                            <div class="city-row"><span>Varanasi</span><strong>76</strong></div>
-                        {% endif %}
-                    </div>
-                </div>
-
                 <div class="hero-trust mt-4">
-                    <span class="hero-trust-chip"><i class="fas fa-bolt"></i> Live Updates</span>
-                    <span class="hero-trust-chip"><i class="fas fa-mobile-alt"></i> Mobile Friendly</span>
-                    <span class="hero-trust-chip"><i class="fas fa-globe-asia"></i> Community Driven</span>
+                    <span class="hero-trust-chip"><i class="fas fa-crown"></i> Royal Design</span>
+                    <span class="hero-trust-chip"><i class="fas fa-bolt"></i> Real-time Community</span>
                 </div>
             </div>
 
@@ -642,14 +611,36 @@
             const overlay = document.getElementById('map-info-overlay');
             if (overlay) overlay.classList.remove('hidden');
             
-            // Update user marker behavior to prefer user profile city over geolocation
+            // Prefer device location first for real user map position
             function getUserLocation() {
+                const onDeviceLocation = (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    addUserMarker(lat, lng, 'Your Device Location', '');
+                    if (!mapInitialized) {
+                        map.setView([lat, lng], 6);
+                        mapInitialized = true;
+                    }
+                };
+
+                const onDeviceError = () => {
+                    resolveProfileOrIpLocation();
+                };
+
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(onDeviceLocation, onDeviceError, {
+                        enableHighAccuracy: true,
+                        timeout: 8000,
+                        maximumAge: 120000
+                    });
+                } else {
+                    resolveProfileOrIpLocation();
+                }
+            }
+
+            function resolveProfileOrIpLocation() {
                 {% if user.is_authenticated and user.profile.city %}
-                // Use city from user profile when available
                 const userCity = "{{ user.profile.city }}";
-                console.log('Using profile city:', userCity);
-                
-                // Try to get coordinates for user's profile city
                 fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(userCity)}`)
                     .then(response => response.json())
                     .then(data => {
@@ -662,16 +653,11 @@
                                 mapInitialized = true;
                             }
                         } else {
-                            // Fallback to IP-based location if city lookup fails
                             fallbackToIpLocation();
                         }
                     })
-                    .catch(error => {
-                        console.error('Error getting city coordinates:', error);
-                        fallbackToIpLocation();
-                    });
+                    .catch(() => fallbackToIpLocation());
                 {% else %}
-                // Try IP-based geolocation first (no permissions needed)
                 fallbackToIpLocation();
                 {% endif %}
             }
@@ -711,46 +697,32 @@
             
             // Add user marker to map
             function addUserMarker(lat, lng, city, country) {
-                // Get user's jaap count if available
-                fetch('{{ url('jaap:jaap_entry') }}?format=json')
-                    .then(response => response.json())
-                    .catch(() => ({ today_count: 0 }))
-                    .then(data => {
-                        const count = data.today_count || 0;
-                        
-                        // Create custom icon with "You" label and count
-                        const userIcon = L.divIcon({
-                            html: `
-                                <div class="user-marker-label">You</div>
-                                <div class='user-location-marker' style="width:40px;height:40px;">
-                                    <span>${count >= 1000 ? (count/1000).toFixed(1) + 'k' : count}</span>
-                                </div>
-                            `,
-                            className: '',
-                            iconSize: [40, 40]
-                        });
-                        
-                        // Remove existing user marker if any
-                        if (userMarker) {
-                            map.removeLayer(userMarker);
-                        }
-                        
-                        // Create user marker
-                        userMarker = L.marker([lat, lng], {
-                            icon: userIcon,
-                            zIndexOffset: 1000
-                        }).addTo(map);
-                        
-                        // Add popup with user details
-                        userMarker.bindPopup(`
-                            <div class="city-popup">
-                                <div class="city-name">You (${city})</div>
-                                <div class="jaap-stats">
-                                    <strong>${count.toLocaleString()}</strong> jaaps today
-                                </div>
-                            </div>
-                        `);
-                    });
+                const userIcon = L.divIcon({
+                    html: `
+                        <div class="user-marker-label">You</div>
+                        <div class='user-location-marker' style="width:36px;height:36px;">
+                            <span><i class="fas fa-location-arrow"></i></span>
+                        </div>
+                    `,
+                    className: '',
+                    iconSize: [36, 36]
+                });
+
+                if (userMarker) {
+                    map.removeLayer(userMarker);
+                }
+
+                userMarker = L.marker([lat, lng], {
+                    icon: userIcon,
+                    zIndexOffset: 1000
+                }).addTo(map);
+
+                userMarker.bindPopup(`
+                    <div class="city-popup">
+                        <div class="city-name">You (${city})</div>
+                        <div class="jaap-stats">Real-time location marker</div>
+                    </div>
+                `);
             }
             
             // Call to get user location
