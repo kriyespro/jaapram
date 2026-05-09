@@ -22,7 +22,7 @@
 
 /* Animated gradient background */
 .animated-gradient {
-  background: linear-gradient(125deg, #7a4a0f 0%, #a86c22 45%, #cf8f2f 100%);
+  background: linear-gradient(125deg, #b45309 0%, #ea580c 48%, #f59e0b 100%);
   background-size: 220% 220%;
   animation: gradientAnimation 14s ease infinite;
 }
@@ -179,7 +179,8 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(245, 158, 11, 0.26);
+  border: 1px solid rgba(255, 255, 255, 0.28);
   padding: 0.35rem 0.6rem;
   border-radius: 999px;
 }
@@ -354,8 +355,8 @@
   text-transform: uppercase;
   padding: 0.25rem 0.45rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.28);
 }
 
 /* Better map controls and overlay behavior on mobile */
