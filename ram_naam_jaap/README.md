@@ -142,6 +142,10 @@ The application follows a modular structure with separate Django apps for differ
 - `dashboard`: User dashboard and statistics
 - `community`: Community features and leaderboards
 
+## Git sync and Docker updates
+
+Docker Compose and the main deployment docs live in the **repository root** (parent of this folder). For `git pull` / `git push` and commands to rebuild and restart containers after updates, see the root **README.md** sections *Docker Deployment* and *Updating after new code (Git + Docker)*, and **README_HELPERS.md** (*Git and Docker updates*).
+
 ## Contributing
 
 1. Fork the repository

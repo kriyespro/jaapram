@@ -132,4 +132,52 @@ Static files are served with cache-busting URLs using a timestamp parameter, ens
 5. If changes aren't appearing in the browser:
    - Hard reload the page (Ctrl+Shift+R or Cmd+Shift+R)
    - Clear browser cache in developer tools
-   - Try a private/incognito window 
+   - Try a private/incognito window
+
+## Git and Docker updates
+
+Run all commands from the **project root** (next to `manage.py`, `docker-compose.yml`, and `Dockerfile`).
+
+### Git
+
+```bash
+# Latest code from remote (default branch main)
+git fetch origin
+git pull origin main
+
+# Publish local commits
+git add -A
+git commit -m "Your message"
+git push origin main
+```
+
+### Docker stack after `git pull`
+
+The `web` service runs migrations and `collectstatic` when it starts (`scripts/docker-entrypoint.sh`).
+
+```bash
+docker compose pull db redis
+docker compose build --pull web celery_worker celery_beat
+docker compose up -d
+```
+
+Shortcut:
+
+```bash
+docker compose up -d --build --pull always
+```
+
+Logs and status:
+
+```bash
+docker compose ps
+docker compose logs -f web celery_worker celery_beat --tail=100
+```
+
+Clean rebuild when dependencies change:
+
+```bash
+docker compose down
+docker compose build --no-cache web celery_worker celery_beat
+docker compose up -d
+```

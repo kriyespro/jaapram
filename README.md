@@ -192,6 +192,66 @@ For larger installations, each component can run on separate servers/containers:
    docker compose logs -f web celery_worker celery_beat
    ```
 
+### Updating after new code (Git + Docker)
+
+Use these from the **repository root** (where `docker-compose.yml` and `Dockerfile` live).
+
+**Bring in remote changes**
+
+```bash
+git fetch origin
+git status
+git pull origin main
+```
+
+Replace `main` with your tracking branch if different.
+
+**Publish your changes**
+
+```bash
+git status
+git add -A
+git commit -m "Describe your change"
+git push origin main
+```
+
+**Refresh the Docker stack** (rebuild app images, restart services)
+
+The `web` container runs `migrate` and `collectstatic` on startup (see `scripts/docker-entrypoint.sh`), so a normal update is:
+
+```bash
+docker compose pull db redis
+docker compose build --pull web celery_worker celery_beat
+docker compose up -d
+```
+
+One-liner equivalent:
+
+```bash
+docker compose up -d --build --pull always
+```
+
+After deploy, confirm containers and tail logs:
+
+```bash
+docker compose ps
+docker compose logs -f web celery_worker celery_beat --tail=100
+```
+
+**Optional: clean rebuild** (if dependencies or the base image changed heavily)
+
+```bash
+docker compose down
+docker compose build --no-cache web celery_worker celery_beat
+docker compose up -d
+```
+
+**Manual migration** (only if you need to run migrations without restarting `web`)
+
+```bash
+docker compose exec web sh -c 'cd /app/ram_naam_jaap && python ../manage.py migrate --noinput'
+```
+
 ## Contributing
 
 1. Fork the repository

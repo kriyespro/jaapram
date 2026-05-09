@@ -18,3 +18,9 @@ Phase 4 - Release checklist
 - Copy .env.docker.example to .env.docker and set strong secrets.
 - Run `docker compose up --build`.
 - Validate `/`, admin login, celery worker, and beat schedule execution.
+
+Phase 5 - Ongoing updates (Git + Docker)
+- Pull latest: `git fetch origin && git pull origin main` (adjust branch if needed).
+- Push changes: `git add -A`, `git commit -m "..."`, `git push origin main`.
+- Refresh containers after code changes: `docker compose up -d --build --pull always` (from repo root).
+- Optional deep rebuild: `docker compose down`, then `docker compose build --no-cache web celery_worker celery_beat`, then `docker compose up -d`.
