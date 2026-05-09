@@ -1,0 +1,43 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans "Google Sign In" %} - Ram Naam Jaap</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+</head>
+<body class="min-h-screen bg-orange-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-xl shadow-lg border border-orange-100 overflow-hidden">
+        <div class="bg-primary text-white px-6 py-5 text-center">
+            <h1 class="text-2xl font-bold">
+                {% if process == "connect" %}
+                    {% blocktrans with provider.name as provider %}Connect {{ provider }}{% endblocktrans %}
+                {% else %}
+                    {% blocktrans with provider.name as provider %}Sign In Via {{ provider }}{% endblocktrans %}
+                {% endif %}
+            </h1>
+        </div>
+        <div class="px-6 py-5">
+            <p class="text-gray-700 text-sm mb-5">
+                {% if process == "connect" %}
+                    {% blocktrans with provider.name as provider %}You are about to connect a new third-party account from {{ provider }}.{% endblocktrans %}
+                {% else %}
+                    {% blocktrans with provider.name as provider %}You are about to sign in using a third-party account from {{ provider }}.{% endblocktrans %}
+                {% endif %}
+            </p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="w-full bg-primary hover:bg-orange-600 text-white font-semibold py-3 rounded-md transition">
+                    {% trans "Continue" %}
+                </button>
+            </form>
+        </div>
+        <div class="px-6 pb-5 text-center text-sm text-gray-600">
+            <a href="{% url 'account_login' %}" class="text-primary hover:underline mr-3">{% trans "Sign In" %}</a>
+            <a href="{% url 'account_signup' %}" class="text-primary hover:underline">{% trans "Sign Up" %}</a>
+        </div>
+    </div>
+</body>
+</html>
