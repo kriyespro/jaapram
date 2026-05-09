@@ -194,7 +194,12 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # Site ID for django.contrib.sites
-SITE_ID = 1
+SITE_ID = int(os.environ.get('SITE_ID', '1'))
+SITE_DOMAIN = os.environ.get('SITE_DOMAIN', 'localhost')
+SITE_BRAND_NAME = os.environ.get('SITE_BRAND_NAME', 'Ram Naam Jaap')
+
+# allauth: custom adapter (safe email send); bootstrap Site row in accounts.apps
+ACCOUNT_ADAPTER = 'accounts.adapter.RamJaapAccountAdapter'
 
 # Custom Admin URL
 ADMIN_URL = os.environ.get('ADMIN_URL', 'durga/')

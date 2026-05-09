@@ -65,5 +65,5 @@ def sync_user_profile(sender, instance, created, **kwargs):
         return
     try:
         instance.profile.save()
-    except User.profile.RelatedObjectDoesNotExist:
+    except (User.profile.RelatedObjectDoesNotExist, AttributeError):
         UserProfile.objects.get_or_create(user=instance)
