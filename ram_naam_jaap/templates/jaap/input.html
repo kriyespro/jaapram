@@ -135,7 +135,7 @@
     
     <!-- Save Button -->
     <form method="post" action="{{ url('jaap:save_entry') }}" x-ref="saveForm">
-        {{ csrf_input(request) }}
+        {{ csrf_input }}
         <input type="hidden" name="count" :value="count" x-ref="countInput">
         <input type="hidden" name="date" value="{{ today_date_iso }}">
         <button type="submit" class="save-button">Save Ram Jaap</button>

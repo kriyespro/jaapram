@@ -2,19 +2,12 @@ from django.templatetags.static import static
 from django.urls import reverse, NoReverseMatch
 from jinja2 import Environment
 from datetime import datetime
-from django.middleware.csrf import get_token
-from markupsafe import Markup
 import time
 from django.template.defaultfilters import date as django_date
 
 
 def environment(**options):
     env = Environment(**options)
-    
-    # Define csrf_input function
-    def csrf_input(request):
-        token = get_token(request)
-        return Markup(f'<input type="hidden" name="csrfmiddlewaretoken" value="{token}">')
     
     # Cache-busting static function
     def static_with_version(path):
@@ -55,7 +48,6 @@ def environment(**options):
         'static': static_with_version,  # Use our version instead of the default
         'url': url_reverse,  # Use our enhanced reverser
         'now': datetime.now,
-        'csrf_input': csrf_input,
         'hasattr': hasattr,  # Add Python's built-in hasattr function
     })
     

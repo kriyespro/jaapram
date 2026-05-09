@@ -276,7 +276,7 @@
         <h2 class="text-2xl font-bold mb-6">Settings</h2>
         
         <form method="post" action="{{ url('dashboard:update_settings') }}">
-            {{ csrf_input(request) }}
+            {{ csrf_input }}
             
             <div class="space-y-6">
                 <div>

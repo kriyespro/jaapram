@@ -239,7 +239,7 @@
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <form action="{{ url('admin_dashboard:update_user', user.id) }}" method="post" enctype="multipart/form-data">
-                                            {{ csrf_input(request) }}
+                                            {{ csrf_input }}
                                             <div class="modal-body">
                                                 <div class="row">
                                                     <div class="col-md-6">
@@ -389,7 +389,7 @@
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                             <form action="{{ url('admin_dashboard:delete_user', user.id) }}" method="post">
-                                                {{ csrf_input(request) }}
+                                                {{ csrf_input }}
                                                 <button type="submit" class="btn btn-danger">Delete User</button>
                                             </form>
                                         </div>
@@ -459,7 +459,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="{{ url('admin_dashboard:add_user') }}" method="post" enctype="multipart/form-data">
-                    {{ csrf_input(request) }}
+                    {{ csrf_input }}
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6">

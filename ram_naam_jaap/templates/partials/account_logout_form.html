@@ -1,4 +1,4 @@
 <form action="{{ url('account_logout') }}" method="post" class="{{ logout_form_classes|default('') }}">
-    {{ csrf_input(request) }}
+    {{ csrf_input }}
     <button type="submit" class="{{ logout_button_classes|default('') }}">Logout</button>
 </form>

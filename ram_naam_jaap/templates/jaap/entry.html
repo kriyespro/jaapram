@@ -189,7 +189,7 @@
     
     <!-- Save Button -->
     <form method="post" action="{{ url('jaap:save_entry') }}" x-ref="saveForm" @submit="resetCounterAfterSubmit">
-        {{ csrf_input(request) }}
+        {{ csrf_input }}
         <input type="hidden" name="count" :value="count" x-ref="countInput">
         <input type="hidden" name="date" value="{{ today_date_iso }}">
         <div class="flex space-x-2">
@@ -210,7 +210,7 @@
             <div class="bg-white p-4 rounded-lg shadow-md">
                 <h2 class="text-lg font-semibold mb-3">Manual Entry</h2>
                 <form action="{{ url('jaap:manual_entry') }}" method="post" class="space-y-3">
-                    {{ csrf_input(request) }}
+                    {{ csrf_input }}
                     <div>
                         <label for="count" class="block text-sm font-medium text-gray-700">Jaap Count</label>
                         <input type="number" name="count" id="count" min="1" required
