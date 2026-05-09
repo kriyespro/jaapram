@@ -56,13 +56,14 @@ class UserProfile(models.Model):
 
 
 @receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    """Create a user profile when a new user is created"""
+def sync_user_profile(sender, instance, created, **kwargs):
+    """One receiver so profile always exists before save (avoids signup races)."""
+    if kwargs.get('raw'):
+        return
     if created:
-        UserProfile.objects.create(user=instance)
-
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    """Save the user profile when the user is saved"""
-    instance.profile.save()
+        UserProfile.objects.get_or_create(user=instance)
+        return
+    try:
+        instance.profile.save()
+    except User.profile.RelatedObjectDoesNotExist:
+        UserProfile.objects.get_or_create(user=instance)

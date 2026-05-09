@@ -214,6 +214,7 @@ ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
 LOGIN_REDIRECT_URL = 'jaap:jaap_entry'
+ACCOUNT_SIGNUP_REDIRECT_URL = 'jaap:jaap_entry'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'account_login'
 
 # Tailwind CSS
@@ -232,7 +233,8 @@ CACHES = {
     }
 }
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+# Reads Redis first; persists to DB so login/signup survives cache flakes (CACHES IGNORE_EXCEPTIONS)
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 SESSION_CACHE_ALIAS = 'default'
 
 # Celery settings

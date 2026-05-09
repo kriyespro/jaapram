@@ -225,7 +225,7 @@
 .hero-cta-row {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.75rem;
 }
 
 .hero-btn-primary,
@@ -233,29 +233,65 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.4rem;
   font-weight: 700;
-  border-radius: 0.7rem;
-  padding: 0.72rem 1rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  font-size: 1rem;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  border-radius: 0.875rem;
+  padding: 0.875rem 1.25rem;
+  min-height: 48px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease,
+    border-color 0.18s ease;
   width: 100%;
   text-align: center;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .hero-btn-primary {
-  background: #ffffff;
-  color: #c44f13;
-  box-shadow: 0 10px 20px -8px rgba(0, 0, 0, 0.25);
+  background: linear-gradient(180deg, #ffffff 0%, #fff8f0 100%);
+  color: #b8460f;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 12px 28px -10px rgba(196, 79, 19, 0.45);
 }
 
 .hero-btn-secondary {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.12);
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(6px);
 }
 
 .hero-btn-primary:hover,
 .hero-btn-secondary:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+}
+
+.hero-btn-primary:active,
+.hero-btn-secondary:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.hero-btn-primary:focus-visible,
+.hero-btn-secondary:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.65);
+  outline-offset: 3px;
+}
+
+.hero-cta-primary::after {
+  content: '\2192';
+  font-size: 1.05rem;
+  opacity: 0.85;
+  margin-left: 0.15rem;
+}
+
+.hero-cta-secondary::after {
+  content: '\2192';
+  font-size: 1rem;
+  opacity: 0.75;
+  margin-left: 0.1rem;
 }
 
 .hero-stats {
@@ -347,7 +383,7 @@
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  min-height: 40px;
+  min-height: 48px;
   text-align: center;
 }
 
@@ -359,16 +395,29 @@
   .hero-cta-row {
     flex-direction: row;
     flex-wrap: wrap;
+    align-items: stretch;
   }
 
   .hero-btn-primary,
   .hero-btn-secondary {
-    min-width: 170px;
+    min-width: 188px;
     width: auto;
+    flex: 1 1 auto;
   }
 
   .mobile-fit-btn {
     width: auto;
+    min-height: 48px;
+  }
+}
+
+@media (max-width: 639px) {
+  .hero-cta-row {
+    padding-bottom: 0.25rem;
+  }
+
+  .hero-shell .lord-ram-image {
+    max-height: 220px !important;
   }
 }
 

@@ -265,11 +265,11 @@
 
                 <div class="hero-cta-row mt-5">
                     {% if user.is_authenticated %}
-                        <a href="{{ url('jaap:jaap_entry') }}" class="hero-btn-primary mobile-fit-btn">Start Jaap Now</a>
-                        <a href="{{ url('dashboard:overview') }}" class="hero-btn-secondary mobile-fit-btn">Open Dashboard</a>
+                        <a href="{{ url('jaap:jaap_entry') }}" class="hero-btn-primary mobile-fit-btn hero-cta-primary">Start Jaap Now</a>
+                        <a href="{{ url('dashboard:overview') }}" class="hero-btn-secondary mobile-fit-btn hero-cta-secondary">Open Dashboard</a>
                     {% else %}
-                        <a href="{{ url('account_signup') }}" class="hero-btn-primary mobile-fit-btn">Create Free Account</a>
-                        <a href="{{ url('account_login') }}" class="hero-btn-secondary mobile-fit-btn">Login</a>
+                        <a href="{{ url('account_signup') }}?next={{ url('jaap:jaap_entry')|urlencode }}" class="hero-btn-primary mobile-fit-btn hero-cta-primary">Create free account</a>
+                        <a href="{{ url('account_login') }}?next={{ url('jaap:jaap_entry')|urlencode }}" class="hero-btn-secondary mobile-fit-btn hero-cta-secondary">Sign in</a>
                     {% endif %}
                 </div>
 
