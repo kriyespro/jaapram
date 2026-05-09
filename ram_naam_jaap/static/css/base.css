@@ -56,7 +56,8 @@
 
 /* Custom hero section */
 .hero-section {
-  background: linear-gradient(rgba(255, 153, 51, 0.9), rgba(255, 140, 0, 0.9)), url('/static/images/ram.jpg');
+  /* Gradient only — no bundled image (collectstatic/WhiteNoise require real files under STATICFILES_DIRS) */
+  background: linear-gradient(135deg, rgba(255, 153, 51, 0.95), rgba(230, 138, 0, 0.92));
   background-size: cover;
   background-position: center;
   color: white;

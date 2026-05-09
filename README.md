@@ -248,9 +248,19 @@ docker compose up -d
 
 **Manual migration** (only if you need to run migrations without restarting `web`)
 
+The container default working directory is `/app`. Do **not** use `python ../manage.py` from `exec` unless you `cd` into `ram_naam_jaap` first (that path is only correct inside `docker-entrypoint.sh`).
+
+```bash
+docker compose exec web python /app/manage.py migrate --noinput
+```
+
+Equivalent (matches the entrypoint):
+
 ```bash
 docker compose exec web sh -c 'cd /app/ram_naam_jaap && python ../manage.py migrate --noinput'
 ```
+
+`docker-compose.yml` does **not** interpolate `${POSTGRES_PASSWORD}` into `DATABASE_URL` anymore — put **`DATABASE_URL` and `POSTGRES_*` in `.env.docker` only**, so passwords can contain **`$`** without Compose warnings.
 
 ## Contributing
 

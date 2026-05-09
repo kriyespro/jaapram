@@ -1,15 +1,17 @@
+# DB credentials and DATABASE_URL come from .env.docker only — no ${POSTGRES_PASSWORD}
+# in this file, so passwords may safely contain '$' (Compose would otherwise treat $x as a variable).
+
 services:
   db:
     image: postgres:16-alpine
     restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-ram_naam_jaap}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    env_file:
+      - .env.docker
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-ram_naam_jaap}"]
+      # Shell expands $POSTGRES_* inside the container (Compose turns $$ into $)
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -35,7 +37,6 @@ services:
     environment:
       DJANGO_ENV: production
       DEBUG: "False"
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-ram_naam_jaap}
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/1
     command: ["web"]
@@ -59,7 +60,6 @@ services:
     environment:
       DJANGO_ENV: production
       DEBUG: "False"
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-ram_naam_jaap}
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/1
     command: ["celery", "-A", "config", "worker", "--loglevel=INFO", "--concurrency=2"]
@@ -78,7 +78,6 @@ services:
     environment:
       DJANGO_ENV: production
       DEBUG: "False"
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-ram_naam_jaap}
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/1
     command: ["celery", "-A", "config", "beat", "--loglevel=INFO", "--scheduler=django_celery_beat.schedulers:DatabaseScheduler"]

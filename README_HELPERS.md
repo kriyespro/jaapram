@@ -174,6 +174,15 @@ docker compose ps
 docker compose logs -f web celery_worker celery_beat --tail=100
 ```
 
+Manual Django commands (container `WORKDIR` is `/app`; use absolute path to `manage.py`):
+
+```bash
+docker compose exec web python /app/manage.py migrate --noinput
+docker compose exec web python /app/manage.py shell
+```
+
+If you still see strange `$…` variable warnings on an older compose file, upgrade this repo’s `docker-compose.yml`: **`DATABASE_URL` must come from `.env.docker`, not from `${POSTGRES_PASSWORD}` in YAML**.
+
 Clean rebuild when dependencies change:
 
 ```bash
