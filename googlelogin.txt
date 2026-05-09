@@ -1,0 +1,19 @@
+Google OAuth Setup (jaapram.com)
+
+DO NOT commit real secrets to git.
+Store these in .env.docker (or server secret manager):
+- GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+- GOOGLE_CLIENT_SECRET=your-client-secret
+
+Google Cloud Console -> OAuth 2.0 Client -> Web Application
+
+Authorized JavaScript origins:
+- https://jaapram.com
+- https://www.jaapram.com
+
+Authorized redirect URIs:
+- https://jaapram.com/accounts/google/login/callback/
+- https://www.jaapram.com/accounts/google/login/callback/
+
+Allauth Google login endpoint:
+- https://jaapram.com/accounts/google/login/
