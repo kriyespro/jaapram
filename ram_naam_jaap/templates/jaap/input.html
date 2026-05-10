@@ -152,17 +152,17 @@
          aria-labelledby="share-modal-title-input">
         <div class="absolute inset-0" @click="closeShareModal()" aria-hidden="true"></div>
         <div class="jaap-share-card relative bg-white rounded-xl shadow-xl max-w-md w-full p-5 border border-gray-100 flex flex-col" @click.stop>
-            <h2 id="share-modal-title-input" class="text-lg font-bold text-gray-900 flex-shrink-0">Share your progress</h2>
-            <p class="text-sm text-gray-600 mt-2 flex-shrink-0">
-                <span class="font-semibold text-primary" x-text="shareDisplayName()"></span> —
-                <span class="font-semibold text-primary" x-text="savedSessionCount"></span> Ram Naam Jaap this session.
+            <h2 id="share-modal-title-input" class="text-lg font-bold text-gray-900 flex-shrink-0">Well done</h2>
+            <p class="text-sm text-gray-700 mt-2 flex-shrink-0 leading-snug">
+                <span class="font-semibold text-primary" x-text="shareDisplayName()"></span>
+                — <span class="font-semibold text-primary" x-text="savedSessionCount"></span> Ram Naam Jaap saved.
             </p>
-            <p class="text-xs text-gray-500 mt-3 flex-shrink-0">Your full message is copied automatically, then Facebook opens. Paste into your post if the composer is empty.</p>
+            <p class="text-base text-gray-700 mt-4 flex-shrink-0">Tap <strong>Share</strong>, then choose Facebook.</p>
             <button type="button"
-                    @click="openFacebookShare()"
-                    class="jaap-share-fb-btn mt-5 w-full inline-flex items-center justify-center gap-2 text-sm font-semibold py-3 px-4 rounded-lg transition">
-                <i class="fab fa-facebook-f"></i>
-                Share your progress on Facebook
+                    @click="shareMyJaap()"
+                    class="jaap-share-fb-btn mt-5 w-full inline-flex items-center justify-center gap-2 text-base font-semibold py-3 px-4 rounded-lg transition">
+                <i class="fas fa-share-from-square"></i>
+                Share
             </button>
         </div>
     </div>
@@ -251,7 +251,23 @@ document.addEventListener('alpine:init', () => {
             );
         },
 
-        openFacebookShare() {
+        jaapExecCopyFallback(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.setAttribute('readonly', '');
+            ta.style.cssText =
+                'position:fixed;top:0;left:-9999px;width:400px;height:220px;margin:0;padding:8px;font-size:16px;border:1px solid transparent;opacity:0.02;';
+            document.body.appendChild(ta);
+            ta.focus();
+            try {
+                ta.select();
+                ta.setSelectionRange(0, text.length);
+                document.execCommand('copy');
+            } catch (e) { /* ignore */ }
+            document.body.removeChild(ta);
+        },
+
+        shareMyJaap() {
             const full = this.shareMessage();
             const u = encodeURIComponent(this.shareAppUrl);
             const quote = encodeURIComponent(this.facebookQuoteShort());
@@ -260,10 +276,42 @@ document.addEventListener('alpine:init', () => {
             const openFb = () => {
                 window.open(href, 'fbShareJaapRam', 'width=600,height=520,noopener,noreferrer');
             };
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(full).then(openFb).catch(openFb);
+            const copyThenFb = () => {
+                const afterCopy = () => {
+                    window.setTimeout(() => {
+                        openFb();
+                        this.closeShareModal();
+                    }, 120);
+                };
+                if (window.isSecureContext && navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(full).then(afterCopy).catch(() => {
+                        this.jaapExecCopyFallback(full);
+                        afterCopy();
+                    });
+                } else {
+                    this.jaapExecCopyFallback(full);
+                    afterCopy();
+                }
+            };
+            if (navigator.share && typeof navigator.share === 'function') {
+                const payload = { title: 'JaapRam', text: full };
+                if (navigator.canShare && !navigator.canShare(payload)) {
+                    copyThenFb();
+                    return;
+                }
+                navigator
+                    .share(payload)
+                    .then(() => {
+                        this.closeShareModal();
+                    })
+                    .catch((err) => {
+                        if (err && err.name === 'AbortError') {
+                            return;
+                        }
+                        copyThenFb();
+                    });
             } else {
-                openFb();
+                copyThenFb();
             }
         },
 

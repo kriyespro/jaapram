@@ -409,17 +409,17 @@
          aria-labelledby="share-modal-title-alpine">
         <div class="absolute inset-0" @click="closeShareModal()" aria-hidden="true"></div>
         <div class="jaap-share-card relative bg-white rounded-xl shadow-xl max-w-md w-full p-5 border border-gray-100 flex flex-col" @click.stop>
-            <h2 id="share-modal-title-alpine" class="text-lg font-bold text-gray-900 flex-shrink-0">Share your progress</h2>
-            <p class="text-sm text-gray-600 mt-2 flex-shrink-0">
-                <span class="font-semibold text-primary" x-text="shareDisplayName()"></span> —
-                <span class="font-semibold text-primary" x-text="savedSessionCount"></span> Ram Naam Jaap this session.
+            <h2 id="share-modal-title-alpine" class="text-lg font-bold text-gray-900 flex-shrink-0">Well done</h2>
+            <p class="text-sm text-gray-700 mt-2 flex-shrink-0 leading-snug">
+                <span class="font-semibold text-primary" x-text="shareDisplayName()"></span>
+                — <span class="font-semibold text-primary" x-text="savedSessionCount"></span> Ram Naam Jaap saved.
             </p>
-            <p class="text-xs text-gray-500 mt-3 flex-shrink-0">Your full message is copied automatically, then Facebook opens. Paste into your post if the composer is empty.</p>
+            <p class="text-base text-gray-700 mt-4 flex-shrink-0">Tap <strong>Share</strong>, then choose Facebook.</p>
             <button type="button"
-                    @click="openFacebookShare()"
-                    class="jaap-share-fb-btn mt-5 w-full inline-flex items-center justify-center gap-2 text-sm font-semibold py-3 px-4 rounded-lg transition">
-                <i class="fab fa-facebook-f"></i>
-                Share your progress on Facebook
+                    @click="shareMyJaap()"
+                    class="jaap-share-fb-btn mt-5 w-full inline-flex items-center justify-center gap-2 text-base font-semibold py-3 px-4 rounded-lg transition">
+                <i class="fas fa-share-from-square"></i>
+                Share
             </button>
         </div>
     </div>
@@ -430,18 +430,18 @@
 <div id="jaap-share-overlay" class="fixed inset-0 z-jaap-share-overlay flex items-center justify-center p-4 jaap-share-backdrop" role="dialog" aria-modal="true" aria-labelledby="jaap-share-title">
     <div class="absolute inset-0" onclick="document.getElementById('jaap-share-overlay').remove()" aria-hidden="true"></div>
     <div class="jaap-share-card relative bg-white rounded-xl shadow-xl max-w-md w-full p-5 border border-gray-100 flex flex-col" onclick="event.stopPropagation()">
-        <h2 id="jaap-share-title" class="text-lg font-bold text-gray-900 flex-shrink-0">Share your progress</h2>
-        <p class="text-sm text-gray-700 mt-2 flex-shrink-0">
+        <h2 id="jaap-share-title" class="text-lg font-bold text-gray-900 flex-shrink-0">Well done</h2>
+        <p class="text-sm text-gray-700 mt-2 flex-shrink-0 leading-snug">
             <span class="font-semibold text-primary">{{ jaap_share_ui.username }}</span>
             — <span class="font-semibold text-primary">{{ jaap_share_ui.count }}</span> Ram Naam Jaap saved.
         </p>
-        <p class="text-xs text-gray-500 mt-3 flex-shrink-0">Tap below: your full message is copied, then Facebook opens. Paste into your post if needed.</p>
-        <textarea id="jaap-share-textarea" readonly tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;top:0;width:1px;height:1px;opacity:0">{{ jaap_share_ui.share_text }}</textarea>
+        <p class="text-base text-gray-700 mt-4 flex-shrink-0">Tap <strong>Share</strong>, then choose Facebook.</p>
+        {{ jaap_share_ui.share_text|json_script:"jaap-share-full-text" }}
         <button type="button" id="jaap-share-fb-btn"
                 data-fb-href="{{ jaap_share_ui.facebook_href }}"
-                class="jaap-share-fb-btn mt-5 w-full inline-flex items-center justify-center gap-2 text-sm font-semibold py-3 px-4 rounded-lg transition border-0 cursor-pointer font-sans">
-            <i class="fab fa-facebook-f"></i>
-            Share your progress on Facebook
+                class="jaap-share-fb-btn mt-5 w-full inline-flex items-center justify-center gap-2 text-base font-semibold py-3 px-4 rounded-lg transition border-0 cursor-pointer font-sans">
+            <i class="fas fa-share-from-square"></i>
+            Share
         </button>
     </div>
 </div>
@@ -449,34 +449,86 @@
 (function () {
     try { localStorage.removeItem('ramJaapCount'); } catch (e) {}
     try { history.replaceState({}, '', window.location.pathname); } catch (e) {}
-    function jaapClipboardWrite(ta) {
-        var text = ta && ta.value ? ta.value : '';
-        if (!text) return Promise.resolve();
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            return navigator.clipboard.writeText(text).catch(function () { return jaapClipboardFallback(ta); });
+    function jaapParseShareFullText() {
+        var el = document.getElementById('jaap-share-full-text');
+        if (!el || el.textContent === undefined || el.textContent === '') {
+            return '';
         }
-        return jaapClipboardFallback(ta);
+        try {
+            return JSON.parse(el.textContent);
+        } catch (e) {
+            return '';
+        }
     }
-    function jaapClipboardFallback(ta) {
-        return new Promise(function (resolve) {
+    function jaapRemoveShareOverlay() {
+        var o = document.getElementById('jaap-share-overlay');
+        if (o) {
+            o.remove();
+        }
+    }
+    function jaapCopyFullTextRobust(text, onDone) {
+        onDone = onDone || function () {};
+        if (!text) {
+            onDone();
+            return;
+        }
+        function execFallback() {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.setAttribute('readonly', '');
+            ta.style.cssText =
+                'position:fixed;top:0;left:-9999px;width:400px;height:220px;margin:0;padding:8px;font-size:16px;border:1px solid transparent;opacity:0.02;';
+            document.body.appendChild(ta);
+            ta.focus();
             try {
-                ta.focus();
                 ta.select();
+                ta.setSelectionRange(0, text.length);
                 document.execCommand('copy');
-            } catch (e) {}
-            resolve();
-        });
+            } catch (err) { /* ignore */ }
+            document.body.removeChild(ta);
+            onDone();
+        }
+        if (window.isSecureContext && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            navigator.clipboard.writeText(text).then(onDone).catch(execFallback);
+        } else {
+            execFallback();
+        }
     }
-    var ta = document.getElementById('jaap-share-textarea');
-    var fbBtn = document.getElementById('jaap-share-fb-btn');
-    if (fbBtn && ta) {
-        fbBtn.addEventListener('click', function () {
-            var href = fbBtn.getAttribute('data-fb-href') || '';
-            jaapClipboardWrite(ta).finally(function () {
+    function jaapCopyThenOpenFacebook(fullText, href) {
+        jaapCopyFullTextRobust(fullText, function () {
+            window.setTimeout(function () {
                 if (href) {
                     window.open(href, 'fbShareJaapRam', 'width=600,height=520,noopener,noreferrer');
                 }
+                jaapRemoveShareOverlay();
+            }, 120);
+        });
+    }
+    function jaapShareEasy(fullText, href) {
+        if (navigator.share && typeof navigator.share === 'function') {
+            var payload = { title: 'JaapRam', text: fullText };
+            if (navigator.canShare && !navigator.canShare(payload)) {
+                jaapCopyThenOpenFacebook(fullText, href);
+                return;
+            }
+            navigator.share(payload).then(function () {
+                jaapRemoveShareOverlay();
+            }).catch(function (err) {
+                if (err && err.name === 'AbortError') {
+                    return;
+                }
+                jaapCopyThenOpenFacebook(fullText, href);
             });
+        } else {
+            jaapCopyThenOpenFacebook(fullText, href);
+        }
+    }
+    var fbBtn = document.getElementById('jaap-share-fb-btn');
+    if (fbBtn) {
+        fbBtn.addEventListener('click', function () {
+            var href = fbBtn.getAttribute('data-fb-href') || '';
+            var fullText = jaapParseShareFullText();
+            jaapShareEasy(fullText, href);
         });
     }
 })();
@@ -619,7 +671,23 @@ document.addEventListener('alpine:init', () => {
             );
         },
 
-        openFacebookShare() {
+        jaapExecCopyFallback(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.setAttribute('readonly', '');
+            ta.style.cssText =
+                'position:fixed;top:0;left:-9999px;width:400px;height:220px;margin:0;padding:8px;font-size:16px;border:1px solid transparent;opacity:0.02;';
+            document.body.appendChild(ta);
+            ta.focus();
+            try {
+                ta.select();
+                ta.setSelectionRange(0, text.length);
+                document.execCommand('copy');
+            } catch (e) { /* ignore */ }
+            document.body.removeChild(ta);
+        },
+
+        shareMyJaap() {
             const full = this.shareMessage();
             const u = encodeURIComponent(this.shareAppUrl);
             const quote = encodeURIComponent(this.facebookQuoteShort());
@@ -628,10 +696,42 @@ document.addEventListener('alpine:init', () => {
             const openFb = () => {
                 window.open(href, 'fbShareJaapRam', 'width=600,height=520,noopener,noreferrer');
             };
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(full).then(openFb).catch(openFb);
+            const copyThenFb = () => {
+                const afterCopy = () => {
+                    window.setTimeout(() => {
+                        openFb();
+                        this.closeShareModal();
+                    }, 120);
+                };
+                if (window.isSecureContext && navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(full).then(afterCopy).catch(() => {
+                        this.jaapExecCopyFallback(full);
+                        afterCopy();
+                    });
+                } else {
+                    this.jaapExecCopyFallback(full);
+                    afterCopy();
+                }
+            };
+            if (navigator.share && typeof navigator.share === 'function') {
+                const payload = { title: 'JaapRam', text: full };
+                if (navigator.canShare && !navigator.canShare(payload)) {
+                    copyThenFb();
+                    return;
+                }
+                navigator
+                    .share(payload)
+                    .then(() => {
+                        this.closeShareModal();
+                    })
+                    .catch((err) => {
+                        if (err && err.name === 'AbortError') {
+                            return;
+                        }
+                        copyThenFb();
+                    });
             } else {
-                openFb();
+                copyThenFb();
             }
         },
 
