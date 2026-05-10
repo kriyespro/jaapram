@@ -436,7 +436,7 @@
             — <span class="font-semibold text-primary">{{ jaap_share_ui.count }}</span> Ram Naam Jaap saved.
         </p>
         <p class="text-base text-gray-700 mt-4 flex-shrink-0">Tap <strong>Share</strong>, then choose Facebook.</p>
-        {{ jaap_share_ui.share_text|json_script:"jaap-share-full-text" }}
+        {{ jaap_share_ui.share_text_json_markup|safe }}
         <button type="button" id="jaap-share-fb-btn"
                 data-fb-href="{{ jaap_share_ui.facebook_href }}"
                 class="jaap-share-fb-btn mt-5 w-full inline-flex items-center justify-center gap-2 text-base font-semibold py-3 px-4 rounded-lg transition border-0 cursor-pointer font-sans">

@@ -10,6 +10,7 @@ from django.core.cache import cache
 from django.conf import settings
 from django.contrib import messages
 from django.urls import NoReverseMatch, reverse
+from django.utils.html import json_script
 from datetime import datetime, timedelta
 import requests
 import json
@@ -69,6 +70,8 @@ def _build_jaap_share_ui(request, prompt):
     )
     fb_params = urlencode({'u': app_url, 'quote': fb_quote})
     facebook_href = f'https://www.facebook.com/sharer/sharer.php?{fb_params}'
+    # Safe for Jinja2 (DjangoTemplates-only |json_script filter would 500 — Jinja is first engine).
+    share_text_json_markup = json_script(share_text, element_id='jaap-share-full-text')
     return {
         'username': username,
         'count': count,
@@ -76,6 +79,7 @@ def _build_jaap_share_ui(request, prompt):
         'join_url': join_url,
         'share_text': share_text,
         'facebook_href': facebook_href,
+        'share_text_json_markup': share_text_json_markup,
     }
 
 
