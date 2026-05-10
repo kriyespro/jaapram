@@ -219,9 +219,13 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
 LOGIN_REDIRECT_URL = 'jaap:jaap_entry'
 ACCOUNT_SIGNUP_REDIRECT_URL = 'jaap:jaap_entry'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'account_login'
+
+# Skip allauth’s intermediate “Sign in via Google → Continue” page; GET goes straight to Google.
+SOCIALACCOUNT_LOGIN_ON_GET = True
 
 # Google OAuth (env-driven, avoids SocialApp.DoesNotExist in production)
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '').strip()
