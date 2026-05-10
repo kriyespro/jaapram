@@ -87,7 +87,9 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-6 max-w-4xl relative" x-data="jaapCounter" data-share-app-url="{{ request.build_absolute_uri('/') }}">
+<div class="container mx-auto px-4 py-6 max-w-4xl relative" x-data="jaapCounter"
+     data-share-app-url="{{ request.build_absolute_uri('/') }}"
+     data-username="{{ request.user.username|e }}">
     <h1 class="text-4xl font-bold text-center text-primary mb-8">राम नाम जाप</h1>
     
     <!-- Counter Display -->
@@ -144,27 +146,33 @@
     <div x-show="shareModalOpen"
          x-transition.opacity
          x-cloak
-         class="fixed inset-0 z-modal-overlay flex items-center justify-center p-4"
+         class="fixed inset-0 z-jaap-share-overlay flex items-center justify-center p-4 bg-black/40"
          role="dialog"
          aria-modal="true"
          aria-labelledby="share-modal-title-input">
-        <div class="absolute inset-0 bg-black/50" @click="closeShareModal()"></div>
+        <div class="absolute inset-0" @click="closeShareModal()" aria-hidden="true"></div>
         <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full p-5 border border-gray-100" @click.stop>
             <h2 id="share-modal-title-input" class="text-lg font-bold text-gray-900">Share your progress</h2>
             <p class="text-sm text-gray-600 mt-2">
-                You recorded <span class="font-semibold text-primary" x-text="savedSessionCount"></span> in this session.
-                Share on Facebook so others can join <span class="font-medium">JaapRam</span>.
+                <span class="font-semibold text-primary" x-text="shareDisplayName()"></span> —
+                <span class="font-semibold text-primary" x-text="savedSessionCount"></span> Ram Naam Jaap this session.
             </p>
-            <div class="mt-4 flex flex-col sm:flex-row gap-2">
+            <p class="text-xs text-gray-500 mt-2">If Facebook shows only the link, use <strong>Copy text + link</strong> and paste in your post.</p>
+            <div class="mt-4 flex flex-col gap-2">
                 <button type="button"
                         @click="openFacebookShare()"
-                        class="flex-1 inline-flex items-center justify-center gap-2 bg-[#1877F2] hover:bg-[#166FE5] text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition">
+                        class="w-full inline-flex items-center justify-center gap-2 bg-[#1877F2] hover:bg-[#166FE5] text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition">
                     <i class="fab fa-facebook-f"></i>
-                    Share on Facebook
+                    Open Facebook share
+                </button>
+                <button type="button"
+                        @click="copyShareText()"
+                        class="w-full py-2.5 px-4 rounded-lg border border-gray-300 text-sm font-medium text-gray-800 hover:bg-gray-50">
+                    Copy text + link
                 </button>
                 <button type="button"
                         @click="closeShareModal()"
-                        class="flex-1 py-2.5 px-4 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        class="w-full py-2.5 px-4 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
                     Not now
                 </button>
             </div>
@@ -227,13 +235,42 @@ document.addEventListener('alpine:init', () => {
             this.shareModalOpen = false;
         },
 
+        shareDisplayName() {
+            const n = (this.$root.dataset.username || '').trim();
+            return n || 'Devotee';
+        },
+
+        joinSignupUrl() {
+            try {
+                return new URL('accounts/signup/', this.shareAppUrl).href;
+            } catch (e) {
+                return this.shareAppUrl;
+            }
+        },
+
+        shareMessage() {
+            return (
+                'Jai Shree Ram! ' + this.shareDisplayName() + ' saved ' + this.savedSessionCount +
+                ' Ram Naam Jaap on JaapRam. Join the app: ' + this.shareAppUrl +
+                ' (Sign up: ' + this.joinSignupUrl() + ')'
+            );
+        },
+
         openFacebookShare() {
             const u = encodeURIComponent(this.shareAppUrl);
+            const quote = encodeURIComponent(this.shareMessage());
             window.open(
-                'https://www.facebook.com/sharer/sharer.php?u=' + u,
+                'https://www.facebook.com/sharer/sharer.php?u=' + u + '&quote=' + quote,
                 'fbShareJaapRam',
                 'width=600,height=520,noopener,noreferrer'
             );
+        },
+
+        copyShareText() {
+            const text = this.shareMessage();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).catch(() => {});
+            }
         },
 
         syncCountToForm() {

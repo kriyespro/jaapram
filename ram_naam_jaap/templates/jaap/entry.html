@@ -139,7 +139,8 @@
 {% block content %}
 <div class="container mx-auto px-4 py-3 max-w-4xl relative" x-data="jaapCounter"
      data-share-app-url="{{ request.build_absolute_uri('/') }}"
-     data-jaap-share-count="{{ jaap_share_saved_count if jaap_share_saved_count is not none else '' }}">
+     data-share-count=""
+     data-username="{{ request.user.username|e }}">
     <!-- Timer, Counter, and Target Selection inline -->
     <div class="controls-flex">
         <!-- Timer Selection - Left -->
@@ -265,37 +266,99 @@
         </div>
     </div>
 
-    <!-- Share progress (after successful save) -->
+    <!-- Fallback share modal (query-string only if session missed) -->
     <div x-show="shareModalOpen"
          x-transition.opacity
          x-cloak
-         class="fixed inset-0 z-modal-overlay flex items-center justify-center p-4"
+         class="fixed inset-0 z-jaap-share-overlay flex items-center justify-center p-4 bg-black/40"
          role="dialog"
          aria-modal="true"
-         aria-labelledby="share-modal-title">
-        <div class="absolute inset-0 bg-black/50" @click="closeShareModal()"></div>
+         aria-labelledby="share-modal-title-alpine">
+        <div class="absolute inset-0" @click="closeShareModal()" aria-hidden="true"></div>
         <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full p-5 border border-gray-100" @click.stop>
-            <h2 id="share-modal-title" class="text-lg font-bold text-gray-900">Share your progress</h2>
+            <h2 id="share-modal-title-alpine" class="text-lg font-bold text-gray-900">Share your progress</h2>
             <p class="text-sm text-gray-600 mt-2">
-                You recorded <span class="font-semibold text-primary" x-text="savedSessionCount"></span> in this session.
-                Share on Facebook so others can join <span class="font-medium">JaapRam</span>.
+                <span class="font-semibold text-primary" x-text="shareDisplayName()"></span> —
+                <span class="font-semibold text-primary" x-text="savedSessionCount"></span> Ram Naam Jaap this session.
             </p>
-            <div class="mt-4 flex flex-col sm:flex-row gap-2">
+            <p class="text-xs text-gray-500 mt-2">Facebook may only show the link; use <strong>Copy text</strong> then paste in your post if needed.</p>
+            <div class="mt-4 flex flex-col gap-2">
                 <button type="button"
                         @click="openFacebookShare()"
-                        class="flex-1 inline-flex items-center justify-center gap-2 bg-[#1877F2] hover:bg-[#166FE5] text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition">
+                        class="w-full inline-flex items-center justify-center gap-2 bg-[#1877F2] hover:bg-[#166FE5] text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition">
                     <i class="fab fa-facebook-f"></i>
-                    Share on Facebook
+                    Open Facebook share
+                </button>
+                <button type="button"
+                        @click="copyShareText()"
+                        class="w-full py-2.5 px-4 rounded-lg border border-gray-300 text-sm font-medium text-gray-800 hover:bg-gray-50">
+                    Copy text + link
                 </button>
                 <button type="button"
                         @click="closeShareModal()"
-                        class="flex-1 py-2.5 px-4 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        class="w-full py-2.5 px-4 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
                     Not now
                 </button>
             </div>
         </div>
     </div>
 </div>
+
+{% if jaap_share_ui %}
+<!-- Server-rendered share (always visible; does not depend on Alpine) -->
+<div id="jaap-share-overlay" class="fixed inset-0 z-jaap-share-overlay flex items-center justify-center p-4 bg-black/40" role="dialog" aria-modal="true" aria-labelledby="jaap-share-title">
+    <div class="absolute inset-0" onclick="document.getElementById('jaap-share-overlay').remove()" aria-hidden="true"></div>
+    <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full p-5 border border-gray-100" onclick="event.stopPropagation()">
+        <h2 id="jaap-share-title" class="text-lg font-bold text-gray-900">Share your progress</h2>
+        <p class="text-sm text-gray-700 mt-2">
+            <span class="font-semibold text-primary">{{ jaap_share_ui.username }}</span>
+            — <span class="font-semibold text-primary">{{ jaap_share_ui.count }}</span> Ram Naam Jaap saved.
+        </p>
+        <label class="block text-xs font-medium text-gray-500 mt-3" for="jaap-share-textarea">Message to share</label>
+        <textarea id="jaap-share-textarea" readonly rows="4" class="mt-1 w-full text-sm border border-gray-200 rounded-lg p-2 text-gray-800 bg-gray-50">{{ jaap_share_ui.share_text }}</textarea>
+        <p class="text-xs text-gray-500 mt-2">Facebook sometimes prefills only the website link. Use <strong>Copy</strong>, open Facebook, and paste into your post for full text.</p>
+        <div class="mt-4 flex flex-col gap-2">
+            <a href="{{ jaap_share_ui.facebook_href }}"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="w-full inline-flex items-center justify-center gap-2 bg-[#1877F2] hover:bg-[#166FE5] text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition">
+                <i class="fab fa-facebook-f"></i>
+                Open Facebook share
+            </a>
+            <button type="button" id="jaap-share-copy-btn"
+                    class="w-full py-2.5 px-4 rounded-lg border border-gray-300 text-sm font-medium text-gray-800 hover:bg-gray-50">
+                Copy text + links
+            </button>
+            <button type="button" class="w-full py-2.5 px-4 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    onclick="document.getElementById('jaap-share-overlay').remove()">
+                Not now
+            </button>
+        </div>
+    </div>
+</div>
+<script>
+(function () {
+    try { localStorage.removeItem('ramJaapCount'); } catch (e) {}
+    try { history.replaceState({}, '', window.location.pathname); } catch (e) {}
+    var btn = document.getElementById('jaap-share-copy-btn');
+    var ta = document.getElementById('jaap-share-textarea');
+    if (btn && ta) {
+        btn.addEventListener('click', function () {
+            ta.focus();
+            ta.select();
+            try {
+                document.execCommand('copy');
+            } catch (e) {}
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(ta.value).catch(function () {});
+            }
+            btn.textContent = 'Copied!';
+            setTimeout(function () { btn.textContent = 'Copy text + links'; }, 2000);
+        });
+    }
+})();
+</script>
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}
@@ -318,9 +381,9 @@ document.addEventListener('alpine:init', () => {
         init() {
             this.shareAppUrl = (this.$root.dataset.shareAppUrl || window.location.origin + '/').trim();
 
-            const fromServer = (this.$root.dataset.jaapShareCount || '').trim();
-            if (fromServer !== '') {
-                const n = parseInt(fromServer, 10);
+            const fromAttr = (this.$root.dataset.shareCount || '').trim();
+            if (fromAttr !== '') {
+                const n = parseInt(fromAttr, 10);
                 if (Number.isFinite(n) && n > 0) {
                     this.savedSessionCount = n;
                     this.shareModalOpen = true;
@@ -339,7 +402,7 @@ document.addEventListener('alpine:init', () => {
                     }
                 }
             }
-            if (this.shareModalOpen) {
+            if (this.shareModalOpen && !document.getElementById('jaap-share-overlay')) {
                 this.$nextTick(() => {
                     window.history.replaceState({}, '', window.location.pathname);
                 });
@@ -373,13 +436,42 @@ document.addEventListener('alpine:init', () => {
             this.shareModalOpen = false;
         },
 
+        shareDisplayName() {
+            const n = (this.$root.dataset.username || '').trim();
+            return n || 'Devotee';
+        },
+
+        joinSignupUrl() {
+            try {
+                return new URL('accounts/signup/', this.shareAppUrl).href;
+            } catch (e) {
+                return this.shareAppUrl;
+            }
+        },
+
+        shareMessage() {
+            return (
+                'Jai Shree Ram! ' + this.shareDisplayName() + ' saved ' + this.savedSessionCount +
+                ' Ram Naam Jaap on JaapRam. Join the app: ' + this.shareAppUrl +
+                ' (Sign up: ' + this.joinSignupUrl() + ')'
+            );
+        },
+
         openFacebookShare() {
             const u = encodeURIComponent(this.shareAppUrl);
+            const quote = encodeURIComponent(this.shareMessage());
             window.open(
-                'https://www.facebook.com/sharer/sharer.php?u=' + u,
+                'https://www.facebook.com/sharer/sharer.php?u=' + u + '&quote=' + quote,
                 'fbShareJaapRam',
                 'width=600,height=520,noopener,noreferrer'
             );
+        },
+
+        copyShareText() {
+            const text = this.shareMessage();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).catch(() => {});
+            }
         },
 
         syncCountToForm() {

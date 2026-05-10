@@ -22,21 +22,65 @@ import redis
 
 
 def _consume_jaap_share_prompt(request):
-    """One-time prompt after save (session survives redirects that drop query strings)."""
+    """One-time share payload after save (session survives redirects that drop query strings)."""
+    data = request.session.pop('jaap_share_prompt', None)
+    if isinstance(data, dict):
+        try:
+            count = int(data.get('count', 0))
+            username = (data.get('username') or '').strip() or 'A devotee'
+            if count <= 0:
+                return None
+            return {'count': count, 'username': username}
+        except (TypeError, ValueError):
+            return None
+    # Legacy: scalar count only
     raw = request.session.pop('jaap_share_saved_count', None)
-    if raw is None:
+    if raw is not None:
+        try:
+            n = int(raw)
+            if n > 0 and request.user.is_authenticated:
+                return {
+                    'count': n,
+                    'username': request.user.get_username(),
+                }
+        except (TypeError, ValueError):
+            pass
+    return None
+
+
+def _build_jaap_share_ui(request, prompt):
+    """Facebook sharer + plain text (quote may be ignored by FB on some clients; copy covers that)."""
+    if not prompt:
         return None
-    try:
-        n = int(raw)
-        return n if n > 0 else None
-    except (TypeError, ValueError):
-        return None
+    app_url = request.build_absolute_uri('/')
+    join_url = request.build_absolute_uri(reverse('account_signup'))
+    username = prompt['username']
+    count = prompt['count']
+    share_text = (
+        f'Jai Shree Ram! {username} saved {count} Ram Naam Jaap on JaapRam. '
+        f'Join the app: {app_url} (Sign up: {join_url})'
+    )
+    fb_params = urlencode({'u': app_url, 'quote': share_text})
+    facebook_href = f'https://www.facebook.com/sharer/sharer.php?{fb_params}'
+    return {
+        'username': username,
+        'count': count,
+        'app_url': app_url,
+        'join_url': join_url,
+        'share_text': share_text,
+        'facebook_href': facebook_href,
+    }
 
 
 def redirect_jaap_entry_after_save(request, saved_count):
     """Redirect to jaap entry; store share prompt in session + query string for the client."""
     try:
-        request.session['jaap_share_saved_count'] = int(saved_count)
+        n = int(saved_count)
+        request.session['jaap_share_prompt'] = {
+            'count': n,
+            'username': request.user.get_username(),
+        }
+        request.session.modified = True
     except (TypeError, ValueError):
         pass
     base = reverse('jaap:jaap_entry')
@@ -129,15 +173,16 @@ def jaap_entry(request):
     # Format today's date in ISO format for the date input field
     today_date_iso = today.strftime('%Y-%m-%d')
 
-    jaap_share_saved_count = _consume_jaap_share_prompt(request)
-    
+    jaap_share_prompt = _consume_jaap_share_prompt(request)
+    jaap_share_ui = _build_jaap_share_ui(request, jaap_share_prompt)
+
     context = {
         'today_count': today_count,
         'daily_target': daily_target,
         'percentage': percentage,
         'recent_entries': recent_entries,
         'today_date_iso': today_date_iso,
-        'jaap_share_saved_count': jaap_share_saved_count,
+        'jaap_share_ui': jaap_share_ui,
     }
     
     return render(request, 'jaap/entry.html', context)

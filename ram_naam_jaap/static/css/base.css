@@ -160,4 +160,9 @@
 .z-modal-overlay {
   z-index: 60;
 }
+
+/* Jaap share dialog above header (50) and mobile tab bar (40) */
+.z-jaap-share-overlay {
+  z-index: 100;
+}
  
