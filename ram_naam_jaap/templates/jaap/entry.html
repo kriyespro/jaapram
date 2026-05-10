@@ -102,36 +102,47 @@
             margin-bottom: 0.2rem;
         }
         
-        .controls-flex {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
+        /*
+         * Desktop timer/target row: do not rely on Tailwind `hidden md:flex` alone — on some builds/order
+         * the row can still paint on mobile. Force display:none below 768px, flex at md+.
+         */
+        .jaap-desktop-controls-row {
+            display: none !important;
         }
-        
+
+        @media (min-width: 768px) {
+            .jaap-desktop-controls-row {
+                display: flex !important;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 1rem;
+            }
+
+            .jaap-desktop-controls-row .side-section {
+                width: 30%;
+            }
+
+            .jaap-desktop-controls-row .center-section {
+                width: 40%;
+            }
+        }
+
         .counter-section {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
         }
-        
-        .side-section {
-            width: 30%;
-        }
-        
-        .center-section {
-            width: 40%;
-        }
-        
-        @media (max-width: 768px) {
-            .controls-flex {
-                flex-direction: column;
+
+        /* Hide mobile-only jaap UI from tablet/desktop (backup if `md:hidden` is overridden) */
+        @media (min-width: 768px) {
+            .jaap-mobile-only {
+                display: none !important;
             }
-            .side-section, .center-section {
-                width: 100%;
-                margin-bottom: 0.5rem;
-            }
+        }
+
+        .jaap-mobile-sheet-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
         }
 
         /* Mobile jaap: counter stays visible when keyboard opens */
@@ -167,7 +178,7 @@
      data-share-count=""
      data-username="{{ request.user.username|e }}">
     <!-- Desktop: unchanged 3-column layout -->
-    <div class="hidden md:flex controls-flex">
+    <div class="jaap-desktop-controls-row">
         <div class="timer-options side-section">
             <h2 class="section-title">Select Timer</h2>
             <div class="grid grid-cols-3 gap-1">
@@ -207,7 +218,7 @@
     </div>
 
     <!-- Mobile: compact setup (before timer/target chosen) -->
-    <div class="md:hidden space-y-2 mb-2" x-show="!mobileFocusActive()" x-cloak>
+    <div class="jaap-mobile-only md:hidden space-y-2 mb-2" x-show="!mobileFocusActive()" x-cloak>
         <div class="rounded-lg border border-orange-200 bg-white px-2 py-2 shadow-sm">
             <p class="text-center text-xs font-bold text-gray-600 uppercase tracking-wide">Timer</p>
             <div class="grid grid-cols-6 gap-1 mt-1">
@@ -247,7 +258,7 @@
     </div>
 
     <!-- Mobile: focus mode — only title, count, label (+ tiny timer/target line) -->
-    <div class="md:hidden mb-2" x-show="mobileFocusActive() && !mobileEditSession" x-cloak>
+    <div class="jaap-mobile-only md:hidden mb-2" x-show="mobileFocusActive() && !mobileEditSession" x-cloak>
         <div class="jaap-mobile-counter-dock rounded-xl border-2 border-orange-300 bg-[#FFF9F2] shadow-md px-3 py-3 text-center">
             <h1 class="text-lg sm:text-xl font-bold text-primary leading-tight">राम नाम जाप</h1>
             <div class="text-5xl sm:text-6xl font-bold leading-none my-1" style="color:#FF9933" x-text="count" :class="{'pulse-animation': justCounted}"></div>
@@ -270,7 +281,7 @@
     </div>
 
     <!-- Mobile: bottom sheet to edit timer/target during focus mode -->
-    <div class="md:hidden fixed inset-0 z-jaap-mobile-sheet flex flex-col justify-end bg-black/50"
+    <div class="jaap-mobile-only md:hidden fixed inset-0 z-jaap-mobile-sheet flex flex-col justify-end jaap-mobile-sheet-backdrop"
          x-show="mobileFocusActive() && mobileEditSession"
          x-cloak
          @click.self="mobileEditSession = false">
@@ -301,8 +312,8 @@
 
     <!-- Input Area -->
     <h2 class="text-lg font-bold mb-2 hidden md:block">Type "Ram" as many times as you wish. The counter will track each occurrence.</h2>
-    <p class="md:hidden text-sm text-gray-700 mb-1 font-medium" x-show="!mobileFocusActive()">Type <span class="font-bold">Ram</span> below. Counter updates automatically.</p>
-    <p class="md:hidden text-xs text-gray-500 mb-1" x-show="mobileFocusActive()">Tap the box and type <span class="font-semibold">Ram</span> — count updates live.</p>
+    <p class="jaap-mobile-only md:hidden text-sm text-gray-700 mb-1 font-medium" x-show="!mobileFocusActive()">Type <span class="font-bold">Ram</span> below. Counter updates automatically.</p>
+    <p class="jaap-mobile-only md:hidden text-xs text-gray-500 mb-1" x-show="mobileFocusActive()">Tap the box and type <span class="font-semibold">Ram</span> — count updates live.</p>
     <div class="input-container jaap-type-box"
          contenteditable="true"
          tabindex="0"
@@ -392,29 +403,29 @@
     <div x-show="shareModalOpen"
          x-transition.opacity
          x-cloak
-         class="fixed inset-0 z-jaap-share-overlay flex items-center justify-center p-4 bg-black/40"
+         class="fixed inset-0 z-jaap-share-overlay flex items-center justify-center p-4 jaap-share-backdrop"
          role="dialog"
          aria-modal="true"
          aria-labelledby="share-modal-title-alpine">
         <div class="absolute inset-0" @click="closeShareModal()" aria-hidden="true"></div>
-        <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full p-5 border border-gray-100" @click.stop>
-            <h2 id="share-modal-title-alpine" class="text-lg font-bold text-gray-900">Share your progress</h2>
-            <p class="text-sm text-gray-600 mt-2">
+        <div class="jaap-share-card relative bg-white rounded-xl shadow-xl max-w-md w-full p-5 border border-gray-100 flex flex-col" @click.stop>
+            <h2 id="share-modal-title-alpine" class="text-lg font-bold text-gray-900 flex-shrink-0">Share your progress</h2>
+            <p class="text-sm text-gray-600 mt-2 flex-shrink-0">
                 <span class="font-semibold text-primary" x-text="shareDisplayName()"></span> —
                 <span class="font-semibold text-primary" x-text="savedSessionCount"></span> Ram Naam Jaap this session.
             </p>
-            <p class="text-xs text-gray-500 mt-2">Facebook may only show the link; use <strong>Copy text</strong> then paste in your post if needed.</p>
-            <div class="mt-4 flex flex-col gap-2">
+            <p class="text-xs text-gray-500 mt-2 flex-shrink-0">Facebook may shorten the prefilled line; use <strong>Copy full message</strong> and paste in your post for both links.</p>
+            <div class="mt-4 flex flex-col space-y-2 flex-shrink-0">
                 <button type="button"
                         @click="openFacebookShare()"
-                        class="w-full inline-flex items-center justify-center gap-2 bg-[#1877F2] hover:bg-[#166FE5] text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition">
+                        class="jaap-share-fb-btn w-full inline-flex items-center justify-center gap-2 text-sm font-semibold py-2.5 px-4 rounded-lg transition">
                     <i class="fab fa-facebook-f"></i>
                     Open Facebook share
                 </button>
                 <button type="button"
                         @click="copyShareText()"
                         class="w-full py-2.5 px-4 rounded-lg border border-gray-300 text-sm font-medium text-gray-800 hover:bg-gray-50">
-                    Copy text + link
+                    Copy full message
                 </button>
                 <button type="button"
                         @click="closeShareModal()"
@@ -428,34 +439,34 @@
 
 {% if jaap_share_ui %}
 <!-- Server-rendered share (always visible; does not depend on Alpine) -->
-<div id="jaap-share-overlay" class="fixed inset-0 z-jaap-share-overlay flex items-center justify-center p-4 bg-black/40" role="dialog" aria-modal="true" aria-labelledby="jaap-share-title">
+<div id="jaap-share-overlay" class="fixed inset-0 z-jaap-share-overlay flex items-center justify-center p-4 jaap-share-backdrop" role="dialog" aria-modal="true" aria-labelledby="jaap-share-title">
     <div class="absolute inset-0" onclick="document.getElementById('jaap-share-overlay').remove()" aria-hidden="true"></div>
-    <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full p-5 border border-gray-100" onclick="event.stopPropagation()">
-        <h2 id="jaap-share-title" class="text-lg font-bold text-gray-900">Share your progress</h2>
-        <p class="text-sm text-gray-700 mt-2">
+    <div class="jaap-share-card relative bg-white rounded-xl shadow-xl max-w-md w-full p-5 border border-gray-100 flex flex-col" onclick="event.stopPropagation()">
+        <h2 id="jaap-share-title" class="text-lg font-bold text-gray-900 flex-shrink-0">Share your progress</h2>
+        <p class="text-sm text-gray-700 mt-2 flex-shrink-0">
             <span class="font-semibold text-primary">{{ jaap_share_ui.username }}</span>
             — <span class="font-semibold text-primary">{{ jaap_share_ui.count }}</span> Ram Naam Jaap saved.
         </p>
-        <label class="block text-xs font-medium text-gray-500 mt-3" for="jaap-share-textarea">Message to share</label>
-        <textarea id="jaap-share-textarea" readonly rows="4" class="mt-1 w-full text-sm border border-gray-200 rounded-lg p-2 text-gray-800 bg-gray-50">{{ jaap_share_ui.share_text }}</textarea>
-        <p class="text-xs text-gray-500 mt-2">Facebook sometimes prefills only the website link. Use <strong>Copy</strong>, open Facebook, and paste into your post for full text.</p>
-        <div class="mt-4 flex flex-col gap-2">
-            <a href="{{ jaap_share_ui.facebook_href }}"
+        <p class="text-xs text-gray-500 mt-2 flex-shrink-0">Buttons stay on screen — scroll only the message if needed. For both links in your post, use <strong>Copy full message</strong>.</p>
+        <div class="mt-4 flex flex-col space-y-2 flex-shrink-0">
+            <a id="jaap-share-fb-link" href="{{ jaap_share_ui.facebook_href }}"
                target="_blank"
                rel="noopener noreferrer"
-               class="w-full inline-flex items-center justify-center gap-2 bg-[#1877F2] hover:bg-[#166FE5] text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition">
+               class="jaap-share-fb-btn w-full inline-flex items-center justify-center gap-2 text-sm font-semibold py-2.5 px-4 rounded-lg transition">
                 <i class="fab fa-facebook-f"></i>
                 Open Facebook share
             </a>
             <button type="button" id="jaap-share-copy-btn"
                     class="w-full py-2.5 px-4 rounded-lg border border-gray-300 text-sm font-medium text-gray-800 hover:bg-gray-50">
-                Copy text + links
+                Copy full message
             </button>
             <button type="button" class="w-full py-2.5 px-4 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     onclick="document.getElementById('jaap-share-overlay').remove()">
                 Not now
             </button>
         </div>
+        <label class="block text-xs font-medium text-gray-500 mt-4 flex-shrink-0" for="jaap-share-textarea">Full message (copy includes signup link)</label>
+        <textarea id="jaap-share-textarea" readonly rows="6" class="mt-1 w-full min-h-[7rem] resize-y text-sm border border-gray-200 rounded-lg p-2 text-gray-800 bg-gray-50 whitespace-pre-wrap">{{ jaap_share_ui.share_text }}</textarea>
     </div>
 </div>
 <script>
@@ -475,7 +486,15 @@
                 navigator.clipboard.writeText(ta.value).catch(function () {});
             }
             btn.textContent = 'Copied!';
-            setTimeout(function () { btn.textContent = 'Copy text + links'; }, 2000);
+            setTimeout(function () { btn.textContent = 'Copy full message'; }, 2000);
+        });
+    }
+    var fbLink = document.getElementById('jaap-share-fb-link');
+    if (fbLink && ta) {
+        fbLink.addEventListener('click', function () {
+            if (navigator.clipboard && navigator.clipboard.writeText && ta.value) {
+                navigator.clipboard.writeText(ta.value).catch(function () {});
+            }
         });
     }
 })();
@@ -607,13 +626,24 @@ document.addEventListener('alpine:init', () => {
             return (
                 'Jai Shree Ram! ' + this.shareDisplayName() + ' saved ' + this.savedSessionCount +
                 ' Ram Naam Jaap on JaapRam. Join the app: ' + this.shareAppUrl +
-                ' (Sign up: ' + this.joinSignupUrl() + ')'
+                '\nSign up: ' + this.joinSignupUrl()
+            );
+        },
+
+        facebookQuoteShort() {
+            return (
+                'Jai Shree Ram! ' + this.shareDisplayName() + ' saved ' + this.savedSessionCount +
+                ' Ram Naam Jaap on JaapRam. ' + this.shareAppUrl
             );
         },
 
         openFacebookShare() {
+            const full = this.shareMessage();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(full).catch(() => {});
+            }
             const u = encodeURIComponent(this.shareAppUrl);
-            const quote = encodeURIComponent(this.shareMessage());
+            const quote = encodeURIComponent(this.facebookQuoteShort());
             window.open(
                 'https://www.facebook.com/sharer/sharer.php?u=' + u + '&quote=' + quote,
                 'fbShareJaapRam',
@@ -624,7 +654,7 @@ document.addEventListener('alpine:init', () => {
         copyShareText() {
             const text = this.shareMessage();
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).catch(() => {});
+                navigator.clipboard.writeText(text).then(() => {}).catch(() => {});
             }
         },
 

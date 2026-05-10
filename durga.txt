@@ -32,3 +32,34 @@ City Detection via IP	Use ip-api.com/json (free, no API key)
 🔹 API to Serve Map Data	JSON of city-wise jaap totals
 🔹 Polling for Updates (Every 30s)	No WebSockets; keep frontend light
 🔹 Jaap Today Total on Top Bar	Simple display of today’s global jaap
+
+
+--- Git + Docker (deploy / update JaapRam stack) — run from repo root (folder with docker-compose.yml + manage.py) ---
+
+Local — pull latest:
+  git fetch origin
+  git pull origin main
+
+Local — commit and push (replace branch if not main):
+  git status
+  git add -u
+  git commit -m "Describe change"
+  git push origin main
+
+Server — after git pull, rebuild and restart (web runs migrate + collectstatic on startup):
+  git pull origin main
+  docker compose up -d --build --pull always
+
+Server — check:
+  docker compose ps
+  docker compose logs -f web celery_worker celery_beat --tail=100
+
+Server — optional clean rebuild (big dependency/image changes):
+  docker compose down
+  docker compose build --no-cache web celery_worker celery_beat
+  docker compose up -d
+
+Docker — manual migrate without restarting web (rare):
+  docker compose exec web python /app/manage.py migrate --noinput
+
+First-time Docker: copy .env.docker.example to .env.docker, fill secrets, then docker compose up --build -d

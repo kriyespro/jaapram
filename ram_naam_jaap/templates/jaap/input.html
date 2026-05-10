@@ -146,29 +146,29 @@
     <div x-show="shareModalOpen"
          x-transition.opacity
          x-cloak
-         class="fixed inset-0 z-jaap-share-overlay flex items-center justify-center p-4 bg-black/40"
+         class="fixed inset-0 z-jaap-share-overlay flex items-center justify-center p-4 jaap-share-backdrop"
          role="dialog"
          aria-modal="true"
          aria-labelledby="share-modal-title-input">
         <div class="absolute inset-0" @click="closeShareModal()" aria-hidden="true"></div>
-        <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full p-5 border border-gray-100" @click.stop>
-            <h2 id="share-modal-title-input" class="text-lg font-bold text-gray-900">Share your progress</h2>
-            <p class="text-sm text-gray-600 mt-2">
+        <div class="jaap-share-card relative bg-white rounded-xl shadow-xl max-w-md w-full p-5 border border-gray-100 flex flex-col" @click.stop>
+            <h2 id="share-modal-title-input" class="text-lg font-bold text-gray-900 flex-shrink-0">Share your progress</h2>
+            <p class="text-sm text-gray-600 mt-2 flex-shrink-0">
                 <span class="font-semibold text-primary" x-text="shareDisplayName()"></span> —
                 <span class="font-semibold text-primary" x-text="savedSessionCount"></span> Ram Naam Jaap this session.
             </p>
-            <p class="text-xs text-gray-500 mt-2">If Facebook shows only the link, use <strong>Copy text + link</strong> and paste in your post.</p>
-            <div class="mt-4 flex flex-col gap-2">
+            <p class="text-xs text-gray-500 mt-2 flex-shrink-0">Facebook may shorten the prefilled line; use <strong>Copy full message</strong> for both links.</p>
+            <div class="mt-4 flex flex-col space-y-2 flex-shrink-0">
                 <button type="button"
                         @click="openFacebookShare()"
-                        class="w-full inline-flex items-center justify-center gap-2 bg-[#1877F2] hover:bg-[#166FE5] text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition">
+                        class="jaap-share-fb-btn w-full inline-flex items-center justify-center gap-2 text-sm font-semibold py-2.5 px-4 rounded-lg transition">
                     <i class="fab fa-facebook-f"></i>
                     Open Facebook share
                 </button>
                 <button type="button"
                         @click="copyShareText()"
                         class="w-full py-2.5 px-4 rounded-lg border border-gray-300 text-sm font-medium text-gray-800 hover:bg-gray-50">
-                    Copy text + link
+                    Copy full message
                 </button>
                 <button type="button"
                         @click="closeShareModal()"
@@ -252,13 +252,24 @@ document.addEventListener('alpine:init', () => {
             return (
                 'Jai Shree Ram! ' + this.shareDisplayName() + ' saved ' + this.savedSessionCount +
                 ' Ram Naam Jaap on JaapRam. Join the app: ' + this.shareAppUrl +
-                ' (Sign up: ' + this.joinSignupUrl() + ')'
+                '\nSign up: ' + this.joinSignupUrl()
+            );
+        },
+
+        facebookQuoteShort() {
+            return (
+                'Jai Shree Ram! ' + this.shareDisplayName() + ' saved ' + this.savedSessionCount +
+                ' Ram Naam Jaap on JaapRam. ' + this.shareAppUrl
             );
         },
 
         openFacebookShare() {
+            const full = this.shareMessage();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(full).catch(() => {});
+            }
             const u = encodeURIComponent(this.shareAppUrl);
-            const quote = encodeURIComponent(this.shareMessage());
+            const quote = encodeURIComponent(this.facebookQuoteShort());
             window.open(
                 'https://www.facebook.com/sharer/sharer.php?u=' + u + '&quote=' + quote,
                 'fbShareJaapRam',

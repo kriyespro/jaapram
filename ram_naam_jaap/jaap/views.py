@@ -58,9 +58,13 @@ def _build_jaap_share_ui(request, prompt):
     count = prompt['count']
     share_text = (
         f'Jai Shree Ram! {username} saved {count} Ram Naam Jaap on JaapRam. '
-        f'Join the app: {app_url} (Sign up: {join_url})'
+        f'Join the app: {app_url}\nSign up: {join_url}'
     )
-    fb_params = urlencode({'u': app_url, 'quote': share_text})
+    # Facebook often truncates long `quote` query params; keep sharer URL short. Full text = textarea + Copy.
+    fb_quote = (
+        f'Jai Shree Ram! {username} saved {count} Ram Naam Jaap on JaapRam. {app_url}'
+    )
+    fb_params = urlencode({'u': app_url, 'quote': fb_quote})
     facebook_href = f'https://www.facebook.com/sharer/sharer.php?{fb_params}'
     return {
         'username': username,

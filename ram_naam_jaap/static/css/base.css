@@ -274,4 +274,24 @@ body.app-shell main .border-gray-200 {
 .z-jaap-mobile-sheet {
   z-index: 85;
 }
- 
+
+/* Jaap share modal: Tailwind 2 CDN has no bg-black/40; reliable FB button color */
+.jaap-share-backdrop {
+  background-color: rgba(0, 0, 0, 0.45);
+}
+
+.jaap-share-card {
+  max-height: min(90vh, 32rem);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.jaap-share-fb-btn {
+  background-color: #1877f2 !important;
+  color: #fff !important;
+}
+
+.jaap-share-fb-btn:hover {
+  background-color: #166fe5 !important;
+  color: #fff !important;
+}
