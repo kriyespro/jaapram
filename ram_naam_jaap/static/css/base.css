@@ -102,4 +102,62 @@
   width: 50px;
   height: 3px;
   background-color: var(--primary-color);
-} 
+}
+
+/* —— Mobile layout: safe areas, header, bottom tab bar —— */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.tap-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 767px) {
+  .main-with-mobile-nav {
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .site-footer-mobile-pad {
+    padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Bottom tab bar: clear focus for keyboard users only */
+.mobile-tabbar a:focus {
+  outline: none;
+}
+
+.mobile-tabbar a:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: -2px;
+}
+
+.mobile-tabbar-item {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.mobile-tabbar-item--primary {
+  color: var(--primary-color);
+}
+
+.mobile-tabbar-item--primary .mobile-tabbar-icon-wrap {
+  background: linear-gradient(180deg, rgba(255, 153, 51, 0.2), rgba(255, 153, 51, 0.08));
+  border-radius: 999px;
+}
+
+/* Above sticky header (z-50) and bottom tab bar (z-40) */
+.z-modal-overlay {
+  z-index: 60;
+}
+ 

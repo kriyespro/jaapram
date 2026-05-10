@@ -87,7 +87,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-6 max-w-4xl" x-data="jaapCounter">
+<div class="container mx-auto px-4 py-6 max-w-4xl relative" x-data="jaapCounter" data-share-app-url="{{ request.build_absolute_uri('/') }}">
     <h1 class="text-4xl font-bold text-center text-primary mb-8">राम नाम जाप</h1>
     
     <!-- Counter Display -->
@@ -134,12 +134,42 @@
     <div class="input-container" contenteditable="true" @input="checkInput" x-ref="inputArea"></div>
     
     <!-- Save Button -->
-    <form method="post" action="{{ url('jaap:save_entry') }}" x-ref="saveForm">
+    <form method="post" action="{{ url('jaap:save_entry') }}" x-ref="saveForm" @submit="resetCounterAfterSubmit">
         {{ csrf_input }}
-        <input type="hidden" name="count" :value="count" x-ref="countInput">
+        <input type="hidden" name="count" value="0" x-bind:value="String(count)" x-ref="countInput" autocomplete="off">
         <input type="hidden" name="date" value="{{ today_date_iso }}">
-        <button type="submit" class="save-button">Save Ram Jaap</button>
+        <button type="submit" class="save-button" x-ref="submitJaapBtn">Save Ram Jaap</button>
     </form>
+
+    <div x-show="shareModalOpen"
+         x-transition.opacity
+         x-cloak
+         class="fixed inset-0 z-modal-overlay flex items-center justify-center p-4"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="share-modal-title-input">
+        <div class="absolute inset-0 bg-black/50" @click="closeShareModal()"></div>
+        <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full p-5 border border-gray-100" @click.stop>
+            <h2 id="share-modal-title-input" class="text-lg font-bold text-gray-900">Share your progress</h2>
+            <p class="text-sm text-gray-600 mt-2">
+                You recorded <span class="font-semibold text-primary" x-text="savedSessionCount"></span> in this session.
+                Share on Facebook so others can join <span class="font-medium">JaapRam</span>.
+            </p>
+            <div class="mt-4 flex flex-col sm:flex-row gap-2">
+                <button type="button"
+                        @click="openFacebookShare()"
+                        class="flex-1 inline-flex items-center justify-center gap-2 bg-[#1877F2] hover:bg-[#166FE5] text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition">
+                    <i class="fab fa-facebook-f"></i>
+                    Share on Facebook
+                </button>
+                <button type="button"
+                        @click="closeShareModal()"
+                        class="flex-1 py-2.5 px-4 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    Not now
+                </button>
+            </div>
+        </div>
+    </div>
     
     <!-- Instructions -->
     <div class="instructions-container">
@@ -167,64 +197,141 @@ document.addEventListener('alpine:init', () => {
         timerRemaining: 0,
         timerInterval: null,
         justCounted: false,
-        
+        autoSubmitScheduled: false,
+        shareModalOpen: false,
+        savedSessionCount: 0,
+        shareAppUrl: '',
+
         init() {
-            // Initialize with previous values from localStorage if available
+            this.shareAppUrl = (this.$root.dataset.shareAppUrl || window.location.origin + '/').trim();
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('jaap_saved') === '1') {
+                const raw = params.get('saved_count');
+                const n = raw != null ? parseInt(raw, 10) : 0;
+                if (Number.isFinite(n) && n > 0) {
+                    this.savedSessionCount = n;
+                    this.shareModalOpen = true;
+                    localStorage.removeItem('ramJaapCount');
+                    this.$nextTick(() => {
+                        window.history.replaceState({}, '', window.location.pathname);
+                    });
+                }
+            }
             const storedCount = localStorage.getItem('ramJaapCount');
             if (storedCount) {
                 this.count = parseInt(storedCount, 10);
             }
+        },
+
+        closeShareModal() {
+            this.shareModalOpen = false;
+        },
+
+        openFacebookShare() {
+            const u = encodeURIComponent(this.shareAppUrl);
+            window.open(
+                'https://www.facebook.com/sharer/sharer.php?u=' + u,
+                'fbShareJaapRam',
+                'width=600,height=520,noopener,noreferrer'
+            );
+        },
+
+        syncCountToForm() {
+            const el = this.$refs.countInput;
+            if (!el) {
+                return;
+            }
+            const v = String(this.count);
+            el.value = v;
+            el.setAttribute('value', v);
+        },
+
+        submitSaveForm() {
+            this.syncCountToForm();
+            const form = this.$refs.saveForm;
+            if (!form) {
+                return;
+            }
+            const btn = this.$refs.submitJaapBtn || form.querySelector('button[type="submit"]');
+            const run = () => {
+                this.syncCountToForm();
+                if (btn) {
+                    btn.click();
+                } else if (typeof form.requestSubmit === 'function') {
+                    form.requestSubmit();
+                } else {
+                    form.submit();
+                }
+            };
+            requestAnimationFrame(() => {
+                requestAnimationFrame(run);
+            });
+        },
+
+        scheduleAutoSubmit() {
+            if (this.count <= 0 || this.autoSubmitScheduled) {
+                return;
+            }
+            this.autoSubmitScheduled = true;
+            queueMicrotask(() => {
+                this.$nextTick(() => {
+                    this.submitSaveForm();
+                });
+            });
+        },
+
+        resetCounter() {
+            this.autoSubmitScheduled = false;
+            this.count = 0;
+            localStorage.removeItem('ramJaapCount');
+            if (this.$refs.inputArea) {
+                this.$refs.inputArea.innerText = '';
+            }
+        },
+
+        resetCounterAfterSubmit() {
+            setTimeout(() => this.resetCounter(), 100);
         },
         
         checkInput() {
             const text = this.$refs.inputArea.innerText.toLowerCase();
             const ramCount = (text.match(/\bram\b/g) || []).length;
             
-            if (ramCount > this.count) {
-                // New "ram" words detected
-                const newRams = ramCount - this.count;
+            if (ramCount !== this.count) {
                 this.count = ramCount;
-                
-                // Trigger animation
                 this.justCounted = true;
                 setTimeout(() => {
                     this.justCounted = false;
                 }, 500);
-                
-                // Save count to localStorage
                 localStorage.setItem('ramJaapCount', this.count);
-                
-                // Check if target reached
                 if (this.target > 0 && this.count >= this.target) {
-                    alert('Congratulations! You have reached your target of ' + this.target + ' Ram Naams!');
+                    this.scheduleAutoSubmit();
                 }
             }
         },
         
         setTimer(minutes) {
-            // Clear existing timer if any
             if (this.timerInterval) {
                 clearInterval(this.timerInterval);
+                this.timerInterval = null;
                 this.timerRunning = false;
             }
-            
             this.timer = minutes;
-            
             if (minutes > 0) {
-                // Start new timer
-                this.timerRemaining = minutes * 60; // convert to seconds
+                this.autoSubmitScheduled = false;
+            }
+            if (minutes > 0) {
+                this.timerRemaining = minutes * 60;
                 this.timerRunning = true;
-                
                 this.timerInterval = setInterval(() => {
                     this.timerRemaining--;
-                    
                     if (this.timerRemaining <= 0) {
                         clearInterval(this.timerInterval);
+                        this.timerInterval = null;
                         this.timerRunning = false;
-                        alert('Timer completed! You recited Ram Naam ' + this.count + ' times.');
-                        
-                        // Optionally auto-submit the form
-                        // this.$refs.saveForm.submit();
+                        if (this.count > 0) {
+                            this.scheduleAutoSubmit();
+                        }
                     }
                 }, 1000);
             }
@@ -232,6 +339,15 @@ document.addEventListener('alpine:init', () => {
         
         setTarget(number) {
             this.target = number;
+            if (number === 0) {
+                this.autoSubmitScheduled = false;
+                return;
+            }
+            if (this.count < number) {
+                this.autoSubmitScheduled = false;
+                return;
+            }
+            this.scheduleAutoSubmit();
         },
         
         formatTime(seconds) {

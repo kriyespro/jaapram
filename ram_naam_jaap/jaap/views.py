@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
@@ -7,6 +9,7 @@ from django.db.models import F, Sum
 from django.core.cache import cache
 from django.conf import settings
 from django.contrib import messages
+from django.urls import reverse
 from datetime import datetime, timedelta
 import requests
 import json
@@ -16,6 +19,29 @@ from dashboard.models import Target, Achievement
 from accounts.models import UserProfile
 
 import redis
+
+
+def _consume_jaap_share_prompt(request):
+    """One-time prompt after save (session survives redirects that drop query strings)."""
+    raw = request.session.pop('jaap_share_saved_count', None)
+    if raw is None:
+        return None
+    try:
+        n = int(raw)
+        return n if n > 0 else None
+    except (TypeError, ValueError):
+        return None
+
+
+def redirect_jaap_entry_after_save(request, saved_count):
+    """Redirect to jaap entry; store share prompt in session + query string for the client."""
+    try:
+        request.session['jaap_share_saved_count'] = int(saved_count)
+    except (TypeError, ValueError):
+        pass
+    base = reverse('jaap:jaap_entry')
+    query = urlencode({'jaap_saved': '1', 'saved_count': str(saved_count)})
+    return redirect(f'{base}?{query}')
 
 
 def get_location_from_ip(ip_address):
@@ -102,6 +128,8 @@ def jaap_entry(request):
     
     # Format today's date in ISO format for the date input field
     today_date_iso = today.strftime('%Y-%m-%d')
+
+    jaap_share_saved_count = _consume_jaap_share_prompt(request)
     
     context = {
         'today_count': today_count,
@@ -109,6 +137,7 @@ def jaap_entry(request):
         'percentage': percentage,
         'recent_entries': recent_entries,
         'today_date_iso': today_date_iso,
+        'jaap_share_saved_count': jaap_share_saved_count,
     }
     
     return render(request, 'jaap/entry.html', context)
@@ -283,7 +312,7 @@ def save_entry(request):
         check_achievements(request.user, jaap_count.count)
     
     messages.success(request, f"{count} Ram Naam Jaap{'s' if count > 1 else ''} recorded successfully!")
-    return redirect('jaap:jaap_entry')
+    return redirect_jaap_entry_after_save(request, count)
 
 
 @login_required
@@ -355,7 +384,7 @@ def manual_entry(request):
     check_achievements(request.user, jaap_count.count)
     
     messages.success(request, f"Successfully added {count} jaaps on {entry_date.strftime('%Y-%m-%d')}")
-    return redirect('jaap:jaap_entry')
+    return redirect_jaap_entry_after_save(request, count)
 
 
 def check_achievements(user, count):

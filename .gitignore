@@ -32,3 +32,6 @@ media/
 staticfiles/
 ram_naam_jaap/logs/
 .DS_Store
+
+# Local OAuth notes with real credentials (never commit)
+googlelogin.local.txt
