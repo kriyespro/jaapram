@@ -157,25 +157,13 @@
                 <span class="font-semibold text-primary" x-text="shareDisplayName()"></span> —
                 <span class="font-semibold text-primary" x-text="savedSessionCount"></span> Ram Naam Jaap this session.
             </p>
-            <p class="text-xs text-gray-500 mt-2 flex-shrink-0">Facebook may shorten the prefilled line; use <strong>Copy full message</strong> for both links.</p>
-            <div class="mt-4 flex flex-col space-y-2 flex-shrink-0">
-                <button type="button"
-                        @click="openFacebookShare()"
-                        class="jaap-share-fb-btn w-full inline-flex items-center justify-center gap-2 text-sm font-semibold py-2.5 px-4 rounded-lg transition">
-                    <i class="fab fa-facebook-f"></i>
-                    Open Facebook share
-                </button>
-                <button type="button"
-                        @click="copyShareText()"
-                        class="w-full py-2.5 px-4 rounded-lg border border-gray-300 text-sm font-medium text-gray-800 hover:bg-gray-50">
-                    Copy full message
-                </button>
-                <button type="button"
-                        @click="closeShareModal()"
-                        class="w-full py-2.5 px-4 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                    Not now
-                </button>
-            </div>
+            <p class="text-xs text-gray-500 mt-3 flex-shrink-0">Your full message is copied automatically, then Facebook opens. Paste into your post if the composer is empty.</p>
+            <button type="button"
+                    @click="openFacebookShare()"
+                    class="jaap-share-fb-btn mt-5 w-full inline-flex items-center justify-center gap-2 text-sm font-semibold py-3 px-4 rounded-lg transition">
+                <i class="fab fa-facebook-f"></i>
+                Share your progress on Facebook
+            </button>
         </div>
     </div>
     
@@ -265,22 +253,17 @@ document.addEventListener('alpine:init', () => {
 
         openFacebookShare() {
             const full = this.shareMessage();
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(full).catch(() => {});
-            }
             const u = encodeURIComponent(this.shareAppUrl);
             const quote = encodeURIComponent(this.facebookQuoteShort());
-            window.open(
-                'https://www.facebook.com/sharer/sharer.php?u=' + u + '&quote=' + quote,
-                'fbShareJaapRam',
-                'width=600,height=520,noopener,noreferrer'
-            );
-        },
-
-        copyShareText() {
-            const text = this.shareMessage();
+            const href =
+                'https://www.facebook.com/sharer/sharer.php?u=' + u + '&quote=' + quote;
+            const openFb = () => {
+                window.open(href, 'fbShareJaapRam', 'width=600,height=520,noopener,noreferrer');
+            };
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).catch(() => {});
+                navigator.clipboard.writeText(full).then(openFb).catch(openFb);
+            } else {
+                openFb();
             }
         },
 

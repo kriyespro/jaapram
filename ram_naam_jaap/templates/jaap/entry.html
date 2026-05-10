@@ -414,25 +414,13 @@
                 <span class="font-semibold text-primary" x-text="shareDisplayName()"></span> —
                 <span class="font-semibold text-primary" x-text="savedSessionCount"></span> Ram Naam Jaap this session.
             </p>
-            <p class="text-xs text-gray-500 mt-2 flex-shrink-0">Facebook may shorten the prefilled line; use <strong>Copy full message</strong> and paste in your post for both links.</p>
-            <div class="mt-4 flex flex-col space-y-2 flex-shrink-0">
-                <button type="button"
-                        @click="openFacebookShare()"
-                        class="jaap-share-fb-btn w-full inline-flex items-center justify-center gap-2 text-sm font-semibold py-2.5 px-4 rounded-lg transition">
-                    <i class="fab fa-facebook-f"></i>
-                    Open Facebook share
-                </button>
-                <button type="button"
-                        @click="copyShareText()"
-                        class="w-full py-2.5 px-4 rounded-lg border border-gray-300 text-sm font-medium text-gray-800 hover:bg-gray-50">
-                    Copy full message
-                </button>
-                <button type="button"
-                        @click="closeShareModal()"
-                        class="w-full py-2.5 px-4 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                    Not now
-                </button>
-            </div>
+            <p class="text-xs text-gray-500 mt-3 flex-shrink-0">Your full message is copied automatically, then Facebook opens. Paste into your post if the composer is empty.</p>
+            <button type="button"
+                    @click="openFacebookShare()"
+                    class="jaap-share-fb-btn mt-5 w-full inline-flex items-center justify-center gap-2 text-sm font-semibold py-3 px-4 rounded-lg transition">
+                <i class="fab fa-facebook-f"></i>
+                Share your progress on Facebook
+            </button>
         </div>
     </div>
 </div>
@@ -447,54 +435,48 @@
             <span class="font-semibold text-primary">{{ jaap_share_ui.username }}</span>
             — <span class="font-semibold text-primary">{{ jaap_share_ui.count }}</span> Ram Naam Jaap saved.
         </p>
-        <p class="text-xs text-gray-500 mt-2 flex-shrink-0">Buttons stay on screen — scroll only the message if needed. For both links in your post, use <strong>Copy full message</strong>.</p>
-        <div class="mt-4 flex flex-col space-y-2 flex-shrink-0">
-            <a id="jaap-share-fb-link" href="{{ jaap_share_ui.facebook_href }}"
-               target="_blank"
-               rel="noopener noreferrer"
-               class="jaap-share-fb-btn w-full inline-flex items-center justify-center gap-2 text-sm font-semibold py-2.5 px-4 rounded-lg transition">
-                <i class="fab fa-facebook-f"></i>
-                Open Facebook share
-            </a>
-            <button type="button" id="jaap-share-copy-btn"
-                    class="w-full py-2.5 px-4 rounded-lg border border-gray-300 text-sm font-medium text-gray-800 hover:bg-gray-50">
-                Copy full message
-            </button>
-            <button type="button" class="w-full py-2.5 px-4 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    onclick="document.getElementById('jaap-share-overlay').remove()">
-                Not now
-            </button>
-        </div>
-        <label class="block text-xs font-medium text-gray-500 mt-4 flex-shrink-0" for="jaap-share-textarea">Full message (copy includes signup link)</label>
-        <textarea id="jaap-share-textarea" readonly rows="6" class="mt-1 w-full min-h-[7rem] resize-y text-sm border border-gray-200 rounded-lg p-2 text-gray-800 bg-gray-50 whitespace-pre-wrap">{{ jaap_share_ui.share_text }}</textarea>
+        <p class="text-xs text-gray-500 mt-3 flex-shrink-0">Tap below: your full message is copied, then Facebook opens. Paste into your post if needed.</p>
+        <textarea id="jaap-share-textarea" readonly tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;top:0;width:1px;height:1px;opacity:0">{{ jaap_share_ui.share_text }}</textarea>
+        <button type="button" id="jaap-share-fb-btn"
+                data-fb-href="{{ jaap_share_ui.facebook_href }}"
+                class="jaap-share-fb-btn mt-5 w-full inline-flex items-center justify-center gap-2 text-sm font-semibold py-3 px-4 rounded-lg transition border-0 cursor-pointer font-sans">
+            <i class="fab fa-facebook-f"></i>
+            Share your progress on Facebook
+        </button>
     </div>
 </div>
 <script>
 (function () {
     try { localStorage.removeItem('ramJaapCount'); } catch (e) {}
     try { history.replaceState({}, '', window.location.pathname); } catch (e) {}
-    var btn = document.getElementById('jaap-share-copy-btn');
-    var ta = document.getElementById('jaap-share-textarea');
-    if (btn && ta) {
-        btn.addEventListener('click', function () {
-            ta.focus();
-            ta.select();
+    function jaapClipboardWrite(ta) {
+        var text = ta && ta.value ? ta.value : '';
+        if (!text) return Promise.resolve();
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            return navigator.clipboard.writeText(text).catch(function () { return jaapClipboardFallback(ta); });
+        }
+        return jaapClipboardFallback(ta);
+    }
+    function jaapClipboardFallback(ta) {
+        return new Promise(function (resolve) {
             try {
+                ta.focus();
+                ta.select();
                 document.execCommand('copy');
             } catch (e) {}
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(ta.value).catch(function () {});
-            }
-            btn.textContent = 'Copied!';
-            setTimeout(function () { btn.textContent = 'Copy full message'; }, 2000);
+            resolve();
         });
     }
-    var fbLink = document.getElementById('jaap-share-fb-link');
-    if (fbLink && ta) {
-        fbLink.addEventListener('click', function () {
-            if (navigator.clipboard && navigator.clipboard.writeText && ta.value) {
-                navigator.clipboard.writeText(ta.value).catch(function () {});
-            }
+    var ta = document.getElementById('jaap-share-textarea');
+    var fbBtn = document.getElementById('jaap-share-fb-btn');
+    if (fbBtn && ta) {
+        fbBtn.addEventListener('click', function () {
+            var href = fbBtn.getAttribute('data-fb-href') || '';
+            jaapClipboardWrite(ta).finally(function () {
+                if (href) {
+                    window.open(href, 'fbShareJaapRam', 'width=600,height=520,noopener,noreferrer');
+                }
+            });
         });
     }
 })();
@@ -639,22 +621,17 @@ document.addEventListener('alpine:init', () => {
 
         openFacebookShare() {
             const full = this.shareMessage();
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(full).catch(() => {});
-            }
             const u = encodeURIComponent(this.shareAppUrl);
             const quote = encodeURIComponent(this.facebookQuoteShort());
-            window.open(
-                'https://www.facebook.com/sharer/sharer.php?u=' + u + '&quote=' + quote,
-                'fbShareJaapRam',
-                'width=600,height=520,noopener,noreferrer'
-            );
-        },
-
-        copyShareText() {
-            const text = this.shareMessage();
+            const href =
+                'https://www.facebook.com/sharer/sharer.php?u=' + u + '&quote=' + quote;
+            const openFb = () => {
+                window.open(href, 'fbShareJaapRam', 'width=600,height=520,noopener,noreferrer');
+            };
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => {}).catch(() => {});
+                navigator.clipboard.writeText(full).then(openFb).catch(openFb);
+            } else {
+                openFb();
             }
         },
 
