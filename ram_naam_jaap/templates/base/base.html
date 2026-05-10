@@ -25,13 +25,13 @@
     
     {% block extra_head %}{% endblock %}
 </head>
-<body class="flex flex-col min-h-screen bg-gray-50 md:bg-white">
+<body class="app-shell flex flex-col min-h-screen">
     {% set rm = request.resolver_match if request is defined else none %}
     {% set nav_ns = rm.namespace if rm else '' %}
     {% set nav_name = rm.url_name if rm else '' %}
 
     <!-- Header -->
-    <header class="site-header sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm safe-area-top">
+    <header class="site-header app-header-cream sticky top-0 z-50 backdrop-blur-md border-b safe-area-top">
         <nav class="container mx-auto px-3 sm:px-4 relative" x-data="{ mobileOpen: false }" @keydown.escape.window="mobileOpen = false">
             <div class="flex items-center justify-between gap-2 py-2.5 md:py-2 min-h-[3.25rem]">
                 <a href="{{ url('core:home') }}" class="flex items-center gap-2 text-lg sm:text-xl md:text-2xl font-bold text-primary tap-target rounded-lg -ml-1 px-1 flex-shrink-0" @click="mobileOpen = false">
@@ -60,14 +60,14 @@
                                 <span class="text-sm max-w-[8rem] truncate">{{ request.user.username }}</span>
                                 <i class="fas fa-user-circle text-2xl text-gray-500"></i>
                             </button>
-                            <div x-show="open" @click.away="open = false" x-cloak class="absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-lg py-1 z-50 border border-gray-100">
-                                <a href="{{ url('accounts:profile') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">Profile</a>
+                            <div x-show="open" @click.away="open = false" x-cloak class="app-nav-panel-cream absolute right-0 mt-2 w-52 rounded-lg shadow-lg py-1 z-50 border">
+                                <a href="{{ url('accounts:profile') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-orange-50">Profile</a>
                                 {% if request.user.is_staff %}
-                                    <a href="{{ url('admin_dashboard:admin_dashboard') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">Admin Dashboard</a>
-                                    <a href="{{ url('admin:index') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">Django Admin</a>
+                                    <a href="{{ url('admin_dashboard:admin_dashboard') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-orange-50">Admin Dashboard</a>
+                                    <a href="{{ url('admin:index') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-orange-50">Django Admin</a>
                                 {% endif %}
                                 {% set logout_form_classes = "" %}
-                                {% set logout_button_classes = "block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 bg-transparent border-0 cursor-pointer font-sans" %}
+                                {% set logout_button_classes = "block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-orange-50 bg-transparent border-0 cursor-pointer font-sans" %}
                                 {% include 'partials/account_logout_form.html' %}
                             </div>
                         </div>
@@ -90,7 +90,7 @@
             
             <!-- Mobile menu panel -->
             <div id="mobile-nav-panel" x-show="mobileOpen" x-transition.opacity.duration.200ms x-cloak
-                 class="md:hidden absolute left-0 right-0 top-full border-t border-gray-100 bg-white shadow-lg max-h-[min(70vh,28rem)] overflow-y-auto z-50 rounded-b-xl">
+                 class="app-nav-panel-cream md:hidden absolute left-0 right-0 top-full border-t shadow-lg max-h-[min(70vh,28rem)] overflow-y-auto z-50 rounded-b-xl">
                 <div class="flex flex-col py-2 px-2">
                     <a href="{{ url('core:home') }}" @click="mobileOpen = false" class="flex items-center gap-3 min-h-[48px] px-3 rounded-lg text-gray-800 hover:bg-orange-50 text-base font-medium">
                         <i class="fas fa-home w-5 text-center text-primary"></i> Home
@@ -144,51 +144,51 @@
     </main>
     
     <!-- Footer -->
-    <footer class="site-footer site-footer-mobile-pad bg-gray-800 text-white py-6 md:py-6">
+    <footer class="site-footer site-footer-mobile-pad app-footer-cream py-6 md:py-6">
         <div class="container mx-auto px-3 sm:px-4">
             <div class="flex flex-col md:flex-row justify-between gap-6">
                 <div class="mb-2 md:mb-0">
                     <h3 class="text-lg font-bold mb-1">JaapRam</h3>
-                    <p class="text-gray-400 text-sm leading-relaxed">A digital platform for devotees to track their Ram Naam Jaap practice.</p>
+                    <p class="app-footer-muted text-sm leading-relaxed">A digital platform for devotees to track their Ram Naam Jaap practice.</p>
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-6 md:gap-12">
                     <div>
-                        <h4 class="text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wide">Quick Links</h4>
+                        <h4 class="text-sm font-semibold mb-2 uppercase tracking-wide app-footer-muted">Quick Links</h4>
                         <ul class="space-y-1.5 text-sm">
-                            <li><a href="{{ url('core:home') }}" class="text-gray-400 hover:text-white">Home</a></li>
+                            <li><a href="{{ url('core:home') }}">Home</a></li>
                             {% if request is defined and request.user.is_authenticated %}
-                                <li><a href="{{ url('jaap:jaap_entry') }}" class="text-gray-400 hover:text-white">Jaap</a></li>
-                                <li><a href="{{ url('dashboard:overview') }}" class="text-gray-400 hover:text-white">Dashboard</a></li>
-                                <li><a href="{{ url('community:home') }}" class="text-gray-400 hover:text-white">Community</a></li>
+                                <li><a href="{{ url('jaap:jaap_entry') }}">Jaap</a></li>
+                                <li><a href="{{ url('dashboard:overview') }}">Dashboard</a></li>
+                                <li><a href="{{ url('community:home') }}">Community</a></li>
                                 <li>
                                     {% set logout_form_classes = "inline" %}
-                                    {% set logout_button_classes = "text-gray-400 hover:text-white bg-transparent border-0 cursor-pointer p-0 font-sans text-sm underline-offset-2 hover:underline" %}
+                                    {% set logout_button_classes = "app-footer-muted bg-transparent border-0 cursor-pointer p-0 font-sans text-sm underline-offset-2 hover:underline" %}
                                     {% include 'partials/account_logout_form.html' %}
                                 </li>
                             {% endif %}
-                            <li><a href="{{ url('core:about') }}" class="text-gray-400 hover:text-white">About</a></li>
+                            <li><a href="{{ url('core:about') }}">About</a></li>
                         </ul>
                     </div>
                     
                     <div>
-                        <h4 class="text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wide">Legal</h4>
+                        <h4 class="text-sm font-semibold mb-2 uppercase tracking-wide app-footer-muted">Legal</h4>
                         <ul class="space-y-1.5 text-sm">
-                            <li><a href="{{ url('core:privacy') }}" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
-                            <li><a href="{{ url('core:terms') }}" class="text-gray-400 hover:text-white">Terms of Service</a></li>
+                            <li><a href="{{ url('core:privacy') }}">Privacy Policy</a></li>
+                            <li><a href="{{ url('core:terms') }}">Terms of Service</a></li>
                         </ul>
                     </div>
                 </div>
             </div>
             
-            <div class="border-t border-gray-700 mt-6 pt-4 text-center text-gray-400 text-sm">
+            <div class="app-footer-divider border-t mt-6 pt-4 text-center app-footer-muted text-sm">
                 <p>&copy; {{ now().year }} JaapRam. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <!-- Mobile bottom navigation (thumb-friendly) -->
-    <nav class="mobile-tabbar md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-[0_-6px_24px_rgba(0,0,0,0.08)] safe-area-bottom" aria-label="Primary">
+    <nav class="mobile-tabbar app-mobile-tabbar-cream md:hidden fixed bottom-0 left-0 right-0 z-40 border-t safe-area-bottom" aria-label="Primary">
         <div class="flex items-stretch justify-around max-w-lg mx-auto pt-1">
             {% if request is defined and request.user.is_authenticated %}
                 <a href="{{ url('core:home') }}" class="mobile-tabbar-item flex flex-col items-center justify-center flex-1 py-2 px-1 text-gray-500 {% if nav_ns == 'core' and nav_name == 'home' %}text-primary font-semibold{% endif %}">

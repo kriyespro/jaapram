@@ -1,14 +1,119 @@
-/* Base saffron theme colors */
+/* Base saffron theme colors + cream app shell */
 :root {
-  --primary-color: #FF9933; /* Saffron color */
+  --primary-color: #FF9933; /* Saffron — accents, buttons */
   --primary-hover: #E68A00;
-  --secondary-color: #FF8C00; /* Darker saffron */
+  --secondary-color: #FF8C00;
   --accent-color: #FFA500;
-  --text-dark: #333333;
+  --text-dark: #3a3428;
   --text-light: #FFFFFF;
-  --bg-light: #FFF9F2; /* Light saffron tint for backgrounds */
-  --bg-gray: #F5F5F5;
-  --border-color: #E5E5E5;
+  --bg-light: #fff6e8;
+  --bg-gray: #f0e8dc;
+  --border-color: #e5dac8;
+
+  /* Cream shell (page, chrome, cards) */
+  --cream-page: #faf4e8;
+  --cream-surface: #fffcf7;
+  --cream-elevated: #fffaf2;
+  --cream-header: rgba(255, 251, 242, 0.97);
+  --cream-footer: #ede6d6;
+  --cream-border: #e5dac8;
+  --cream-text: #3a3428;
+  --cream-text-muted: #6b6256;
+}
+
+/* Global app background */
+body.app-shell {
+  background-color: var(--cream-page);
+  color: var(--cream-text);
+}
+
+.app-header-cream {
+  background-color: var(--cream-header) !important;
+  border-color: var(--cream-border) !important;
+  box-shadow: 0 1px 0 rgba(58, 52, 40, 0.06);
+}
+
+.app-header-cream .hover\:bg-gray-100:hover {
+  background-color: rgba(255, 153, 51, 0.1) !important;
+}
+
+.app-nav-panel-cream {
+  background-color: var(--cream-surface) !important;
+  border-color: var(--cream-border) !important;
+}
+
+.app-footer-cream {
+  background-color: var(--cream-footer);
+  color: var(--cream-text);
+  border-top: 1px solid var(--cream-border);
+}
+
+.app-footer-cream a,
+.app-footer-cream button {
+  color: var(--cream-text-muted);
+}
+
+.app-footer-cream a:hover,
+.app-footer-cream button:hover {
+  color: var(--primary-color);
+}
+
+.app-footer-cream h3,
+.app-footer-cream h4 {
+  color: var(--cream-text);
+}
+
+.app-footer-cream p,
+.app-footer-cream .app-footer-muted {
+  color: var(--cream-text-muted);
+}
+
+.app-footer-cream .app-footer-divider {
+  border-color: var(--cream-border) !important;
+}
+
+.app-mobile-tabbar-cream {
+  background-color: var(--cream-surface) !important;
+  border-color: var(--cream-border) !important;
+  box-shadow: 0 -4px 24px rgba(58, 52, 40, 0.07);
+}
+
+/*
+ * Cream-tinted neutrals inside <main>: most pages use Tailwind bg-white / bg-gray-50
+ * on cards and tables; remap so the whole app reads warm cream without per-template edits.
+ */
+body.app-shell main .bg-white {
+  background-color: var(--cream-surface) !important;
+}
+
+body.app-shell main .bg-gray-50 {
+  background-color: var(--bg-gray) !important;
+}
+
+body.app-shell main .bg-gray-100 {
+  background-color: #e8e0d4 !important;
+}
+
+body.app-shell main .hover\:bg-gray-50:hover {
+  background-color: var(--bg-gray) !important;
+}
+
+body.app-shell main .hover\:bg-gray-100:hover {
+  background-color: #dfd6c8 !important;
+}
+
+body.app-shell main .bg-gray-200,
+body.app-shell main .hover\:bg-gray-200:hover {
+  background-color: #d4cbb8 !important;
+}
+
+body.app-shell main .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--cream-border) !important;
+}
+
+body.app-shell main .border-gray-100,
+body.app-shell main .border-gray-200 {
+  border-color: var(--cream-border) !important;
 }
 
 /* Apply text color */
@@ -82,8 +187,8 @@
 .card-saffron {
   border-top: 3px solid var(--primary-color);
   border-radius: 0.5rem;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  background-color: white;
+  box-shadow: 0 2px 5px rgba(58, 52, 40, 0.08);
+  background-color: var(--cream-surface);
   padding: 1.5rem;
 }
 
@@ -164,5 +269,9 @@
 /* Jaap share dialog above header (50) and mobile tab bar (40) */
 .z-jaap-share-overlay {
   z-index: 100;
+}
+
+.z-jaap-mobile-sheet {
+  z-index: 85;
 }
  
