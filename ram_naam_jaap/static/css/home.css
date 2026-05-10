@@ -173,6 +173,47 @@
   gap: 0.8rem;
 }
 
+/* Minimal hero (title + subtitle only) */
+.hero-simple .hero-simple-grid {
+  gap: 1rem;
+}
+
+.hero-simple-title {
+  font-size: 1.75rem;
+  line-height: 1.15;
+}
+
+.hero-simple-subtitle {
+  font-size: 1rem;
+  font-weight: 600;
+  opacity: 0.95;
+  max-width: none;
+}
+
+.lord-ram-image--simple {
+  max-height: 200px !important;
+}
+
+.hero-simple-image-wrap {
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 1024px) {
+  .hero-simple .hero-simple-title {
+    font-size: 2.35rem;
+  }
+
+  .hero-simple .hero-simple-subtitle {
+    font-size: 1.12rem;
+  }
+
+  .lord-ram-image--simple {
+    max-height: 260px !important;
+  }
+}
+
 .hero-kicker {
   display: inline-block;
   font-size: 0.72rem;
