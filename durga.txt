@@ -63,3 +63,9 @@ Docker — manual migrate without restarting web (rare):
   docker compose exec web python /app/manage.py migrate --noinput
 
 First-time Docker: copy .env.docker.example to .env.docker, fill secrets, then docker compose up --build -d
+
+--- If you see HTTP 500 on the server ---
+  docker compose logs web --tail=200
+  docker compose exec web python /app/manage.py check
+  docker compose exec web python /app/manage.py migrate --noinput
+Fix ALLOWED_HOSTS / DATABASE_URL / SECRET_KEY in .env.docker if logs mention them. After code fix: git pull, then docker compose up -d --build.

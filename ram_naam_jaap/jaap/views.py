@@ -9,7 +9,7 @@ from django.db.models import F, Sum
 from django.core.cache import cache
 from django.conf import settings
 from django.contrib import messages
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from datetime import datetime, timedelta
 import requests
 import json
@@ -53,7 +53,10 @@ def _build_jaap_share_ui(request, prompt):
     if not prompt:
         return None
     app_url = request.build_absolute_uri('/')
-    join_url = request.build_absolute_uri(reverse('account_signup'))
+    try:
+        join_url = request.build_absolute_uri(reverse('account_signup'))
+    except NoReverseMatch:
+        join_url = request.build_absolute_uri('/accounts/signup/')
     username = prompt['username']
     count = prompt['count']
     share_text = (
