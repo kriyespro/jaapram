@@ -1,5 +1,4 @@
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
 from django.db.models import Sum, Count
 from django.core.cache import cache
 from django.utils import timezone
@@ -12,7 +11,10 @@ from jaap.models import JaapCount
 
 
 def community_home(request):
-    """Community home page with statistics and leaderboard"""
+    """Public community snapshot; logged-in users use the combined dashboard hub."""
+    if request.user.is_authenticated:
+        return redirect('dashboard:overview')
+
     # Get total Ram Naam count
     total_count = JaapCount.objects.aggregate(total=Sum('count'))['total'] or 0
     
@@ -24,56 +26,15 @@ def community_home(request):
         total_jaap=Sum('jaap_counts__count')
     ).filter(
         total_jaap__gt=0
-    ).order_by('-total_jaap')[:10]
-    
-    # Get recent activity
-    recent_activity = JaapCount.objects.filter(
-        count__gt=0
-    ).select_related('user').order_by('-date')[:10]
-    
-    # Get top 5 cities
-    top_cities = UserProfile.objects.exclude(
-        city=''
-    ).values('city').annotate(
-        user_count=Count('user')
-    ).order_by('-user_count')[:5]
-    
-    # Create a safe version of top_cities with URL-safe city names
-    safe_top_cities = []
-    for city_data in top_cities:
-        safe_top_cities.append({
-            'city': city_data['city'],
-            'city_url': city_data['city'],  # This is used directly in URL
-            'user_count': city_data['user_count']
-        })
-    
-    # Get daily counts for the past 7 days for the activity chart
-    seven_days_ago = timezone.now().date() - timezone.timedelta(days=7)
-    daily_counts = JaapCount.objects.filter(
-        date__gte=seven_days_ago
-    ).values('date').annotate(
-        day_total=Sum('count')
-    ).order_by('date')
-    
-    # Prepare chart data
-    chart_labels = [count['date'].strftime('%b %d') for count in daily_counts]
-    chart_data = [count['day_total'] for count in daily_counts]
-    
-    # JSON encode the chart data
-    chart_labels_json = json.dumps(chart_labels)
-    chart_data_json = json.dumps(chart_data)
-    
+    ).select_related('profile').order_by('-total_jaap')[:10]
+
     context = {
         'total_count': total_count,
         'total_users': total_users,
         'top_users': top_users,
-        'recent_activity': recent_activity,
-        'top_cities': safe_top_cities,
-        'chart_labels': chart_labels_json,
-        'chart_data': chart_data_json,
     }
-    
-    return render(request, 'community/home.html', context)
+
+    return render(request, 'community/public_home.html', context)
 
 
 def global_leaderboard(request):

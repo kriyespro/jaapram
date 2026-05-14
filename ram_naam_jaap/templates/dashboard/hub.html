@@ -1,0 +1,111 @@
+{% extends 'base/base.html' %}
+
+{% block title %}My Jaap &amp; community | JaapRam{% endblock %}
+
+{% block extra_head %}
+    <meta name="description" content="Your Ram Naam Jaap progress and a quick look at the sangat.">
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-3 sm:px-4 py-3 max-w-3xl">
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+        <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-gray-900">My Jaap</h1>
+            <p class="text-sm text-gray-600">Your counts · community snapshot</p>
+        </div>
+        <a href="{{ url('jaap:jaap_entry') }}" class="inline-flex items-center gap-1.5 bg-primary hover:bg-orange-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
+            <i class="fas fa-om"></i> Start Jaap
+        </a>
+    </div>
+
+    <!-- You -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+        <div class="rounded-xl border border-orange-200 bg-white p-3 text-center shadow-sm">
+            <div class="text-xs font-semibold text-gray-500 uppercase">Today</div>
+            <div class="text-2xl font-bold text-primary mt-0.5">{{ my_today }}</div>
+            <div class="text-[10px] text-gray-500 mt-1">Goal {{ target.daily_target }} · {{ my_daily_pct }}%</div>
+        </div>
+        <div class="rounded-xl border border-orange-200 bg-white p-3 text-center shadow-sm">
+            <div class="text-xs font-semibold text-gray-500 uppercase">This week</div>
+            <div class="text-2xl font-bold text-primary mt-0.5">{{ my_week_total }}</div>
+            <div class="text-[10px] text-gray-500 mt-1">Goal {{ target.weekly_target }} · {{ my_week_pct }}%</div>
+        </div>
+        <div class="rounded-xl border border-orange-200 bg-white p-3 text-center shadow-sm">
+            <div class="text-xs font-semibold text-gray-500 uppercase">All time</div>
+            <div class="text-2xl font-bold text-primary mt-0.5">{{ my_total }}</div>
+            <div class="text-[10px] text-gray-500 mt-1">Your total</div>
+        </div>
+        <div class="rounded-xl border border-orange-200 bg-white p-3 text-center shadow-sm">
+            <div class="text-xs font-semibold text-gray-500 uppercase">Streak</div>
+            <div class="text-2xl font-bold text-primary mt-0.5">{{ my_streak }}</div>
+            <div class="text-[10px] text-gray-500 mt-1">Days in a row</div>
+        </div>
+    </div>
+    <div class="flex flex-wrap gap-2 mb-6 text-sm">
+        <a href="{{ url('dashboard:user_targets') }}" class="text-primary font-medium hover:underline">Change daily / weekly goals</a>
+    </div>
+
+    <!-- Sangat -->
+    <h2 class="text-lg font-bold text-gray-900 mb-2">Sangat</h2>
+    <div class="grid grid-cols-2 gap-2 mb-4">
+        <div class="rounded-lg border border-gray-200 bg-white p-3 text-center">
+            <div class="text-xl font-bold text-primary">{{ global_total }}</div>
+            <div class="text-xs text-gray-600">Total jaaps (all)</div>
+        </div>
+        <div class="rounded-lg border border-gray-200 bg-white p-3 text-center">
+            <div class="text-xl font-bold text-secondary">{{ global_members }}</div>
+            <div class="text-xs text-gray-600">Members</div>
+        </div>
+    </div>
+
+    <div class="rounded-xl border border-gray-200 bg-white overflow-hidden mb-4 shadow-sm">
+        <div class="px-3 py-2 border-b border-gray-100 flex justify-between items-center">
+            <span class="text-sm font-bold text-gray-800">Top devotees</span>
+            <a href="{{ url('community:leaderboard') }}" class="text-xs font-semibold text-primary hover:underline">Full list →</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead class="bg-gray-50 text-left text-xs text-gray-500 uppercase">
+                    <tr>
+                        <th class="px-3 py-2">#</th>
+                        <th class="px-3 py-2">Name</th>
+                        <th class="px-3 py-2">Place</th>
+                        <th class="px-3 py-2 text-right">Total</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for u in top_users %}
+                    <tr class="{% if u.id == request.user.id %}bg-orange-50{% endif %}">
+                        <td class="px-3 py-2 text-gray-600">{{ loop.index }}</td>
+                        <td class="px-3 py-2 font-medium text-gray-900">{{ u.username }}</td>
+                        <td class="px-3 py-2 text-gray-500 text-xs">{{ u.profile.city|default('—') }}</td>
+                        <td class="px-3 py-2 text-right font-semibold text-primary">{{ u.total_jaap }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4" class="px-3 py-4 text-center text-gray-500 text-xs">No entries yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="rounded-xl border border-gray-200 bg-white p-3 mb-4 shadow-sm">
+        <div class="text-sm font-bold text-gray-800 mb-2">Latest saved jaaps</div>
+        <ul class="space-y-2">
+            {% for row in recent_feed %}
+            <li class="flex justify-between text-xs text-gray-700 border-b border-gray-50 last:border-0 pb-2 last:pb-0">
+                <span class="font-medium">{{ row.user.username }}</span>
+                <span class="text-gray-500">{{ row.count }} · {{ row.date.strftime('%b %d') }}</span>
+            </li>
+            {% else %}
+            <li class="text-xs text-gray-500">No recent activity.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="flex flex-wrap gap-3 text-sm justify-center pb-4">
+        <a href="{{ url('community:city_leaderboard') }}" class="text-primary font-medium hover:underline">By city</a>
+        <a href="{{ url('community:statistics') }}" class="text-primary font-medium hover:underline">Community stats</a>
+    </div>
+</div>
+{% endblock %}

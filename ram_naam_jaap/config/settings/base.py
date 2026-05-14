@@ -279,6 +279,9 @@ EMAIL_BACKEND = os.environ.get(
     'EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend'
 )
 
+# Home page: live Leaflet map (set SHOW_HOME_JAAP_MAP=true in env to turn back on)
+SHOW_HOME_JAAP_MAP = os.environ.get('SHOW_HOME_JAAP_MAP', '').lower() in ('1', 'true', 'yes')
+
 # Django Debug Toolbar
 if DEBUG:
     INTERNAL_IPS = ['127.0.0.1']

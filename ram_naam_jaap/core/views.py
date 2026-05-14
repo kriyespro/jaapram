@@ -83,7 +83,8 @@ def home_view(request):
         'top_users': top_users,
         'top_cities': top_cities,
         'chart_labels': json.dumps(chart_labels),
-        'chart_data': json.dumps(chart_data)
+        'chart_data': json.dumps(chart_data),
+        'show_home_jaap_map': settings.SHOW_HOME_JAAP_MAP,
     }
     
     return render(request, 'pages/home.html', context)

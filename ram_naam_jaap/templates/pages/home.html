@@ -9,6 +9,7 @@
 {% block extra_head %}
     <meta name="description" content="Track your Ram Naam Jaap practice and join the community of devotees in this sacred practice.">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% if show_home_jaap_map %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
     <!-- Leaflet Fullscreen plugin -->
@@ -18,6 +19,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    {% endif %}
     <style>
         .animated-counter {
             transition: all 0.5s ease-in-out;
@@ -62,6 +64,7 @@
             transform: translateY(-3px);
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
         }
+        {% if show_home_jaap_map %}
         /* Updated marker styling for more compact look */
         .jaap-marker {
             background-color: rgba(231, 81, 31, 0.9);
@@ -242,11 +245,12 @@
             width: 100%;
             z-index: 10;
         }
+        {% endif %}
     </style>
 {% endblock %}
 
 {% block content %}
-<div class="flex flex-col space-y-8" x-data="{ showBenefits: false }">
+<div class="flex flex-col space-y-5" x-data="{ showBenefits: false }">
     <!-- Mobile-first Landing Hero -->
     <section class="hero-shell rounded-2xl overflow-hidden shadow-xl hero-bg animated-gradient hero-simple">
         <div class="hero-grid hero-simple-grid p-5 sm:p-6 lg:p-8 hero-content items-center">
@@ -271,6 +275,7 @@
         </div>
     </section>
     
+    {% if show_home_jaap_map %}
     <!-- Live Map Section - Full Width -->
     <div class="map-fullwidth-container mb-6" id="global-jaap-map-container">
         <div class="container mx-auto px-4 py-2">
@@ -310,6 +315,7 @@
             </p>
         </div>
     </div>
+    {% endif %}
     
     <!-- Leaderboard Section - Modified to be more compact -->
     <div class="bg-white rounded-lg shadow-md p-4 shadow-elevated">
@@ -379,35 +385,24 @@
         </div>
     </div>
     
-    <!-- Benefits Section -->
-    <div class="bg-white rounded-lg shadow-md p-6 shadow-elevated">
-        <div class="flex flex-wrap gap-2 justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-800 title-saffron">Benefits of Ram Naam Jaap</h2>
-            <div class="text-primary text-4xl om-symbol">
-                <i class="fas fa-om"></i>
+    <!-- Why JaapRam -->
+    <div class="bg-white rounded-lg shadow-md p-4 shadow-elevated">
+        <h2 class="text-lg font-bold text-gray-800 title-saffron mb-3 text-center">Why JaapRam</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center text-sm text-gray-700">
+            <div class="p-3 rounded-lg bg-gray-50 border border-gray-100">
+                <i class="fas fa-heart text-primary text-2xl mb-1"></i>
+                <p class="font-semibold text-gray-900">Peace</p>
+                <p class="text-xs mt-1">Simple daily naam jaap.</p>
             </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-            <div class="flex flex-col items-center p-4 benefit-card bg-gray-50 rounded-lg border border-gray-100 benefit-highlight">
-                <div class="text-primary text-4xl mb-3">
-                    <i class="fas fa-heart"></i>
-                </div>
-                <h3 class="text-lg font-semibold mb-2">Inner Peace</h3>
-                <p class="text-gray-600 text-center">Experience tranquility and inner peace through the repetition of the divine name.</p>
+            <div class="p-3 rounded-lg bg-gray-50 border border-gray-100">
+                <i class="fas fa-users text-primary text-2xl mb-1"></i>
+                <p class="font-semibold text-gray-900">Sangat</p>
+                <p class="text-xs mt-1">See totals and rankings.</p>
             </div>
-            <div class="flex flex-col items-center p-4 benefit-card bg-gray-50 rounded-lg border border-gray-100 benefit-highlight">
-                <div class="text-primary text-4xl mb-3">
-                    <i class="fas fa-users"></i>
-                </div>
-                <h3 class="text-lg font-semibold mb-2">Community</h3>
-                <p class="text-gray-600 text-center">Join a global community of devotees practicing this ancient spiritual tradition.</p>
-            </div>
-            <div class="flex flex-col items-center p-4 benefit-card bg-gray-50 rounded-lg border border-gray-100 benefit-highlight">
-                <div class="text-primary text-4xl mb-3">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <h3 class="text-lg font-semibold mb-2">Track Progress</h3>
-                <p class="text-gray-600 text-center">Visualize your spiritual journey with detailed statistics and progress tracking.</p>
+            <div class="p-3 rounded-lg bg-gray-50 border border-gray-100">
+                <i class="fas fa-chart-line text-primary text-2xl mb-1"></i>
+                <p class="font-semibold text-gray-900">Track</p>
+                <p class="text-xs mt-1">Count and save your jaap.</p>
             </div>
         </div>
     </div>
@@ -418,8 +413,11 @@
 <script>
     // Initialize HTMX and Alpine.js
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize the map directly without Alpine.js
-        initGlobalJaapMap();
+        {% if show_home_jaap_map %}
+        if (document.getElementById('global-jaap-map')) {
+            initGlobalJaapMap();
+        }
+        {% endif %}
         
         // Add scroll-triggered animations for benefits
         const benefitCards = document.querySelectorAll('.benefit-card');
