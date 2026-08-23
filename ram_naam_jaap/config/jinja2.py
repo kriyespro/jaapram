@@ -2,23 +2,12 @@ from django.templatetags.static import static
 from django.urls import reverse, NoReverseMatch
 from jinja2 import Environment
 from datetime import datetime
-import time
 from django.template.defaultfilters import date as django_date
 
 
 def environment(**options):
     env = Environment(**options)
-    
-    # Cache-busting static function
-    def static_with_version(path):
-        # Add timestamp to force cache refresh
-        timestamp = int(time.time())
-        url = static(path)
-        if '?' in url:
-            return f"{url}&v={timestamp}"
-        else:
-            return f"{url}?v={timestamp}"
-    
+
     # Enhanced URL reverser
     def url_reverse(view_name, *args, **kwargs):
         # Try with args first
@@ -45,7 +34,7 @@ def environment(**options):
                 raise
     
     env.globals.update({
-        'static': static_with_version,  # Use our version instead of the default
+        'static': static,  # ManifestStaticFilesStorage already content-hashes URLs in prod
         'url': url_reverse,  # Use our enhanced reverser
         'now': datetime.now,
         'hasattr': hasattr,  # Add Python's built-in hasattr function

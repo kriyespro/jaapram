@@ -46,47 +46,55 @@ def home_view(request):
     # If user is logged in, redirect to jaap entry
     if request.user.is_authenticated:
         return redirect('jaap:jaap_entry')
-    
-    # Get total jaap count and user count for display
-    total_count = JaapCount.objects.aggregate(total=Sum('count'))['total'] or 0
-    user_count = User.objects.filter(is_active=True).count()
-    
-    # Get top users for home page leaderboard
-    top_users = User.objects.annotate(
-        total_jaap=Sum('jaap_counts__count')
-    ).filter(
-        total_jaap__gt=0
-    ).order_by('-total_jaap')[:10]
-    
-    # Get top 5 cities
-    top_cities = UserProfile.objects.exclude(
-        city=''
-    ).values('city').annotate(
-        user_count=Count('user')
-    ).order_by('-user_count')[:5]
-    
-    # Create chart data for activity over time
-    seven_days_ago = timezone.now().date() - timezone.timedelta(days=7)
-    daily_counts = JaapCount.objects.filter(
-        date__gte=seven_days_ago
-    ).values('date').annotate(
-        day_total=Sum('count')
-    ).order_by('date')
-    
-    # Prepare chart data
-    chart_labels = [count['date'].strftime('%b %d') for count in daily_counts]
-    chart_data = [count['day_total'] for count in daily_counts]
-    
+
+    # Same aggregate stats for every anonymous visitor — cache briefly instead
+    # of recomputing on every request (this is the highest-traffic page).
+    home_stats = cache.get('home_page_stats')
+    if home_stats is None:
+        total_count = JaapCount.objects.aggregate(total=Sum('count'))['total'] or 0
+        user_count = User.objects.filter(is_active=True).count()
+
+        top_users = list(User.objects.annotate(
+            total_jaap=Sum('jaap_counts__count')
+        ).filter(
+            total_jaap__gt=0
+        ).select_related('profile').order_by('-total_jaap')[:10])
+
+        top_cities = list(UserProfile.objects.exclude(
+            city=''
+        ).values('city').annotate(
+            user_count=Count('user')
+        ).order_by('-user_count')[:5])
+
+        seven_days_ago = timezone.now().date() - timezone.timedelta(days=7)
+        daily_counts = list(JaapCount.objects.filter(
+            date__gte=seven_days_ago
+        ).values('date').annotate(
+            day_total=Sum('count')
+        ).order_by('date'))
+
+        home_stats = {
+            'total_count': total_count,
+            'user_count': user_count,
+            'top_users': top_users,
+            'top_cities': top_cities,
+            'daily_counts': daily_counts,
+        }
+        cache.set('home_page_stats', home_stats, 60)
+
+    chart_labels = [count['date'].strftime('%b %d') for count in home_stats['daily_counts']]
+    chart_data = [count['day_total'] for count in home_stats['daily_counts']]
+
     context = {
-        'total_count': total_count,
-        'total_users': user_count,
-        'top_users': top_users,
-        'top_cities': top_cities,
+        'total_count': home_stats['total_count'],
+        'total_users': home_stats['user_count'],
+        'top_users': home_stats['top_users'],
+        'top_cities': home_stats['top_cities'],
         'chart_labels': json.dumps(chart_labels),
         'chart_data': json.dumps(chart_data),
         'show_home_jaap_map': settings.SHOW_HOME_JAAP_MAP,
     }
-    
+
     return render(request, 'pages/home.html', context)
 
 
@@ -279,12 +287,11 @@ def admin_statistics(request):
     # Get city statistics
     city_stats = UserProfile.objects.filter(
         user__jaap_counts__date__gte=start_date
+    ).exclude(
+        city=''
     ).values('city').annotate(
         total=Sum('user__jaap_counts__count'),
         user_count=Count('user', distinct=True)
-    ).filter(
-        city__isnull=False,
-        city__ne=''
     ).order_by('-total')[:10]
     
     # Context for template

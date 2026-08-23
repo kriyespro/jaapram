@@ -34,13 +34,11 @@ class Target(models.Model):
         today = timezone.now().date()
         week_start = today - timedelta(days=today.weekday())
         
-        week_counts = JaapCount.objects.filter(
-            user=self.user, 
-            date__gte=week_start, 
+        total_count = JaapCount.objects.filter(
+            user=self.user,
+            date__gte=week_start,
             date__lte=today
-        )
-        
-        total_count = sum(count.count for count in week_counts)
+        ).aggregate(total=models.Sum('count'))['total'] or 0
         return min(100, (total_count / self.weekly_target) * 100) if self.weekly_target > 0 else 0
     
     @property
@@ -51,13 +49,11 @@ class Target(models.Model):
         today = timezone.now().date()
         month_start = today.replace(day=1)
         
-        month_counts = JaapCount.objects.filter(
-            user=self.user, 
-            date__gte=month_start, 
+        total_count = JaapCount.objects.filter(
+            user=self.user,
+            date__gte=month_start,
             date__lte=today
-        )
-        
-        total_count = sum(count.count for count in month_counts)
+        ).aggregate(total=models.Sum('count'))['total'] or 0
         return min(100, (total_count / self.monthly_target) * 100) if self.monthly_target > 0 else 0
     
     @property
@@ -68,13 +64,11 @@ class Target(models.Model):
         today = timezone.now().date()
         year_start = today.replace(month=1, day=1)
         
-        year_counts = JaapCount.objects.filter(
-            user=self.user, 
-            date__gte=year_start, 
+        total_count = JaapCount.objects.filter(
+            user=self.user,
+            date__gte=year_start,
             date__lte=today
-        )
-        
-        total_count = sum(count.count for count in year_counts)
+        ).aggregate(total=models.Sum('count'))['total'] or 0
         return min(100, (total_count / self.yearly_target) * 100) if self.yearly_target > 0 else 0
 
 
@@ -99,6 +93,9 @@ class Achievement(models.Model):
     
     class Meta:
         ordering = ['-achieved_at']
-    
+        indexes = [
+            models.Index(fields=['user', 'achievement_type'], name='dashboard_achv_user_type_idx'),
+        ]
+
     def __str__(self):
         return f"{self.user.username} - {self.title}"

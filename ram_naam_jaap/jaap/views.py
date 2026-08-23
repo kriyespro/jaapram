@@ -17,7 +17,6 @@ import json
 
 from .models import JaapSession, JaapCount, JaapEntry, CityJaapCount
 from dashboard.models import Target, Achievement
-from accounts.models import UserProfile
 
 import redis
 
@@ -161,25 +160,27 @@ def jaap_entry(request):
     # Calculate percentage
     percentage = min(int((today_count / daily_target) * 100), 100) if daily_target > 0 else 0
     
-    # Get recent entries for the past 7 days
+    # Get recent entries for the past 7 days (single query instead of one per day)
+    week_start = today - timedelta(days=6)
+    counts_by_date = {
+        c.date: c.count
+        for c in JaapCount.objects.filter(user=request.user, date__gte=week_start, date__lte=today)
+    }
     recent_entries = []
     for i in range(7):
         day = today - timedelta(days=i)
-        day_name = day.strftime('%A')
-        try:
-            entry = JaapCount.objects.get(user=request.user, date=day)
+        if day in counts_by_date:
             recent_entries.append({
                 'date': day,
-                'count': entry.count,
-                'day_name': day_name
+                'count': counts_by_date[day],
+                'day_name': day.strftime('%A')
             })
-        except JaapCount.DoesNotExist:
-            if i == 0:  # Only add today if it doesn't exist
-                recent_entries.append({
-                    'date': day,
-                    'count': 0,
-                    'day_name': day_name
-                })
+        elif i == 0:  # Only add today if it doesn't exist
+            recent_entries.append({
+                'date': day,
+                'count': 0,
+                'day_name': day.strftime('%A')
+            })
     
     # Format today's date in ISO format for the date input field
     today_date_iso = today.strftime('%Y-%m-%d')
@@ -221,18 +222,13 @@ def increment_jaap(request):
     session_key = f"jaap:session:{request.user.id}:{timezone.now().date()}"
     
     try:
-        # Try to use Redis through Django's cache framework
-        current_count = cache.get(session_key, 0)
-        count = current_count + 1
-        cache.set(session_key, count)
-    except Exception as e:
+        # Atomic increment (get+set would race under concurrent taps/tabs)
+        cache.add(session_key, 0)
+        count = cache.incr(session_key)
+    except Exception:
         # Fallback to using the database if cache fails
-        if session.count is None:
-            session.count = 0
-        session.count += 1
-        session.save()
-        count = session.count
-    
+        count = (session.count or 0) + 1
+
     # Update session count in the database
     session.count = count
     session.save()
@@ -341,16 +337,16 @@ def save_entry(request):
         defaults={'count': 0}
     )
     
-    # Add the new count to the existing count
-    jaap_count.count += count
-    jaap_count.save()
-    
+    # Add the new count to the existing count (F() avoids lost updates under concurrent saves)
+    JaapCount.objects.filter(pk=jaap_count.pk).update(count=F('count') + count)
+    jaap_count.refresh_from_db()
+
     # Get or create an active session
     active_session = JaapSession.objects.filter(
-        user=request.user, 
+        user=request.user,
         end_time=None
     ).first()
-    
+
     if not active_session:
         # Create a new session
         active_session = JaapSession.objects.create(
@@ -358,10 +354,9 @@ def save_entry(request):
             ip_address=request.META.get('REMOTE_ADDR'),
             device_info=request.META.get('HTTP_USER_AGENT', '')
         )
-    
+
     # Update session count
-    active_session.count += count
-    active_session.save()
+    JaapSession.objects.filter(pk=active_session.pk).update(count=F('count') + count)
     
     # Check for achievements
     if jaap_count.count >= 108 or count >= 108:
@@ -412,14 +407,11 @@ def manual_entry(request):
         defaults={'count': 0}
     )
     
-    jaap_count.count += count
-    jaap_count.save()
-    
-    # Update profile total_jaaps
-    profile = UserProfile.objects.get(user=request.user)
-    profile.total_jaaps += count
-    profile.save()
-    
+    JaapCount.objects.filter(pk=jaap_count.pk).update(count=F('count') + count)
+    jaap_count.refresh_from_db()
+
+    # (total jaap count is a computed property on UserProfile, derived from JaapCount — nothing to persist here)
+
     # Update streak
     update_streak(request.user)
     

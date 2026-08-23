@@ -80,22 +80,20 @@ def city_leaderboard(request):
         'city', flat=True
     ).distinct()
     
-    # Get top user for each city
-    city_leaders = {}
-    for city in cities:
-        leader = User.objects.filter(
-            profile__city=city
-        ).annotate(
-            total_jaap=Sum('jaap_counts__count')
-        ).filter(
-            total_jaap__gt=0
-        ).order_by('-total_jaap').first()
-        
-        if leader:
-            city_leaders[city] = {
-                'user': leader,
-                'count': leader.total_jaap,
-            }
+    # Get top user for each city (single query instead of one per city;
+    # DISTINCT ON requires PostgreSQL, which this project runs on)
+    top_per_city = User.objects.filter(
+        profile__city__in=cities
+    ).select_related('profile').annotate(
+        total_jaap=Sum('jaap_counts__count')
+    ).filter(
+        total_jaap__gt=0
+    ).order_by('profile__city', '-total_jaap').distinct('profile__city')
+
+    city_leaders = {
+        user.profile.city: {'user': user, 'count': user.total_jaap}
+        for user in top_per_city
+    }
     
     # Get global stats for the top of the page
     total_count = JaapCount.objects.aggregate(total=Sum('count'))['total'] or 0

@@ -14,7 +14,10 @@ class JaapSession(models.Model):
     
     class Meta:
         ordering = ['-start_time']
-    
+        indexes = [
+            models.Index(fields=['user', 'end_time'], name='jaap_session_user_end_idx'),
+        ]
+
     def __str__(self):
         return f"{self.user.username}'s session on {self.start_time.strftime('%Y-%m-%d %H:%M')}"
     
@@ -41,7 +44,7 @@ class JaapSession(models.Model):
 class JaapCount(models.Model):
     """Model to track daily jaap counts for each user"""
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='jaap_counts')
-    date = models.DateField(default=timezone.now)
+    date = models.DateField(default=timezone.now, db_index=True)
     count = models.PositiveIntegerField(default=0)
     cumulative_count = models.PositiveIntegerField(default=0)
     
@@ -92,7 +95,7 @@ class CityJaapCount(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
     count = models.PositiveIntegerField(default=0)
-    date = models.DateField(default=timezone.now)
+    date = models.DateField(default=timezone.now, db_index=True)
     timestamp = models.DateTimeField(default=timezone.now)
     
     class Meta:
@@ -121,8 +124,10 @@ class CityJaapCount(models.Model):
         )
         
         if not created:
-            city_count.count += count_to_add
-            city_count.timestamp = timezone.now()
-            city_count.save()
-        
+            cls.objects.filter(pk=city_count.pk).update(
+                count=models.F('count') + count_to_add,
+                timestamp=timezone.now(),
+            )
+            city_count.refresh_from_db()
+
         return city_count
