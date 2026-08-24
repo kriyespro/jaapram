@@ -6,85 +6,36 @@
 <meta name="description" content="Log in to your Ram Naam Jaap account to continue your spiritual practice">
 <style>
     .auth-container {
-        max-width: 500px;
+        max-width: 420px;
         margin: 1rem auto;
-        border-radius: 0.5rem;
+        border-radius: 1rem;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         background-color: var(--cream-surface);
         overflow: hidden;
     }
-    
+
     .auth-header {
-        background-color: var(--primary-color); /* Saffron header */
-        padding: 1rem 1.25rem;
-        text-align: center;
-        color: white;
-    }
-    
-    .auth-body {
-        padding: 1.1rem 1.1rem 1rem;
-    }
-    
-    .auth-footer {
-        padding: 1rem 2rem;
-        background-color: var(--bg-gray);
-        border-top: 1px solid var(--cream-border);
-        text-align: center;
-    }
-    
-    .form-group {
-        margin-bottom: 0.8rem;
-    }
-    
-    .form-control {
-        display: block;
-        width: 100%;
-        padding: 0.6rem 0.65rem;
-        border: 1px solid #ddd;
-        border-radius: 0.25rem;
-        font-size: 0.95rem;
-    }
-    
-    .form-control:focus {
-        outline: none;
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(255, 153, 51, 0.25);
-    }
-    
-    .btn-auth {
-        display: block;
-        width: 100%;
-        padding: 0.65rem;
         background-color: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 0.25rem;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background-color 0.2s;
+        padding: 1.25rem;
         text-align: center;
+        color: white;
     }
-    
-    .btn-auth:hover {
-        background-color: #e68a00; /* Darker saffron */
-    }
-    
-    .social-login {
-        margin-bottom: 0.9rem;
+
+    .auth-body {
+        padding: 1.5rem;
     }
 
     .google-btn {
-        display: inline-flex;
+        display: flex;
         align-items: center;
         justify-content: center;
         gap: 0.75rem;
-        border: 1px solid #dadce0;
+        border: 2px solid #dadce0;
         background: var(--cream-surface);
-        border-radius: 0.5rem;
+        border-radius: 0.9rem;
         color: #3c4043;
-        font-weight: 600;
-        font-size: 1.125rem;
+        font-weight: 700;
+        font-size: 1.15rem;
         min-height: 56px;
         padding: 0.875rem 1rem;
         width: 100%;
@@ -98,27 +49,44 @@
     }
 
     .google-icon {
-        width: 24px;
-        height: 24px;
+        width: 26px;
+        height: 26px;
         flex-shrink: 0;
     }
-    
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-control {
+        display: block;
+        width: 100%;
+        min-height: 52px;
+        padding: 0.75rem;
+        border: 2px solid #ddd;
+        border-radius: 0.75rem;
+        font-size: 1.1rem;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+    }
+
     .auth-link {
         color: var(--primary-color);
         text-decoration: none;
+        font-weight: 600;
     }
-    
+
     .auth-link:hover {
         text-decoration: underline;
     }
-    
-    .checkbox-container {
-        display: flex;
-        align-items: center;
-    }
-    
-    .checkbox-container input[type="checkbox"] {
-        margin-right: 0.5rem;
+
+    .field-error {
+        color: #e53e3e;
+        font-size: 0.9rem;
+        margin-top: 0.25rem;
     }
 </style>
 {% endblock %}
@@ -126,68 +94,67 @@
 {% block content %}
 <div class="auth-container">
     <div class="auth-header">
-        <h1 class="text-3xl font-bold">Log In</h1>
-        <p class="mt-2">Welcome back to Ram Naam Jaap</p>
+        <h1 class="text-2xl font-bold">Log In</h1>
+        <p class="mt-1">Welcome back to Ram Naam Jaap</p>
     </div>
-    
+
     <div class="auth-body">
-        <div class="social-login">
-            <a href="/accounts/google/login/?process=login" class="google-btn">
-                <svg class="google-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.2-.9 2.2-1.9 2.9l3.1 2.4c1.8-1.7 2.8-4.1 2.8-7 0-.7-.1-1.5-.2-2.2H12z"/><path fill="#34A853" d="M12 22c2.7 0 4.9-.9 6.5-2.5l-3.1-2.4c-.9.6-2 .9-3.4.9-2.6 0-4.8-1.7-5.6-4.1H3.2v2.5C4.8 19.8 8.1 22 12 22z"/><path fill="#FBBC05" d="M6.4 13.9c-.2-.6-.3-1.2-.3-1.9s.1-1.3.3-1.9V7.6H3.2C2.4 9 2 10.4 2 12s.4 3 1.2 4.4l3.2-2.5z"/><path fill="#4285F4" d="M12 6.9c1.5 0 2.8.5 3.8 1.5l2.8-2.8C16.9 4 14.7 3 12 3 8.1 3 4.8 5.2 3.2 8.6l3.2 2.5c.8-2.4 3-4.2 5.6-4.2z"/></svg>
-                Continue with Google
-            </a>
+        {% if google_login_enabled %}
+        <!-- Easiest way: one tap, no typing -->
+        <a href="/accounts/google/login/?process=login" class="google-btn">
+            <svg class="google-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.2-.9 2.2-1.9 2.9l3.1 2.4c1.8-1.7 2.8-4.1 2.8-7 0-.7-.1-1.5-.2-2.2H12z"/><path fill="#34A853" d="M12 22c2.7 0 4.9-.9 6.5-2.5l-3.1-2.4c-.9.6-2 .9-3.4.9-2.6 0-4.8-1.7-5.6-4.1H3.2v2.5C4.8 19.8 8.1 22 12 22z"/><path fill="#FBBC05" d="M6.4 13.9c-.2-.6-.3-1.2-.3-1.9s.1-1.3.3-1.9V7.6H3.2C2.4 9 2 10.4 2 12s.4 3 1.2 4.4l3.2-2.5z"/><path fill="#4285F4" d="M12 6.9c1.5 0 2.8.5 3.8 1.5l2.8-2.8C16.9 4 14.7 3 12 3 8.1 3 4.8 5.2 3.2 8.6l3.2 2.5c.8-2.4 3-4.2 5.6-4.2z"/></svg>
+            Continue with Google
+        </a>
+        <p class="text-center text-sm text-gray-600 mt-2">Easiest way — no password needed</p>
+        {% endif %}
+
+        <div x-data="{ showForm: {{ 'true' if (not google_login_enabled or form.errors) else 'false' }} }" class="mt-5">
+            {% if google_login_enabled %}
+            <button type="button" @click="showForm = !showForm" class="w-full text-center text-sm font-semibold text-gray-600 py-2 border-t border-b border-gray-100" x-show="!showForm">
+                Or use a username &amp; password
+            </button>
+            {% endif %}
+
+            <div x-show="showForm" x-cloak class="mt-4">
+                <form method="post" action="{{ url('account_login') }}">
+                    {{ csrf_input }}
+                    {% if redirect_field_value %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+                    {% endif %}
+
+                    {% if form.errors %}
+                        <div class="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded">
+                            <p>The email or password you entered is incorrect. Please try again.</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label for="id_login" class="block text-base font-semibold text-gray-700 mb-1">Email or Username</label>
+                        <input type="text" name="login" id="id_login" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_password" class="block text-base font-semibold text-gray-700 mb-1">Password</label>
+                        <input type="password" name="password" id="id_password" class="form-control" required>
+                    </div>
+
+                    <div class="form-group flex items-center gap-2">
+                        <input type="checkbox" name="remember" id="id_remember" class="h-5 w-5">
+                        <label for="id_remember" class="text-base text-gray-700">Remember Me</label>
+                    </div>
+
+                    <button type="submit" class="btn-big btn-big-primary w-full mt-2">Log In</button>
+
+                    <div class="text-center mt-4">
+                        <a href="{{ url('account_reset_password') }}" class="auth-link text-sm">Forgot Password?</a>
+                    </div>
+                </form>
+            </div>
         </div>
-
-        <form method="post" action="{{ url('account_login') }}">
-            {{ csrf_input }}
-            {% if redirect_field_value %}
-            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
-            {% endif %}
-            
-            {% if form.errors %}
-                <div class="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
-                    <p>The email or password you entered is incorrect. Please try again.</p>
-                </div>
-            {% endif %}
-            
-            <div class="form-group">
-                <label for="id_login" class="block text-sm font-medium text-gray-700 mb-1">Email or Username</label>
-                <input type="text" name="login" id="id_login" class="form-control" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="id_password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                <input type="password" name="password" id="id_password" class="form-control" required>
-            </div>
-            
-            <div class="form-group checkbox-container">
-                <input type="checkbox" name="remember" id="id_remember">
-                <label for="id_remember" class="text-sm text-gray-700">Remember Me</label>
-            </div>
-            
-            <div class="form-group mb-4">
-                <button type="submit" class="btn-auth">Log In</button>
-            </div>
-            
-            <div class="text-center mt-4">
-                <a href="{{ url('account_reset_password') }}" class="auth-link text-sm">Forgot Password?</a>
-            </div>
-            
-        </form>
     </div>
-    
-    <div class="auth-footer">
-        <p class="text-gray-600">Don't have an account? <a href="{{ signup_url }}" class="auth-link font-medium">Sign Up</a></p>
+
+    <div class="border-t border-gray-100 p-4 text-center bg-orange-50">
+        <p class="text-gray-700">New here? <a href="{{ url('account_signup') }}" class="auth-link">Sign Up</a></p>
     </div>
 </div>
-
-<div class="text-center mt-8">
-    <div class="mb-4">
-        <i class="fas fa-om text-primary text-4xl"></i>
-    </div>
-    <p class="text-gray-600 max-w-md mx-auto">
-        "The name of Ram is the destroyer of all sins and the bestower of supreme peace. 
-        It is equivalent to the thousand names of Lord Vishnu."
-    </p>
-</div>
-{% endblock %} 
+{% endblock %}

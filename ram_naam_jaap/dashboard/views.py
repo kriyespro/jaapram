@@ -15,7 +15,7 @@ User = get_user_model()
 
 @login_required
 def user_dashboard(request):
-    """Combined personal progress + community snapshot (single hub page)."""
+    """Personal progress hub."""
     today = timezone.now().date()
     target, _ = Target.objects.get_or_create(
         user=request.user,
@@ -49,20 +49,6 @@ def user_dashboard(request):
     profile = getattr(request.user, 'profile', None)
     my_streak = profile.streak_days if profile else 0
 
-    global_total = JaapCount.objects.aggregate(t=Sum('count'))['t'] or 0
-    global_members = User.objects.filter(is_active=True).count()
-    top_users = (
-        User.objects.annotate(total_jaap=Sum('jaap_counts__count'))
-        .filter(total_jaap__gt=0)
-        .select_related('profile')
-        .order_by('-total_jaap')[:8]
-    )
-    recent_feed = (
-        JaapCount.objects.filter(count__gt=0)
-        .select_related('user')
-        .order_by('-date', '-id')[:6]
-    )
-
     context = {
         'target': target,
         'my_today': my_today,
@@ -71,10 +57,6 @@ def user_dashboard(request):
         'my_week_pct': my_week_pct,
         'my_total': my_total,
         'my_streak': my_streak,
-        'global_total': global_total,
-        'global_members': global_members,
-        'top_users': top_users,
-        'recent_feed': recent_feed,
     }
     return render(request, 'dashboard/hub.html', context)
 

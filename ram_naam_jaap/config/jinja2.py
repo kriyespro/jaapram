@@ -1,5 +1,6 @@
 from django.templatetags.static import static
 from django.urls import reverse, NoReverseMatch
+from django.conf import settings
 from jinja2 import Environment
 from datetime import datetime
 from django.template.defaultfilters import date as django_date
@@ -38,6 +39,7 @@ def environment(**options):
         'url': url_reverse,  # Use our enhanced reverser
         'now': datetime.now,
         'hasattr': hasattr,  # Add Python's built-in hasattr function
+        'google_login_enabled': settings.GOOGLE_LOGIN_ENABLED,
     })
     
     # Add filters

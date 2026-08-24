@@ -295,3 +295,83 @@ body.app-shell main .border-gray-200 {
   background-color: #166fe5 !important;
   color: #fff !important;
 }
+
+/* —— Easy mode: bigger text, bigger tap targets, few choices per screen —— */
+:root {
+  --tap-min: 56px;
+}
+
+body.app-shell {
+  font-size: 18px;
+}
+
+.btn-big {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: var(--tap-min);
+  padding: 0.9rem 1.5rem;
+  border-radius: 0.9rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: transform 0.1s ease, background-color 0.2s ease;
+}
+
+.btn-big:active {
+  transform: scale(0.98);
+}
+
+.btn-big-primary {
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 14px rgba(255, 153, 51, 0.35);
+}
+
+.btn-big-primary:hover {
+  background-color: var(--primary-hover);
+  color: #fff;
+}
+
+.btn-big-secondary {
+  background-color: var(--cream-surface);
+  color: var(--cream-text);
+  border: 2px solid var(--cream-border);
+}
+
+.btn-big-secondary:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-big-outline {
+  background: transparent;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+}
+
+.stat-card-big {
+  background-color: var(--cream-surface);
+  border: 1px solid var(--cream-border);
+  border-radius: 1rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+.stat-card-big .stat-number {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  line-height: 1.1;
+}
+
+.stat-card-big .stat-label {
+  font-size: 0.95rem;
+  color: var(--cream-text-muted);
+  font-weight: 600;
+  margin-top: 0.25rem;
+}

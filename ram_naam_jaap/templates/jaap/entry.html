@@ -7,313 +7,141 @@
     <style>
         .input-container {
             background-color: #FFF9F2;
-            min-height: 200px;
+            min-height: 160px;
             border: 2px solid #FF9933;
-            border-radius: 8px;
+            border-radius: 1rem;
             padding: 1rem;
-            font-size: 18px;
+            font-size: 1.2rem;
             line-height: 1.6;
             margin-bottom: 1rem;
         }
 
+        .jaap-type-box {
+            font-size: 18px; /* reduces iOS zoom-on-focus */
+            min-height: 150px;
+            max-height: 45vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
         .count-display {
-            font-size: 4rem;
-            font-weight: bold;
+            font-size: 4.5rem;
+            font-weight: 800;
             color: #FF9933;
             text-align: center;
-            margin-bottom: 0;
-        }
-
-        .timer-options, .target-options {
-            margin-bottom: 0.5rem;
-        }
-
-        .option-button {
-            background-color: white;
-            border: 1px solid #FF9933;
-            color: #333;
-            padding: 0.2rem 0.3rem;
-            margin-right: 0.1rem;
-            margin-bottom: 0.1rem;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .option-button:hover {
-            background-color: #FFF0E0;
-        }
-
-        .option-button.active {
-            background-color: #FF9933;
-            color: white;
-        }
-
-        .save-button {
-            background-color: #FF9933;
-            color: white;
-            font-size: 1.1rem;
-            font-weight: bold;
-            padding: 0.6rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            display: block;
-            margin: 0 auto;
-        }
-
-        .save-button:hover {
-            background-color: #E68A00;
-        }
-
-        .instructions-container {
-            margin-top: 1.5rem;
-            border-top: 1px solid #E5E5E5;
-            padding-top: 1rem;
+            line-height: 1;
         }
 
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            50% { transform: scale(1.06); }
             100% { transform: scale(1); }
         }
 
         .pulse-animation {
             animation: pulse 0.5s ease-in-out;
         }
-        
-        .compact-header {
-            margin-bottom: 0;
-        }
-        
-        .section-title {
-            font-size: 0.9rem;
-            font-weight: bold;
-            margin-bottom: 0.3rem;
-            text-align: center;
-        }
-        
-        .count-label {
-            font-size: 0.85rem;
-            margin-top: 0;
-            margin-bottom: 0.2rem;
-        }
-        
-        /*
-         * Desktop timer/target row: do not rely on Tailwind `hidden md:flex` alone — on some builds/order
-         * the row can still paint on mobile. Force display:none below 768px, flex at md+.
-         */
-        .jaap-desktop-controls-row {
-            display: none !important;
-        }
 
-        @media (min-width: 768px) {
-            .jaap-desktop-controls-row {
-                display: flex !important;
-                align-items: center;
-                justify-content: space-between;
-                margin-bottom: 1rem;
-            }
-
-            .jaap-desktop-controls-row .side-section {
-                width: 30%;
-            }
-
-            .jaap-desktop-controls-row .center-section {
-                width: 40%;
-            }
-        }
-
-        .counter-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Hide mobile-only jaap UI from tablet/desktop (backup if `md:hidden` is overridden) */
-        @media (min-width: 768px) {
-            .jaap-mobile-only {
-                display: none !important;
-            }
-        }
-
-        .jaap-mobile-sheet-backdrop {
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-
-        /* Mobile jaap: counter stays visible when keyboard opens */
-        .jaap-mobile-counter-dock {
+        .jaap-counter-dock {
             position: -webkit-sticky;
             position: sticky;
             top: 0.5rem;
             z-index: 25;
         }
 
-        .jaap-type-box {
-            font-size: 17px; /* reduces iOS zoom-on-focus */
+        .jaap-sheet-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
         }
 
-        @media (max-width: 767px) {
-            .jaap-type-box {
-                min-height: 140px;
-                max-height: 40vh;
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
-            }
+        .option-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 52px;
+            background-color: white;
+            border: 2px solid #FF9933;
+            color: #333;
+            font-weight: 700;
+            font-size: 1rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
 
-            .jaap-page-mobile-pad {
-                padding-bottom: max(5rem, env(safe-area-inset-bottom, 0px));
-            }
+        .option-btn.active {
+            background-color: #FF9933;
+            color: white;
+        }
+
+        .jaap-page-pad {
+            padding-bottom: max(5rem, env(safe-area-inset-bottom, 0px));
         }
     </style>
 {% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-3 sm:px-4 py-2 md:py-3 max-w-4xl relative jaap-page-mobile-pad" x-data="jaapCounter"
+<div class="container mx-auto px-3 sm:px-4 py-2 max-w-lg relative jaap-page-pad" x-data="jaapCounter"
      data-share-app-url="{{ request.build_absolute_uri('/') }}"
      data-share-count=""
      data-username="{{ request.user.username|e }}">
-    <!-- Desktop: unchanged 3-column layout -->
-    <div class="jaap-desktop-controls-row">
-        <div class="timer-options side-section">
-            <h2 class="section-title">Select Timer</h2>
-            <div class="grid grid-cols-3 gap-1">
-                <button type="button" @click="setTimer(0)" :class="{'active': timer === 0}" class="option-button">No</button>
-                <button type="button" @click="setTimer(5)" :class="{'active': timer === 5}" class="option-button">5m</button>
-                <button type="button" @click="setTimer(10)" :class="{'active': timer === 10}" class="option-button">10m</button>
-                <button type="button" @click="setTimer(15)" :class="{'active': timer === 15}" class="option-button">15m</button>
-                <button type="button" @click="setTimer(30)" :class="{'active': timer === 30}" class="option-button">30m</button>
-                <button type="button" @click="setTimer(60)" :class="{'active': timer === 60}" class="option-button">60m</button>
-            </div>
-            <div x-show="timerRunning" class="mt-1 text-center text-gray-700 text-xs">
-                <span x-text="formatTime(timerRemaining)"></span>
-            </div>
-        </div>
-        <div class="counter-section center-section">
-            <h1 class="text-2xl font-bold text-center text-primary mb-0 compact-header">राम नाम जाप</h1>
-            <div class="count-display" x-text="count" :class="{'pulse-animation': justCounted}"></div>
-            <p class="text-center text-gray-600 count-label">Ram Count</p>
-        </div>
-        <div class="target-options side-section">
-            <h2 class="section-title">Select Target</h2>
-            <div class="grid grid-cols-3 gap-1">
-                <button type="button" @click="setTarget(0)" :class="{'active': target === 0}" class="option-button">No</button>
-                <button type="button" @click="setTarget(108)" :class="{'active': target === 108}" class="option-button">108</button>
-                <button type="button" @click="setTarget(1008)" :class="{'active': target === 1008}" class="option-button">1k</button>
-                <button type="button" @click="setTarget(10000)" :class="{'active': target === 10000}" class="option-button">10k</button>
-                <button type="button" @click="setTarget(100000)" :class="{'active': target === 100000}" class="option-button">100k</button>
-            </div>
-            <div x-show="target > 0" class="mt-1 text-center text-gray-700 text-xs">
+
+    <!-- Always-visible counter dock -->
+    <div class="jaap-counter-dock rounded-2xl border-2 border-orange-300 bg-[#FFF9F2] shadow-md px-4 py-4 text-center mb-3">
+        <h1 class="text-xl font-bold text-primary leading-tight">राम नाम जाप</h1>
+        <div class="count-display my-1" x-text="count" :class="{'pulse-animation': justCounted}"></div>
+        <p class="text-base text-gray-700 font-semibold">Ram Count</p>
+
+        <div class="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm text-gray-800" x-show="timer > 0 || target > 0" x-cloak>
+            <span x-show="timer > 0" class="inline-flex items-center gap-1 font-mono font-bold">
+                <i class="fas fa-clock text-primary"></i>
+                <span x-text="timerRunning ? formatTime(timerRemaining) : formatTime(timer * 60)"></span>
+            </span>
+            <span x-show="target > 0" class="font-bold">
                 <span x-text="count"></span>/<span x-text="target"></span>
-                (<span x-text="Math.round((count / target) * 100)"></span>%)
-                <div class="w-full bg-gray-200 rounded-full h-1 mt-1">
-                    <div class="bg-primary h-1 rounded-full transition-all duration-300" :style="`width: ${Math.min(100, Math.round((count / target) * 100))}%`"></div>
-                </div>
-            </div>
+                <span class="text-gray-600 font-normal ml-1" x-text="'(' + Math.round((count / target) * 100) + '%)'"></span>
+            </span>
         </div>
+
+        <button type="button" @click="mobileEditSession = true"
+                class="btn-big btn-big-outline mt-3 w-full max-w-xs mx-auto text-base">
+            <i class="fas fa-sliders-h"></i> More options
+        </button>
     </div>
 
-    <!-- Mobile: compact setup (before timer/target chosen) -->
-    <div class="jaap-mobile-only md:hidden space-y-2 mb-2" x-show="!mobileFocusActive()" x-cloak>
-        <div class="rounded-lg border border-orange-200 bg-white px-2 py-2 shadow-sm">
-            <p class="text-center text-xs font-bold text-gray-600 uppercase tracking-wide">Timer</p>
-            <div class="grid grid-cols-6 gap-1 mt-1">
-                <button type="button" @click="setTimer(0)" :class="{'active': timer === 0}" class="option-button text-xs py-1 px-0">Off</button>
-                <button type="button" @click="setTimer(5)" :class="{'active': timer === 5}" class="option-button text-xs py-1">5m</button>
-                <button type="button" @click="setTimer(10)" :class="{'active': timer === 10}" class="option-button text-xs py-1">10</button>
-                <button type="button" @click="setTimer(15)" :class="{'active': timer === 15}" class="option-button text-xs py-1">15</button>
-                <button type="button" @click="setTimer(30)" :class="{'active': timer === 30}" class="option-button text-xs py-1">30</button>
-                <button type="button" @click="setTimer(60)" :class="{'active': timer === 60}" class="option-button text-xs py-1">60</button>
-            </div>
-            <p x-show="timerRunning" class="text-center text-sm font-mono font-semibold text-primary mt-1" x-text="formatTime(timerRemaining)"></p>
-        </div>
-        <div class="text-center py-1">
-            <h1 class="text-xl font-bold text-primary leading-tight">राम नाम जाप</h1>
-            <div class="text-5xl font-bold leading-none my-0.5" style="color:#FF9933" x-text="count" :class="{'pulse-animation': justCounted}"></div>
-            <p class="text-sm text-gray-600">Ram Count</p>
-        </div>
-        <div class="rounded-lg border border-orange-200 bg-white px-2 py-2 shadow-sm">
-            <p class="text-center text-xs font-bold text-gray-600 uppercase tracking-wide">Target</p>
-            <div class="grid grid-cols-5 gap-1 mt-1">
-                <button type="button" @click="setTarget(0)" :class="{'active': target === 0}" class="option-button text-xs py-1">Off</button>
-                <button type="button" @click="setTarget(108)" :class="{'active': target === 108}" class="option-button text-xs py-1">108</button>
-                <button type="button" @click="setTarget(1008)" :class="{'active': target === 1008}" class="option-button text-xs py-1">1k</button>
-                <button type="button" @click="setTarget(10000)" :class="{'active': target === 10000}" class="option-button text-xs py-1">10k</button>
-                <button type="button" @click="setTarget(100000)" :class="{'active': target === 100000}" class="option-button text-xs py-1">100k</button>
-            </div>
-            <div x-show="target > 0" class="mt-1 px-1">
-                <div class="flex justify-between text-xs text-gray-700">
-                    <span><span x-text="count"></span>/<span x-text="target"></span></span>
-                    <span x-text="Math.round((count / target) * 100) + '%'"></span>
-                </div>
-                <div class="w-full bg-gray-200 rounded-full h-1 mt-0.5">
-                    <div class="bg-primary h-1 rounded-full transition-all duration-300" :style="`width: ${Math.min(100, Math.round((count / target) * 100))}%`"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Mobile: focus mode — only title, count, label (+ tiny timer/target line) -->
-    <div class="jaap-mobile-only md:hidden mb-2" x-show="mobileFocusActive() && !mobileEditSession" x-cloak>
-        <div class="jaap-mobile-counter-dock rounded-xl border-2 border-orange-300 bg-[#FFF9F2] shadow-md px-3 py-3 text-center">
-            <h1 class="text-lg sm:text-xl font-bold text-primary leading-tight">राम नाम जाप</h1>
-            <div class="text-5xl sm:text-6xl font-bold leading-none my-1" style="color:#FF9933" x-text="count" :class="{'pulse-animation': justCounted}"></div>
-            <p class="text-sm text-gray-700 font-medium">Ram Count</p>
-            <div class="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-gray-800" x-show="timer > 0 || target > 0">
-                <span x-show="timer > 0" class="inline-flex items-center gap-1 font-mono font-semibold">
-                    <i class="fas fa-clock text-primary"></i>
-                    <span x-text="timerRunning ? formatTime(timerRemaining) : formatTime(timer * 60)"></span>
-                </span>
-                <span x-show="target > 0" class="font-semibold">
-                    <span x-text="count"></span>/<span x-text="target"></span>
-                    <span class="text-gray-600 font-normal ml-1" x-text="'(' + Math.round((count / target) * 100) + '%)'"></span>
-                </span>
-            </div>
-            <button type="button" @click="mobileEditSession = true"
-                    class="mt-2 text-xs font-semibold text-primary underline decoration-2">
-                Change timer / target
-            </button>
-        </div>
-    </div>
-
-    <!-- Mobile: bottom sheet to edit timer/target during focus mode -->
-    <div class="jaap-mobile-only md:hidden fixed inset-0 z-jaap-mobile-sheet flex flex-col justify-end jaap-mobile-sheet-backdrop"
-         x-show="mobileFocusActive() && mobileEditSession"
+    <!-- Bottom sheet: timer & target, few big choices -->
+    <div class="fixed inset-0 z-jaap-mobile-sheet flex flex-col justify-end jaap-sheet-backdrop"
+         x-show="mobileEditSession"
          x-cloak
          @click.self="mobileEditSession = false">
-        <div class="bg-white rounded-t-2xl shadow-xl max-h-[75vh] overflow-y-auto p-4 pb-6 safe-area-bottom" @click.stop>
-            <div class="flex justify-between items-center border-b border-gray-100 pb-2 mb-3">
-                <span class="font-bold text-gray-900">Timer &amp; target</span>
-                <button type="button" @click="mobileEditSession = false" class="text-sm font-semibold text-primary px-2 py-1">Done</button>
+        <div class="bg-white rounded-t-2xl shadow-xl max-h-[80vh] overflow-y-auto p-4 pb-6 safe-area-bottom mx-auto w-full max-w-lg" @click.stop>
+            <div class="flex justify-between items-center border-b border-gray-100 pb-2 mb-4">
+                <span class="font-bold text-gray-900 text-lg">Timer &amp; Target</span>
+                <button type="button" @click="mobileEditSession = false" class="btn-big btn-big-primary text-sm py-2 px-4 min-h-0">Done</button>
             </div>
-            <p class="text-xs font-bold text-gray-500 mb-1">Timer</p>
-            <div class="grid grid-cols-6 gap-1 mb-4">
-                <button type="button" @click="setTimer(0)" :class="{'active': timer === 0}" class="option-button text-xs py-2">Off</button>
-                <button type="button" @click="setTimer(5)" :class="{'active': timer === 5}" class="option-button text-xs py-2">5m</button>
-                <button type="button" @click="setTimer(10)" :class="{'active': timer === 10}" class="option-button text-xs py-2">10</button>
-                <button type="button" @click="setTimer(15)" :class="{'active': timer === 15}" class="option-button text-xs py-2">15</button>
-                <button type="button" @click="setTimer(30)" :class="{'active': timer === 30}" class="option-button text-xs py-2">30</button>
-                <button type="button" @click="setTimer(60)" :class="{'active': timer === 60}" class="option-button text-xs py-2">60</button>
+
+            <p class="text-base font-bold text-gray-700 mb-2">Timer</p>
+            <div class="grid grid-cols-3 gap-2 mb-5">
+                <button type="button" @click="setTimer(0)" :class="{'active': timer === 0}" class="option-btn">Off</button>
+                <button type="button" @click="setTimer(5)" :class="{'active': timer === 5}" class="option-btn">5 min</button>
+                <button type="button" @click="setTimer(10)" :class="{'active': timer === 10}" class="option-btn">10 min</button>
+                <button type="button" @click="setTimer(15)" :class="{'active': timer === 15}" class="option-btn">15 min</button>
+                <button type="button" @click="setTimer(30)" :class="{'active': timer === 30}" class="option-btn">30 min</button>
+                <button type="button" @click="setTimer(60)" :class="{'active': timer === 60}" class="option-btn">60 min</button>
             </div>
-            <p class="text-xs font-bold text-gray-500 mb-1">Target</p>
-            <div class="grid grid-cols-5 gap-1">
-                <button type="button" @click="setTarget(0)" :class="{'active': target === 0}" class="option-button text-xs py-2">Off</button>
-                <button type="button" @click="setTarget(108)" :class="{'active': target === 108}" class="option-button text-xs py-2">108</button>
-                <button type="button" @click="setTarget(1008)" :class="{'active': target === 1008}" class="option-button text-xs py-2">1k</button>
-                <button type="button" @click="setTarget(10000)" :class="{'active': target === 10000}" class="option-button text-xs py-2">10k</button>
-                <button type="button" @click="setTarget(100000)" :class="{'active': target === 100000}" class="option-button text-xs py-2">100k</button>
+
+            <p class="text-base font-bold text-gray-700 mb-2">Target</p>
+            <div class="grid grid-cols-3 gap-2">
+                <button type="button" @click="setTarget(0)" :class="{'active': target === 0}" class="option-btn">Off</button>
+                <button type="button" @click="setTarget(108)" :class="{'active': target === 108}" class="option-btn">108</button>
+                <button type="button" @click="setTarget(1008)" :class="{'active': target === 1008}" class="option-btn">1,008</button>
+                <button type="button" @click="setTarget(10000)" :class="{'active': target === 10000}" class="option-btn">10,000</button>
+                <button type="button" @click="setTarget(100000)" :class="{'active': target === 100000}" class="option-btn">1,00,000</button>
             </div>
         </div>
     </div>
 
     <!-- Input Area -->
-    <h2 class="text-lg font-bold mb-2 hidden md:block">Type "Ram" as many times as you wish. The counter will track each occurrence.</h2>
-    <p class="jaap-mobile-only md:hidden text-sm text-gray-700 mb-1 font-medium" x-show="!mobileFocusActive()">Type <span class="font-bold">Ram</span> below. Counter updates automatically.</p>
-    <p class="jaap-mobile-only md:hidden text-xs text-gray-500 mb-1" x-show="mobileFocusActive()">Tap the box and type <span class="font-semibold">Ram</span> — count updates live.</p>
+    <p class="text-lg text-gray-800 mb-2 font-bold text-center">Type <span class="text-primary">Ram</span> below</p>
     <div class="input-container jaap-type-box"
          contenteditable="true"
          tabindex="0"
@@ -322,45 +150,35 @@
          @focusin="scrollJaapInputIntoView"
          @click="scrollJaapInputIntoView"
          x-ref="inputArea"></div>
-    
+
     <!-- Save Button -->
     <form method="post" action="{{ url('jaap:save_entry') }}" x-ref="saveForm" @submit="resetCounterAfterSubmit">
         {{ csrf_input }}
         <input type="hidden" name="count" value="0" x-bind:value="String(count)" x-ref="countInput" autocomplete="off">
         <input type="hidden" name="date" value="{{ today_date_iso }}">
-        <div class="flex space-x-2">
-            <button type="submit" class="save-button flex-1" x-ref="submitJaapBtn">Save Ram Jaap</button>
-            <button type="button" @click="resetCounter" class="save-button bg-gray-500 hover:bg-gray-600 flex-none px-3">Reset</button>
+        <div class="flex flex-col gap-2">
+            <button type="submit" class="btn-big btn-big-primary" x-ref="submitJaapBtn">
+                <i class="fas fa-check"></i> Save Ram Jaap
+            </button>
+            <button type="button" @click="resetCounter" class="btn-big btn-big-secondary text-base">
+                <i class="fas fa-rotate-left"></i> Reset
+            </button>
         </div>
     </form>
-    
-    <!-- Recent Entries -->
-    <div class="mb-6 bg-white p-4 rounded-lg shadow-md">
-        <h2 class="text-lg font-semibold mb-3">Recent Entries</h2>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Day</th>
-                        <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    {% for entry in recent_entries %}
-                    <tr>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{{ entry.date.strftime('%b %d, %Y') }}</td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{{ entry.day_name }}</td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{{ entry.count }}</td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="3" class="px-4 py-2 whitespace-nowrap text-sm text-gray-500 text-center">No recent entries found</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+
+    <!-- Recent Entries: big simple list -->
+    <div class="mb-6 mt-6 bg-white p-4 rounded-2xl shadow-md">
+        <h2 class="text-lg font-bold mb-3 text-gray-800">Recent Days</h2>
+        <ul class="divide-y divide-gray-100">
+            {% for entry in recent_entries %}
+            <li class="flex items-center justify-between py-2.5">
+                <span class="text-gray-700 font-medium">{{ entry.day_name }}, {{ entry.date.strftime('%b %d') }}</span>
+                <span class="text-primary font-bold text-lg">{{ entry.count }}</span>
+            </li>
+            {% else %}
+            <li class="py-3 text-center text-gray-500">No recent entries yet</li>
+            {% endfor %}
+        </ul>
     </div>
 
     <!-- Fallback share modal (query-string only if session missed) -->
@@ -518,10 +336,6 @@ document.addEventListener('alpine:init', () => {
         shareAppUrl: '',
         mobileEditSession: false,
 
-        mobileFocusActive() {
-            return this.timer > 0 || this.target > 0;
-        },
-
         scrollJaapInputIntoView() {
             if (window.matchMedia('(min-width: 768px)').matches) {
                 return;
@@ -584,18 +398,18 @@ document.addEventListener('alpine:init', () => {
             if (storedCount) {
                 this.count = parseInt(storedCount, 10);
             }
-            
+
             // Ensure counter shows proper value on page load
             this.$nextTick(() => {
                 this.checkInput();
             });
-            
+
             // Setup mutation observer to detect content changes that might be triggered by browser features
             const inputArea = this.$refs.inputArea;
             const observer = new MutationObserver(() => {
                 this.checkInput();
             });
-            
+
             observer.observe(inputArea, {
                 childList: true,
                 characterData: true,
@@ -742,62 +556,62 @@ document.addEventListener('alpine:init', () => {
                 });
             });
         },
-        
+
         checkInput() {
             const inputArea = this.$refs.inputArea;
             const text = inputArea.innerText.toLowerCase();
-            
+
             // First clean the text - replace punctuation with spaces
             const cleanText = text.replace(/[^\w\s]|_/g, ' ').replace(/\s+/g, ' ').trim();
-            
+
             // Count all instances of the complete word "ram"
             const words = cleanText.split(' ');
             const ramCount = words.filter(word => word === 'ram').length;
-            
+
             // Only update if count differs from current count
             if (ramCount !== this.count) {
                 this.count = ramCount;
-                
+
                 // Trigger animation only on increase
                 this.justCounted = true;
                 setTimeout(() => {
                     this.justCounted = false;
                 }, 500);
-                
+
                 // Save count to localStorage
                 localStorage.setItem('ramJaapCount', this.count);
-                
+
                 if (this.target > 0 && this.count >= this.target) {
                     this.scheduleAutoSubmit();
                 }
             }
         },
-        
+
         autoAddSpaceAfterRam(event) {
             // Simplified auto-space implementation
             const inputArea = this.$refs.inputArea;
             if (!inputArea) return;
-            
+
             // Get selection
             const selection = window.getSelection();
             if (!selection.rangeCount) return;
-            
+
             const range = selection.getRangeAt(0);
             const text = inputArea.textContent;
-            
+
             // We need text content before cursor
             const cursorPos = range.endOffset;
             const textBeforeCursor = text.substring(0, cursorPos);
-            
+
             // Check if the last 3 characters are 'ram'
             const lastThreeChars = textBeforeCursor.slice(-3).toLowerCase();
-            
+
             // If 'ram' is found and not part of a longer word
             if (lastThreeChars === 'ram') {
                 // Check if it's a word boundary (either at beginning or has space before)
-                const isWordBoundary = (textBeforeCursor.length === 3) || 
+                const isWordBoundary = (textBeforeCursor.length === 3) ||
                     /\s/.test(textBeforeCursor.charAt(textBeforeCursor.length - 4));
-                
+
                 // Only add space if it's a complete word and there isn't already one after it
                 if (isWordBoundary && (cursorPos >= text.length || text[cursorPos] !== ' ')) {
                     // Insert space
@@ -805,21 +619,21 @@ document.addEventListener('alpine:init', () => {
                 }
             }
         },
-        
+
         resetCounter() {
             this.autoSubmitScheduled = false;
             this.count = 0;
             localStorage.removeItem('ramJaapCount');
             this.$refs.inputArea.innerText = '';
         },
-        
+
         resetCounterAfterSubmit() {
             // This will run after form submission is complete
             setTimeout(() => {
                 this.resetCounter();
             }, 100);
         },
-        
+
         setTimer(minutes) {
             // Clear existing timer if any
             if (this.timerInterval) {
@@ -827,21 +641,21 @@ document.addEventListener('alpine:init', () => {
                 this.timerInterval = null;
                 this.timerRunning = false;
             }
-            
+
             this.timer = minutes;
             this.mobileEditSession = false;
             if (minutes > 0) {
                 this.autoSubmitScheduled = false;
             }
-            
+
             if (minutes > 0) {
                 // Start new timer
                 this.timerRemaining = minutes * 60; // convert to seconds
                 this.timerRunning = true;
-                
+
                 this.timerInterval = setInterval(() => {
                     this.timerRemaining--;
-                    
+
                     if (this.timerRemaining <= 0) {
                         clearInterval(this.timerInterval);
                         this.timerInterval = null;
@@ -853,7 +667,7 @@ document.addEventListener('alpine:init', () => {
                 }, 1000);
             }
         },
-        
+
         setTarget(number) {
             this.target = number;
             this.mobileEditSession = false;
@@ -867,7 +681,7 @@ document.addEventListener('alpine:init', () => {
             }
             this.scheduleAutoSubmit();
         },
-        
+
         formatTime(seconds) {
             const minutes = Math.floor(seconds / 60);
             const remainingSeconds = seconds % 60;
@@ -876,4 +690,4 @@ document.addEventListener('alpine:init', () => {
     }));
 });
 </script>
-{% endblock %} 
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block extra_head %}
+<style>
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-control {
+        display: block;
+        width: 100%;
+        min-height: 52px;
+        padding: 0.75rem;
+        border: 2px solid #ddd;
+        border-radius: 0.75rem;
+        font-size: 1.1rem;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+    }
+
+    .field-error {
+        color: #e53e3e;
+        font-size: 0.9rem;
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto">
+    <h1 class="text-2xl font-bold text-gray-900 mb-4 text-center">Edit Profile</h1>
+
+    <div class="bg-white rounded-2xl shadow-md p-5">
+        <form method="post" enctype="multipart/form-data">
+            {{ csrf_input }}
+
+            {% if user_form.non_field_errors() or profile_form.non_field_errors() %}
+                <div class="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded">
+                    <p>Please correct the errors below.</p>
+                </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="id_first_name" class="block text-base font-semibold text-gray-700 mb-1">First Name</label>
+                {{ user_form.first_name }}
+                {% for err in user_form.first_name.errors %}<div class="field-error">{{ err }}</div>{% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_last_name" class="block text-base font-semibold text-gray-700 mb-1">Last Name</label>
+                {{ user_form.last_name }}
+                {% for err in user_form.last_name.errors %}<div class="field-error">{{ err }}</div>{% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_email" class="block text-base font-semibold text-gray-700 mb-1">Email</label>
+                {{ user_form.email }}
+                {% for err in user_form.email.errors %}<div class="field-error">{{ err }}</div>{% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_city" class="block text-base font-semibold text-gray-700 mb-1">City</label>
+                {{ profile_form.city }}
+                {% for err in profile_form.city.errors %}<div class="field-error">{{ err }}</div>{% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_profile_image" class="block text-base font-semibold text-gray-700 mb-1">Profile Photo</label>
+                {{ profile_form.profile_image }}
+                {% for err in profile_form.profile_image.errors %}<div class="field-error">{{ err }}</div>{% endfor %}
+            </div>
+
+            <div class="flex flex-col gap-2 mt-4">
+                <button type="submit" class="btn-big btn-big-primary w-full">
+                    <i class="fas fa-check"></i> Save
+                </button>
+                <a href="{{ url('accounts:profile') }}" class="btn-big btn-big-secondary w-full text-base">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
