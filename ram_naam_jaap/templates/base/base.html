@@ -9,9 +9,11 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://unpkg.com">
 
-    <!-- Tailwind CSS: self-hosted, purged to only the classes this app uses
-         (was the full CDN build, ~301KB gzip -> this is ~6KB gzip) -->
-    <link rel="stylesheet" href="{{ static('css/tailwind-built.css') }}">
+    <!-- App CSS: purged Tailwind utilities + our base.css, combined into one file
+         (one request instead of two; was the full Tailwind CDN build, ~301KB gzip ->
+         this is ~8KB gzip). Regenerate with scripts/build-css.sh after editing
+         base.css or adding new Tailwind classes to a template. -->
+    <link rel="stylesheet" href="{{ static('css/app.css') }}">
 
     <!-- Alpine.js -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js" defer></script>
@@ -22,8 +24,6 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="{{ static('css/base.css') }}">
     <style>[x-cloak] { display: none !important; }</style>
     
     {% block extra_css %}{% endblock %}
