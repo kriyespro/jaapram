@@ -224,6 +224,10 @@ LOGIN_REDIRECT_URL = 'jaap:jaap_entry'
 ACCOUNT_SIGNUP_REDIRECT_URL = 'jaap:jaap_entry'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'account_login'
 
+# Brute-force login protection: lock out after 5 bad attempts for 5 minutes (per username/IP)
+ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5
+ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 300
+
 # Skip allauth’s intermediate “Sign in via Google → Continue” page; GET goes straight to Google.
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
