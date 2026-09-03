@@ -1,6 +1,7 @@
 /* Base saffron theme colors + cream app shell */
 :root {
-  --primary-color: #FF9933; /* Saffron — accents, buttons */
+  --primary-color: #FF9933; /* Saffron — accents, button backgrounds (white text on this is fine) */
+  --primary-text: #A64B00; /* Darker saffron for text-on-light use — #FF9933 text only hits ~2.1:1 on cream/white, fails WCAG AA */
   --primary-hover: #E68A00;
   --secondary-color: #FF8C00;
   --accent-color: #FFA500;
@@ -55,7 +56,7 @@ body.app-shell {
 
 .app-footer-cream a:hover,
 .app-footer-cream button:hover {
-  color: var(--primary-color);
+  color: var(--primary-text);
 }
 
 .app-footer-cream h3,
@@ -116,9 +117,9 @@ body.app-shell main .border-gray-200 {
   border-color: var(--cream-border) !important;
 }
 
-/* Apply text color */
+/* Apply text color — uses the darker --primary-text, not --primary-color, for contrast (see :root comment) */
 .text-primary {
-  color: var(--primary-color) !important;
+  color: var(--primary-text) !important;
 }
 
 .text-secondary {
@@ -253,7 +254,7 @@ body.app-shell main .border-gray-200 {
 }
 
 .mobile-tabbar-item--primary {
-  color: var(--primary-color);
+  color: var(--primary-text);
 }
 
 .mobile-tabbar-item--primary .mobile-tabbar-icon-wrap {
@@ -345,12 +346,12 @@ body.app-shell {
 
 .btn-big-secondary:hover {
   border-color: var(--primary-color);
-  color: var(--primary-color);
+  color: var(--primary-text);
 }
 
 .btn-big-outline {
   background: transparent;
-  color: var(--primary-color);
+  color: var(--primary-text);
   border: 2px solid var(--primary-color);
 }
 
@@ -365,7 +366,7 @@ body.app-shell {
 .stat-card-big .stat-number {
   font-size: 2.25rem;
   font-weight: 800;
-  color: var(--primary-color);
+  color: var(--primary-text);
   line-height: 1.1;
 }
 
@@ -374,4 +375,15 @@ body.app-shell {
   color: var(--cream-text-muted);
   font-weight: 600;
   margin-top: 0.25rem;
+}
+
+/* Font Awesome's own CDN stylesheet ships without font-display, so the icon
+   webfont blocks text render until it downloads. This file loads after
+   theirs (see base.html), so the redeclaration below wins and adds swap. */
+@font-face {
+  font-family: "Font Awesome 6 Free";
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2") format("woff2");
 }
