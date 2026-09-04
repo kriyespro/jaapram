@@ -13,6 +13,7 @@ import os
 import sys
 import django
 import json
+import math
 
 # Try to import optional dependencies
 try:
@@ -51,8 +52,11 @@ def home_view(request):
     # of recomputing on every request (this is the highest-traffic page).
     home_stats = cache.get('home_page_stats')
     if home_stats is None:
+        today = timezone.now().date()
         total_count = JaapCount.objects.aggregate(total=Sum('count'))['total'] or 0
         user_count = User.objects.filter(is_active=True).count()
+        jaap_today = JaapCount.objects.filter(date=today).aggregate(total=Sum('count'))['total'] or 0
+        users_today = User.objects.filter(is_active=True, date_joined__date=today).count()
 
         top_users = list(User.objects.annotate(
             total_jaap=Sum('jaap_counts__count')
@@ -76,6 +80,8 @@ def home_view(request):
         home_stats = {
             'total_count': total_count,
             'user_count': user_count,
+            'jaap_today': jaap_today,
+            'users_today': users_today,
             'top_users': top_users,
             'top_cities': top_cities,
             'daily_counts': daily_counts,
@@ -85,13 +91,39 @@ def home_view(request):
     chart_labels = [count['date'].strftime('%b %d') for count in home_stats['daily_counts']]
     chart_data = [count['day_total'] for count in home_stats['daily_counts']]
 
+    # Small 4-point hero sparkline: users joined today, jaap done today,
+    # jaap total to date, users total to date. Values span a huge range
+    # (tens vs millions), so plot on a log scale — a plain linear scale
+    # would flatten the two "today" points to the baseline.
+    hero_points = [
+        ('New today', home_stats['users_today']),
+        ('Jaap today', home_stats['jaap_today']),
+        ('Jaap total', home_stats['total_count']),
+        ('Users total', home_stats['user_count']),
+    ]
+    scaled = [math.log1p(v) for _, v in hero_points]
+    lo, hi = min(scaled), max(scaled)
+    span = (hi - lo) or 1
+    width, height, pad = 260, 56, 10
+    hero_chart = []
+    for i, ((label, value), s) in enumerate(zip(hero_points, scaled)):
+        x = round(pad + i * (width - 2 * pad) / 3, 1)
+        y = round(pad + (1 - (s - lo) / span) * (height - 2 * pad), 1)
+        hero_chart.append({'label': label, 'value': value, 'x': x, 'y': y})
+
     context = {
         'total_count': home_stats['total_count'],
         'total_users': home_stats['user_count'],
+        'jaap_today': home_stats['jaap_today'],
+        'users_today': home_stats['users_today'],
         'top_users': home_stats['top_users'],
         'top_cities': home_stats['top_cities'],
         'chart_labels': json.dumps(chart_labels),
         'chart_data': json.dumps(chart_data),
+        'hero_chart': hero_chart,
+        'hero_chart_polyline': ' '.join(f"{p['x']},{p['y']}" for p in hero_chart),
+        'hero_chart_width': width,
+        'hero_chart_height': height,
         'show_home_jaap_map': settings.SHOW_HOME_JAAP_MAP,
     }
 

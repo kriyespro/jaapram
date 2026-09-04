@@ -38,6 +38,24 @@
         {% endif %}
     </section>
 
+    <!-- Small live-activity sparkline: today's joins/jaap next to all-time totals -->
+    <section class="bg-white rounded-2xl shadow-md p-4">
+        <svg viewBox="0 0 {{ hero_chart_width }} {{ hero_chart_height }}" class="w-full" style="max-height: 70px;" role="img" aria-label="Today and all-time activity">
+            <polyline points="{{ hero_chart_polyline }}" fill="none" stroke="var(--primary-color)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></polyline>
+            {% for p in hero_chart %}
+            <circle cx="{{ p.x }}" cy="{{ p.y }}" r="3.5" fill="var(--primary-color)"></circle>
+            {% endfor %}
+        </svg>
+        <div class="grid grid-cols-4 gap-1 text-center mt-1">
+            {% for p in hero_chart %}
+            <div>
+                <div class="font-bold text-gray-900 text-sm">{{ '{:,}'.format(p.value) }}</div>
+                <div class="text-xs text-gray-500 leading-tight">{{ p.label }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
     <!-- One big stat -->
     <section class="stat-card-big">
         <div class="stat-number">{{ '{:,}'.format(total_count) }}</div>
