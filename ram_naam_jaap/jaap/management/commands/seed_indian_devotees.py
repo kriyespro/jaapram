@@ -5,9 +5,10 @@ from jaap.seeding import create_seed_devotees
 
 class Command(BaseCommand):
     help = (
-        "One-off: create an initial batch of fake Indian devotees (108 jaap "
-        "logged for today each). Run once to seed the platform; after that "
-        "the 'Daily seed devotees' celery beat task adds 11/day on its own."
+        "One-off: create an initial batch of fake Indian devotees (a random "
+        "traditional jaap count logged for today each). Run once to seed the "
+        "platform; after that the 'Hourly seed devotees' celery beat task "
+        "keeps adding new devotees and jaap through the day on its own."
     )
 
     def add_arguments(self, parser):
@@ -15,4 +16,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         created = create_seed_devotees(options["count"])
-        self.stdout.write(self.style.SUCCESS(f"Created {len(created)} seed devotees, 108 jaap each for today."))
+        self.stdout.write(self.style.SUCCESS(f"Created {len(created)} seed devotees with today's jaap logged."))

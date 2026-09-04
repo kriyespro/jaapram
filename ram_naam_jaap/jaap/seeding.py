@@ -1,5 +1,5 @@
 """
-Fake-devotee seed data: shared by the initial seed command and the daily
+Fake-devotee seed data: shared by the initial seed command and the hourly
 celery task, so both stay in sync with one implementation.
 
 Seed users are marked by an @example.com email (same convention the older
@@ -9,6 +9,7 @@ change.
 """
 import random
 import secrets
+from zoneinfo import ZoneInfo
 
 from django.contrib.auth.models import User
 from django.core.cache import cache
@@ -23,8 +24,20 @@ from jaap.management.commands.generate_dummy_data import (
     INDIAN_CITIES,
 )
 
-DAILY_JAAP = 108
 SEED_EMAIL_DOMAIN = "example.com"
+IST = ZoneInfo("Asia/Kolkata")
+
+# Traditional japa counts — not a flat 108 for everyone. Weighted so 108 is
+# still the single most common value, but real variety shows up on the
+# leaderboard instead of a suspiciously identical number for every devotee.
+SACRED_COUNTS = [11, 21, 51, 108, 216, 501, 1008]
+SACRED_COUNT_WEIGHTS = [10, 10, 15, 35, 15, 10, 5]
+
+# Per-hour chance an as-yet-unlogged devotee gets today's jaap this run.
+# With an hourly cron, 1-(1-0.25)^24 ≈ 99.9% chance any given devotee is
+# covered well before the day ends; the last-hour force-flush below is the
+# backstop for that remaining ~0.1%.
+HOURLY_COVERAGE_PROBABILITY = 0.25
 
 
 def is_seed_user(user: User) -> bool:
@@ -33,6 +46,10 @@ def is_seed_user(user: User) -> bool:
 
 def seed_devotees_queryset():
     return User.objects.filter(email__endswith=f"@{SEED_EMAIL_DOMAIN}", is_active=True)
+
+
+def random_jaap_count():
+    return random.choices(SACRED_COUNTS, weights=SACRED_COUNT_WEIGHTS)[0]
 
 
 def _invalidate_stat_caches():
@@ -51,8 +68,8 @@ def _unique_username(first_name, last_name):
 
 
 def create_seed_devotees(count):
-    """Create `count` new fake devotees, each with a profile city and
-    today's 108 jaap already logged. Returns the list of created User rows."""
+    """Create `count` new fake devotees, each with a profile city and a
+    random japa count already logged for today. Returns the created Users."""
     today = timezone.now().date()
     created = []
     with transaction.atomic():
@@ -76,7 +93,7 @@ def create_seed_devotees(count):
     # cumulative_count stays 0 on these rows — only cosmetic, admin-only
     # display; the real totals everywhere else use Sum('count')).
     JaapCount.objects.bulk_create(
-        [JaapCount(user=u, date=today, count=DAILY_JAAP) for u in created],
+        [JaapCount(user=u, date=today, count=random_jaap_count()) for u in created],
         ignore_conflicts=True,
     )
     if created:
@@ -84,14 +101,18 @@ def create_seed_devotees(count):
     return created
 
 
-def run_daily_seed(new_devotees=11, jaap_per_devotee=DAILY_JAAP):
-    """The once-a-day cron job: add `new_devotees` fresh fake devotees, and
-    log `jaap_per_devotee` for every existing fake devotee that doesn't
-    already have an entry for today (safe to re-run — idempotent per day).
-    One bulk_create for all of it: lowest possible DB load for the size."""
-    today = timezone.now().date()
+def run_hourly_seed(new_devotee_range=(0, 2)):
+    """The once-an-hour cron job (see migration 0006): joins trickle in
+    across the day instead of arriving in one fixed daily batch, and each
+    devotee's jaap for the day is logged at a random hour with a random
+    traditional count (11/21/51/108/...), not a uniform 108 for everyone at
+    a fixed time. Safe to re-run any hour — only tops up devotees who don't
+    already have today's entry. One bulk query per run either way."""
+    now_ist = timezone.localtime(timezone.now(), IST)
+    today = now_ist.date()
+    is_last_hour_of_day = now_ist.hour == 23
 
-    new_users = create_seed_devotees(new_devotees)
+    new_users = create_seed_devotees(random.randint(*new_devotee_range))
     new_user_ids = {u.id for u in new_users}
 
     existing_ids = set(
@@ -104,14 +125,22 @@ def run_daily_seed(new_devotees=11, jaap_per_devotee=DAILY_JAAP):
     )
     due_ids = existing_ids - already_done_today
 
+    if is_last_hour_of_day:
+        # Backstop: everyone still missing today's jaap gets it now, so
+        # "all seed devotees jaap daily" holds even on an unlucky day.
+        chosen_ids = due_ids
+    else:
+        chosen_ids = {uid for uid in due_ids if random.random() < HOURLY_COVERAGE_PROBABILITY}
+
     JaapCount.objects.bulk_create(
-        [JaapCount(user_id=uid, date=today, count=jaap_per_devotee) for uid in due_ids],
+        [JaapCount(user_id=uid, date=today, count=random_jaap_count()) for uid in chosen_ids],
         ignore_conflicts=True,
     )
-    if due_ids:
+    if chosen_ids or new_users:
         _invalidate_stat_caches()
 
     return {
         "new_devotees": len(new_users),
-        "existing_devotees_updated": len(due_ids),
+        "existing_devotees_updated": len(chosen_ids),
+        "still_due_today": len(due_ids) - len(chosen_ids),
     }
