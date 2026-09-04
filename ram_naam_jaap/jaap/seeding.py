@@ -11,6 +11,7 @@ import random
 import secrets
 
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.db import transaction
 from django.utils import timezone
 
@@ -32,6 +33,13 @@ def is_seed_user(user: User) -> bool:
 
 def seed_devotees_queryset():
     return User.objects.filter(email__endswith=f"@{SEED_EMAIL_DOMAIN}", is_active=True)
+
+
+def _invalidate_stat_caches():
+    """New devotees / new jaap should show up immediately, not after the
+    leaderboard's 1-hour cache (or the home page's 60s one) expires."""
+    cache.delete('global_leaderboard')
+    cache.delete('home_page_stats')
 
 
 def _unique_username(first_name, last_name):
@@ -71,6 +79,8 @@ def create_seed_devotees(count):
         [JaapCount(user=u, date=today, count=DAILY_JAAP) for u in created],
         ignore_conflicts=True,
     )
+    if created:
+        _invalidate_stat_caches()
     return created
 
 
@@ -98,6 +108,8 @@ def run_daily_seed(new_devotees=11, jaap_per_devotee=DAILY_JAAP):
         [JaapCount(user_id=uid, date=today, count=jaap_per_devotee) for uid in due_ids],
         ignore_conflicts=True,
     )
+    if due_ids:
+        _invalidate_stat_caches()
 
     return {
         "new_devotees": len(new_users),

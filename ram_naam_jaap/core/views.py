@@ -82,6 +82,11 @@ def home_view(request):
         ).values('date_joined__date').annotate(day_count=Count('id')))
         new_users_by_date = {row['date_joined__date']: row['day_count'] for row in daily_new_users}
 
+        daily_active = list(JaapCount.objects.filter(
+            date__gte=seven_days_ago
+        ).values('date').annotate(active=Count('user', distinct=True)))
+        active_by_date = {row['date']: row['active'] for row in daily_active}
+
         # Baselines so day 1's cumulative line starts from the real running
         # total, not from zero — one aggregate query each, not per-day.
         baseline_jaap = JaapCount.objects.filter(date__lt=seven_days_ago).aggregate(
@@ -90,7 +95,7 @@ def home_view(request):
             is_active=True, date_joined__date__lt=seven_days_ago).count()
 
         date_range = [seven_days_ago + timedelta(days=i) for i in range(7)]
-        jaap_per_day, users_per_day, jaap_cumulative, users_cumulative = [], [], [], []
+        jaap_per_day, active_per_day, jaap_cumulative, users_cumulative = [], [], [], []
         running_jaap, running_users = baseline_jaap, baseline_users
         for d in date_range:
             day_jaap = day_total_by_date.get(d, 0)
@@ -98,7 +103,7 @@ def home_view(request):
             running_jaap += day_jaap
             running_users += day_users
             jaap_per_day.append(day_jaap)
-            users_per_day.append(day_users)
+            active_per_day.append(active_by_date.get(d, 0))
             jaap_cumulative.append(running_jaap)
             users_cumulative.append(running_users)
 
@@ -112,7 +117,7 @@ def home_view(request):
             'daily_counts': daily_counts,
             'date_range': date_range,
             'jaap_per_day': jaap_per_day,
-            'users_per_day': users_per_day,
+            'active_per_day': active_per_day,
             'jaap_cumulative': jaap_cumulative,
             'users_cumulative': users_cumulative,
         }
@@ -122,7 +127,10 @@ def home_view(request):
     chart_data = [count['day_total'] for count in home_stats['daily_counts']]
 
     # Hero mini chart: 4 lines, 4 independent data sources, last 7 days each —
-    # new users/day, jaap/day, cumulative jaap total, cumulative user total.
+    # devotees active/day, jaap/day, cumulative jaap total, cumulative user
+    # total. (New-users/day dropped: with only ~11 fake signups/day it read
+    # as an obviously flat/robotic line — active-devotee count moves more
+    # naturally since it reflects real+seed practice, not just signups.)
     # Each line is normalized against its own min/max (scales differ by
     # orders of magnitude), so every line uses the full chart height.
     width, height, pad = 260, 64, 6
@@ -140,7 +148,7 @@ def home_view(request):
         return pts
 
     hero_series = [
-        {'label': 'New users/day', 'color': '#3B82F6', 'values': home_stats['users_per_day']},
+        {'label': 'Active today', 'color': '#3B82F6', 'values': home_stats['active_per_day']},
         {'label': 'Jaap/day', 'color': '#10B981', 'values': home_stats['jaap_per_day']},
         {'label': 'Jaap total', 'color': '#FF9933', 'values': home_stats['jaap_cumulative']},
         {'label': 'Users total', 'color': '#EC4899', 'values': home_stats['users_cumulative']},
