@@ -13,7 +13,6 @@ import os
 import sys
 import django
 import json
-import math
 
 # Try to import optional dependencies
 try:
@@ -70,12 +69,38 @@ def home_view(request):
             user_count=Count('user')
         ).order_by('-user_count')[:5])
 
-        seven_days_ago = timezone.now().date() - timezone.timedelta(days=7)
+        seven_days_ago = today - timedelta(days=6)  # 7 points, today included
         daily_counts = list(JaapCount.objects.filter(
             date__gte=seven_days_ago
         ).values('date').annotate(
             day_total=Sum('count')
         ).order_by('date'))
+        day_total_by_date = {row['date']: row['day_total'] for row in daily_counts}
+
+        daily_new_users = list(User.objects.filter(
+            is_active=True, date_joined__date__gte=seven_days_ago
+        ).values('date_joined__date').annotate(day_count=Count('id')))
+        new_users_by_date = {row['date_joined__date']: row['day_count'] for row in daily_new_users}
+
+        # Baselines so day 1's cumulative line starts from the real running
+        # total, not from zero — one aggregate query each, not per-day.
+        baseline_jaap = JaapCount.objects.filter(date__lt=seven_days_ago).aggregate(
+            total=Sum('count'))['total'] or 0
+        baseline_users = User.objects.filter(
+            is_active=True, date_joined__date__lt=seven_days_ago).count()
+
+        date_range = [seven_days_ago + timedelta(days=i) for i in range(7)]
+        jaap_per_day, users_per_day, jaap_cumulative, users_cumulative = [], [], [], []
+        running_jaap, running_users = baseline_jaap, baseline_users
+        for d in date_range:
+            day_jaap = day_total_by_date.get(d, 0)
+            day_users = new_users_by_date.get(d, 0)
+            running_jaap += day_jaap
+            running_users += day_users
+            jaap_per_day.append(day_jaap)
+            users_per_day.append(day_users)
+            jaap_cumulative.append(running_jaap)
+            users_cumulative.append(running_users)
 
         home_stats = {
             'total_count': total_count,
@@ -85,31 +110,46 @@ def home_view(request):
             'top_users': top_users,
             'top_cities': top_cities,
             'daily_counts': daily_counts,
+            'date_range': date_range,
+            'jaap_per_day': jaap_per_day,
+            'users_per_day': users_per_day,
+            'jaap_cumulative': jaap_cumulative,
+            'users_cumulative': users_cumulative,
         }
         cache.set('home_page_stats', home_stats, 60)
 
     chart_labels = [count['date'].strftime('%b %d') for count in home_stats['daily_counts']]
     chart_data = [count['day_total'] for count in home_stats['daily_counts']]
 
-    # Small 4-point hero sparkline: users joined today, jaap done today,
-    # jaap total to date, users total to date. Values span a huge range
-    # (tens vs millions), so plot on a log scale — a plain linear scale
-    # would flatten the two "today" points to the baseline.
-    hero_points = [
-        ('New today', home_stats['users_today']),
-        ('Jaap today', home_stats['jaap_today']),
-        ('Jaap total', home_stats['total_count']),
-        ('Users total', home_stats['user_count']),
+    # Hero mini chart: 4 lines, 4 independent data sources, last 7 days each —
+    # new users/day, jaap/day, cumulative jaap total, cumulative user total.
+    # Each line is normalized against its own min/max (scales differ by
+    # orders of magnitude), so every line uses the full chart height.
+    width, height, pad = 260, 64, 6
+    n = len(home_stats['date_range'])
+    step = (width - 2 * pad) / (n - 1) if n > 1 else 0
+
+    def line_points(series):
+        lo, hi = min(series), max(series)
+        span = (hi - lo) or 1
+        pts = []
+        for i, v in enumerate(series):
+            x = round(pad + i * step, 1)
+            y = round(pad + (1 - (v - lo) / span) * (height - 2 * pad), 1)
+            pts.append((x, y))
+        return pts
+
+    hero_series = [
+        {'label': 'New users/day', 'color': '#3B82F6', 'values': home_stats['users_per_day']},
+        {'label': 'Jaap/day', 'color': '#10B981', 'values': home_stats['jaap_per_day']},
+        {'label': 'Jaap total', 'color': '#FF9933', 'values': home_stats['jaap_cumulative']},
+        {'label': 'Users total', 'color': '#EC4899', 'values': home_stats['users_cumulative']},
     ]
-    scaled = [math.log1p(v) for _, v in hero_points]
-    lo, hi = min(scaled), max(scaled)
-    span = (hi - lo) or 1
-    width, height, pad = 260, 56, 10
-    hero_chart = []
-    for i, ((label, value), s) in enumerate(zip(hero_points, scaled)):
-        x = round(pad + i * (width - 2 * pad) / 3, 1)
-        y = round(pad + (1 - (s - lo) / span) * (height - 2 * pad), 1)
-        hero_chart.append({'label': label, 'value': value, 'x': x, 'y': y})
+    for s in hero_series:
+        pts = line_points(s['values'])
+        s['polyline'] = ' '.join(f"{x},{y}" for x, y in pts)
+        s['last_x'], s['last_y'] = pts[-1]
+        s['latest'] = s['values'][-1]
 
     context = {
         'total_count': home_stats['total_count'],
@@ -120,8 +160,7 @@ def home_view(request):
         'top_cities': home_stats['top_cities'],
         'chart_labels': json.dumps(chart_labels),
         'chart_data': json.dumps(chart_data),
-        'hero_chart': hero_chart,
-        'hero_chart_polyline': ' '.join(f"{p['x']},{p['y']}" for p in hero_chart),
+        'hero_series': hero_series,
         'hero_chart_width': width,
         'hero_chart_height': height,
         'show_home_jaap_map': settings.SHOW_HOME_JAAP_MAP,

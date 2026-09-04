@@ -38,22 +38,24 @@
         {% endif %}
     </section>
 
-    <!-- Small live-activity sparkline: today's joins/jaap next to all-time totals -->
+    <!-- Small live-activity chart: 4 lines, 4 data sources, last 7 days -->
     <section class="bg-white rounded-2xl shadow-md p-4">
-        <svg viewBox="0 0 {{ hero_chart_width }} {{ hero_chart_height }}" class="w-full" style="max-height: 70px;" role="img" aria-label="Today and all-time activity">
-            <polyline points="{{ hero_chart_polyline }}" fill="none" stroke="var(--primary-color)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></polyline>
-            {% for p in hero_chart %}
-            <circle cx="{{ p.x }}" cy="{{ p.y }}" r="3.5" fill="var(--primary-color)"></circle>
+        <svg viewBox="0 0 {{ hero_chart_width }} {{ hero_chart_height }}" class="w-full" style="max-height: 80px;" role="img" aria-label="Last 7 days: new users, jaap per day, and running totals">
+            {% for s in hero_series %}
+            <polyline points="{{ s.polyline }}" fill="none" stroke="{{ s.color }}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></polyline>
+            <circle cx="{{ s.last_x }}" cy="{{ s.last_y }}" r="3" fill="{{ s.color }}"></circle>
             {% endfor %}
         </svg>
-        <div class="grid grid-cols-4 gap-1 text-center mt-1">
-            {% for p in hero_chart %}
-            <div>
-                <div class="font-bold text-gray-900 text-sm">{{ '{:,}'.format(p.value) }}</div>
-                <div class="text-xs text-gray-500 leading-tight">{{ p.label }}</div>
+        <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 mt-2">
+            {% for s in hero_series %}
+            <div class="flex items-center gap-1.5 min-w-0">
+                <span class="flex-shrink-0 h-2.5 w-2.5 rounded-full" style="background-color: {{ s.color }};"></span>
+                <span class="text-xs text-gray-500 truncate">{{ s.label }}</span>
+                <span class="text-xs font-bold text-gray-900 ml-auto">{{ '{:,}'.format(s.latest) }}</span>
             </div>
             {% endfor %}
         </div>
+        <div class="text-xs text-gray-400 text-center mt-2">Last 7 days</div>
     </section>
 
     <!-- One big stat -->
